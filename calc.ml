@@ -8,7 +8,7 @@ module StringHash = Hashtbl.Make(struct
 let vals = StringHash.create 10
 
 let rec eval = function 
-    Lit(x)            -> x
+    Liti(x)            -> x
   | Binop(e1, op, e2) ->
       let v1  = eval e1 in
       let v2 = eval e2 in
@@ -21,8 +21,9 @@ let rec eval = function
   | Assi(v, e) -> StringHash.add vals v (eval e); StringHash.find vals v
   | Seq(e1, e2) -> ignore (eval e1); eval e2
 
-let _ =
+(* let _ =
   let lexbuf = Lexing.from_channel stdin in
-  let expr = Parser.expr Scanner.tokenize lexbuf in
-  let result = eval expr in
-  print_endline (string_of_int result)
+  let expr = Parser.expr Scanner.tokenize lexbuf 
+  in print_endline expr *)
+  (* let result = eval expr in
+  print_endline (string_of_int result) *)

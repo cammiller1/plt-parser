@@ -9,6 +9,8 @@ rule tokenize = parse
 | "**" { EXP }
 | "and" { AND }
 | "or" { OR }
+| "++" { PP }
+| "--" { MM }
 | '%' { MOD }
 | '>' { GT }
 | '<' { LT }

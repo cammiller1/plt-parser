@@ -1,7 +1,7 @@
 %{ open Ast %}  
 //  Exp | Mod | Lt | Gt | Lte | Gte | Eq | Ne | And | Or
 
-%token ASSI PLUS MINUS TIMES DIVIDE EOF LT GT LTE GTE EQ NE AND OR MODULO EXPO SEQ PP MM
+%token ASSI PLUS MINUS TIMES DIVIDE EOF LT GT LTE GTE EQ NE AND OR MOD EXP SEQ PP MM 
 %token <int> ILITERAL
 %token <float> FLITERAL
 %token <string> VARIABLE
@@ -11,7 +11,7 @@
 %right ASSI
 %left LT GT LTE GTE EQ NE AND OR
 %left PLUS MINUS
-%left TIMES DIVIDE MODULO EXPO
+%left TIMES DIVIDE MOD EXP
 %left PP MM
 
 %start expr
@@ -32,8 +32,8 @@ expr:
 | VARIABLE ASSI expr { Assi($1, $3) }
 | expr LT expr       { Binop($1, Lt, $3) }
 | expr GT expr       { Binop($1, Gt, $3) }
-| expr EXPO expr     { Binop($1, Exp, $3) }
-| expr MODULO expr   { Binop($1, Mod, $3) }
+| expr EXP expr     { Binop($1, Exp, $3) }
+| expr MOD expr   { Binop($1, Mod, $3) }
 | expr LTE expr      { Binop($1, Lte, $3) }
 | expr GTE expr      { Binop($1, Gte, $3) }
 | expr EQ expr       { Binop($1, Eq, $3) }

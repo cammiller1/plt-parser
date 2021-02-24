@@ -1,13 +1,14 @@
 %{ open Ast %}  
 //  Exp | Mod | Lt | Gt | Lte | Gte | Eq | Ne | And | Or
 
-%token ASSI PLUS MINUS TIMES DIVIDE EOF LT GT LTE GTE EQ NE AND OR MOD EXP SEQ PP MM 
+%token ASSI PLUS MINUS TIMES DIVIDE EOF LT GT LTE GTE EQ NE AND OR MOD EXP SEMC PP MM 
+%token LPAREN RPAREN
 %token <int> ILITERAL
 %token <float> FLITERAL
 %token <string> VARIABLE
 %token <bool> BOOL
 
-%left SEQ
+// %left SEQ
 %right ASSI
 %left LT GT LTE GTE EQ NE AND OR
 %left PLUS MINUS
@@ -28,12 +29,12 @@ expr:
 | FLITERAL           { Litf($1) }
 | BOOL               { Bool($1) }
 | VARIABLE           { Var($1) }
-| expr SEQ expr      { Seq($1, $3) }
+| expr SEMC expr      { Seq($1, $3) }
 | VARIABLE ASSI expr { Assi($1, $3) }
 | expr LT expr       { Binop($1, Lt, $3) }
 | expr GT expr       { Binop($1, Gt, $3) }
-| expr EXP expr     { Binop($1, Exp, $3) }
-| expr MOD expr   { Binop($1, Mod, $3) }
+| expr EXP expr      { Binop($1, Exp, $3) }
+| expr MOD expr      { Binop($1, Mod, $3) }
 | expr LTE expr      { Binop($1, Lte, $3) }
 | expr GTE expr      { Binop($1, Gte, $3) }
 | expr EQ expr       { Binop($1, Eq, $3) }
@@ -42,6 +43,10 @@ expr:
 | expr OR expr       { Binop($1, Or, $3) }
 | expr PP            { Uniop($1, Pp) }
 | expr MM            { Uniop($1, Mm) }
+| LPAREN expr RPAREN { $2 }
+| IF expr
+| ELSE 
+| 
 
 
 

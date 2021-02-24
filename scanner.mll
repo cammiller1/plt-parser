@@ -30,6 +30,10 @@ rule tokenize = parse
 | '/'     { DIVIDE }
 | ';'     { SEMC }
 | '='     { ASSI }
+| '('     { LPAREN }
+| ')'     { RPAREN }
+| '{'     { LBRAC }
+| '}'     { RBRAC }
 | "if"    { IF }
 | "else"  { ELSE }
 | "elif"  { ELIF }

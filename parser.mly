@@ -2,7 +2,8 @@
 //  Exp | Mod | Lt | Gt | Lte | Gte | Eq | Ne | And | Or
 
 %token ASSI PLUS MINUS TIMES DIVIDE EOF LT GT LTE GTE EQ NE AND OR MOD EXP SEMC PP MM 
-%token LPAREN RPAREN
+%token IF ELSE ELIF WHILE
+%token LPAREN RPAREN RBRACE LBRACE 
 %token <int> ILITERAL
 %token <float> FLITERAL
 %token <string> VARIABLE
@@ -29,7 +30,7 @@ expr:
 | FLITERAL           { Litf($1) }
 | BOOL               { Bool($1) }
 | VARIABLE           { Var($1) }
-| expr SEMC expr      { Seq($1, $3) }
+// | expr SEMC expr     { Seq($1, $3) }
 | VARIABLE ASSI expr { Assi($1, $3) }
 | expr LT expr       { Binop($1, Lt, $3) }
 | expr GT expr       { Binop($1, Gt, $3) }
@@ -44,9 +45,17 @@ expr:
 | expr PP            { Uniop($1, Pp) }
 | expr MM            { Uniop($1, Mm) }
 | LPAREN expr RPAREN { $2 }
-| IF expr
-| ELSE 
 | 
+
+stmt://
+  IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE LBRACE stmt RBRACE
+|// IF LPAREN expr RPAREN  {error} //
+| RBRACE ELSE LBRACE stmt RBRACE// to be implemented
+| LBRACE stmt RBRACE   { ... }//to be implemented
+| //FOR...to be implemented
+| //WHILEto be implemented
+
+ //types
 
 
 

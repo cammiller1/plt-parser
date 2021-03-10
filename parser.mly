@@ -1,6 +1,8 @@
 %{ open Ast %}  
 //  Exp | Mod | Lt | Gt | Lte | Gte | Eq | Ne | And | Or
 
+/* Declarations: tokens, precendence, etc. */
+
 %token ASSI PLUS MINUS TIMES DIVIDE EOF LT GT LTE GTE EQ NE AND OR MOD EXP SEMC PP MM 
 %token IF ELSE ELIF WHILE
 %token LPAREN RPAREN RBRACE LBRACE 
@@ -9,17 +11,19 @@
 %token <string> VARIABLE
 %token <bool> BOOL
 
-// %left SEQ
+/* lowest to highest precedence */
+%left SEQ
 %right ASSI
 %left LT GT LTE GTE EQ NE AND OR
 %left PLUS MINUS
 %left TIMES DIVIDE MOD EXP
 %left PP MM
 
-%start expr
+%start expr  /* the entry point */
 %type <Ast.expr> expr
 
 %%
+/* Rules: context-free rules */
 
 expr:
   expr PLUS   expr   { Binop($1, Add, $3) }

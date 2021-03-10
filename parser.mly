@@ -18,6 +18,7 @@
 %left PLUS MINUS
 %left TIMES DIVIDE MOD EXP
 %left PP MM
+%nonassoc UMINUS
 
 %start expr  /* the entry point */
 %type <Ast.expr> expr
@@ -49,7 +50,7 @@ expr:
 | expr PP            { Uniop($1, Pp) }
 | expr MM            { Uniop($1, Mm) }
 | LPAREN expr RPAREN { $2 }
-| 
+| MINUS expr %prec UMINUS { - $2 }
 
 stmt://
   IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE LBRACE stmt RBRACE

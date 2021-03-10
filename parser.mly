@@ -3,7 +3,7 @@
 
 /* Declarations: tokens, precendence, etc. */
 
-%token ASSI PLUS MINUS TIMES DIVIDE EOF LT GT LTE GTE EQ NE AND OR MOD EXP SEMC PP MM 
+%token ASSI PLUS MINUS TIMES DIVIDE LT GT LTE GTE EQ NE AND OR MOD EXP SEMC PP MM EOF
 %token IF ELSE ELIF WHILE
 %token LPAREN RPAREN RBRACE LBRACE 
 %token <int> ILITERAL
@@ -20,11 +20,15 @@
 %left PP MM
 %nonassoc UMINUS
 
-%start expr  /* the entry point */
-%type <Ast.expr> expr
+%start main  /* the entry point */
+%type <int> main
+/*%type <Ast.expr> expr*/
 
 %%
 /* Rules: context-free rules */
+
+main:
+	expr EOF	{ $1 }
 
 expr:
   expr PLUS   expr   { Binop($1, Add, $3) }

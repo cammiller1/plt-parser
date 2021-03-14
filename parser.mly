@@ -3,14 +3,15 @@
 
 /* Declarations: tokens, precendence, etc. */
 
-%token ASSIGN PLUS MINUS TIMES DIVIDE LT GT LTE GTE EQ NE AND OR MOD EXP SEMC PP MM 
+%token ASSIGN PLUS MINUS TIMES DIVIDE LT GT LTE GTE EQ NE AND OR MOD  
+%token EXP SEMC PP MM
 %token IF ELSE /*ELIF*/ WHILE FOR DEF RETURN
 %token LPAREN RPAREN RBRACE LBRACE COMMA
 %token INT FLOAT BOOL STRING /*ARRAY OF*/
 %token <int> ILITERAL
 %token <float> FLITERAL
 %token <string> VARIABLE
-%token <bool> BOOL
+%token <bool> BLITERAL
 %token EOF
 
 /* lowest to highest precedence */

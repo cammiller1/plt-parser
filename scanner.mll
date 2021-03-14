@@ -2,13 +2,15 @@
 
 let letter = ['a'-'z' 'A'-'Z']
 let digit = ['0'-'9']
-let float = (['0'-'9']*'.'['0'-'9']+|['0'-'9']+'.'['0'-'9']*)
+let float = digit*'.'digit+|digit+'.'digit*
 
 rule tokenize = parse
  [' ' '\t' '\r' '\n'] { tokenize lexbuf }
 | digit+ as lit { ILITERAL(int_of_string lit) }
-| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*  as var { VARIABLE(var) }
+| letter['a'-'z' 'A'-'Z' '0'-'9' '_']*  as var { VARIABLE(var) }
 | float as flt { FLITERAL(float_of_string flt) }
+| "True"  { BLITERAL (true) }
+| "False" { BLITERAL (false) }
 | "int"   { INT }
 | "float" { FLOAT }
 | "bool"  { BOOL }

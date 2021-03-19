@@ -71,8 +71,8 @@ expr:
   | expr NE expr       { Binop($1, Ne, $3) }
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
-  | expr PP            { Uniop($1, Pp) }
-  | expr MM            { Uniop($1, Mm) }
+  | PP expr            { Uniop(Pp, $2) }
+  | MM expr            { Uniop(Mm, $2) }
   | LPAREN expr RPAREN { $2 }
   | MINUS expr %prec UMINUS { Uniop(Neg, $2) }
 

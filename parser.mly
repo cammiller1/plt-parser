@@ -36,8 +36,8 @@ program:
 	something EOF	{ $1 }
 
 something:
-    vdecl { $1 }
-  | fdecl { $1 }
+    vdecl { }
+  | fdecl { }
   | expr { $1 }
   | stmt { $1 }
 

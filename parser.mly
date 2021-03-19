@@ -41,12 +41,12 @@ something:
   | stmt { $1 }
 
 
-type: 
+typ: 
   INT                { Int }
   | FLOAT            { Float }
   | BOOL             { Boolean }
   | STRING           { String }
-  /*/  | ARRAY OF T = type { TypArray t }
+  /*/  | ARRAY OF T = typ { TypArray t }
 */
 
 
@@ -87,8 +87,8 @@ stmt:
 
 
 fdecl:
-  DEF type VARIABLE LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
-  { { type = $2;
+  DEF typ VARIABLE LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+  { { typ = $2;
   fname = $3;
   formals = List.rev $5;
   body = List.rev $8 } } 
@@ -98,8 +98,8 @@ formals_opt:
   | formal_list { $1 } 
 
 formal_list:
-  type VARIABLE { [($1,$2)] }
-  | formal_list COMMA type VARIABLE { ($3,$4) :: $1 } 
+  typ VARIABLE { [($1,$2)] }
+  | formal_list COMMA typ VARIABLE { ($3,$4) :: $1 } 
 
 stmt_list:
   /* nothing */ { [] }

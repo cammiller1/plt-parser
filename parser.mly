@@ -28,7 +28,7 @@ open Ast
 %nonassoc UMINUS
 
 %start program  /* the entry point */
-%type <Ast.expr> program
+%type <Ast.program> program
 
 %%
 /* Rules: context-free rules */
@@ -60,6 +60,7 @@ expr:
   | expr DIVIDE expr   { Binop($1, Div, $3) }
   | ILITERAL           { Liti($1) }
   | FLITERAL           { Litf($1) }
+  | BLITERAL           { Litb($1) }
   | VARIABLE           { Var($1) }
   | VARIABLE ASSIGN expr { Assi($1, $3) }
   | expr LT expr       { Binop($1, Lt, $3) }

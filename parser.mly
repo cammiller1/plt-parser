@@ -40,6 +40,7 @@ something:
   expr { $1 }
   | stmt { $1 }
   | vdecl { }
+  | fdecl { }
 
 /* 4 rules never reduced in here */
 typ: 
@@ -87,7 +88,7 @@ stmt:
   | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
 
 
-/* fdecl:
+fdecl:
   DEF typ VARIABLE LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
   { { typ = $2;
   fname = $3;
@@ -105,4 +106,3 @@ formal_list:
 stmt_list:
    { [] }
   | stmt_list stmt { $2 :: $1 } 
-*/

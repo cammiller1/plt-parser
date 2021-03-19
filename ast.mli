@@ -9,7 +9,7 @@ type bind = typ * string
 
 type expr =
     Liti of int
-  | Litf of string
+  | Litf of float
   | Litb of bool
   | Var of string
   | Binop of expr * operator * expr

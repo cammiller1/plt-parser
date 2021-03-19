@@ -1,6 +1,12 @@
 
 # "ocamlbuild jpie.native" will also build the calculator
 
+# "make test" Compiles everything and runs the regression tests
+#.PHONY : test
+#test : testall.sh
+#	./testall.sh
+
+.PHONY : all
 all: scanner.ml parser.ml parser.mli
 #%.cmo : %.ml
 #	ocamlc -c $<

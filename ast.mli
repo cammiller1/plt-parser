@@ -12,8 +12,8 @@ type expr =
   | Litf of string
   | Litb of bool
   | Var of string
-  | Binop of expr * op * expr
-  | Uniop of uop * expr
+  | Binop of expr * operator * expr
+  | Uniop of unary_operator * expr
   | Assign of string * expr
 
 type stmt =

@@ -33,13 +33,12 @@
 /* Rules: context-free rules */
 
 program:
-	something EOF	{ $1 }
+  decls EOF { $1 }
 
-something:
-    vdecl { }
-  | fdecl { }
-  | expr { $1 }
-  | stmt { $1 }
+decls:
+   /* nothing */ { ([], [])               }
+ | decls vdecl { (($2 :: fst $1), snd $1) }
+ | decls fdecl { (fst $1, ($2 :: snd $1)) }
 
 typ: 
     INT                { Int }

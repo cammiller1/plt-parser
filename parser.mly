@@ -1,5 +1,6 @@
-%{ open Ast %}  
-//  Exp | Mod | Lt | Gt | Lte | Gte | Eq | Ne | And | Or
+%{
+open Ast
+%}
 
 /* Declarations: tokens, precendence, etc. */
 

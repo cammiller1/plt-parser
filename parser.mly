@@ -57,7 +57,6 @@ expr:
   | expr DIVIDE expr   { Binop($1, Div, $3) }
   | ILITERAL           { Liti($1) }
   | FLITERAL           { Litf($1) }
-  | BOOL               { Bool($1) }
   | VARIABLE           { Var($1) }
   | VARIABLE ASSIGN expr { Assi($1, $3) }
   | expr LT expr       { Binop($1, Lt, $3) }

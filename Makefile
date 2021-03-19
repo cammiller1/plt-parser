@@ -5,8 +5,8 @@
 #test : testall.sh
 #	./testall.sh
 
-jpie: parser.cmo scanner.cmo jpie.cmo
-	ocamlc -o jpie $^
+jpie: parser.cmo scanner.cmo ast.cmo
+	ocamlc -o ast $^
 
 %.cmo : %.ml
 	ocamlc -c $<
@@ -21,16 +21,16 @@ parser.ml parser.mli : parser.mly
 	ocamlyacc $^
 
 # Depedencies from ocamldep
-jpie.cmo : scanner.cmo parser.cmi ast.cmi
-jpie.cmx : scanner.cmx parser.cmx ast.cmi
+ast.cmo : scanner.cmo parser.cmi ast.cmi
+ast.cmx : scanner.cmx parser.cmx ast.cmi
 parser.cmo : ast.cmi parser.cmi
 parser.cmx : ast.cmi parser.cmi
 scanner.cmo : parser.cmi
 scanner.cmx : parser.cmx
 
 # need for printing
-jpie.out : jpie jpie.tb
-	./jpie < jpie.tb > jpie.out
+ast.out : ast ast.tb
+	./ast < ast.tb > ast.out
 
 ##############################
 

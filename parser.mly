@@ -28,7 +28,7 @@ open Ast
 %nonassoc UMINUS
 
 %start program  /* the entry point */
-%type <Ast.program> program
+%type <Ast.expr> program
 
 %%
 /* Rules: context-free rules */

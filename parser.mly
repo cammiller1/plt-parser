@@ -62,7 +62,7 @@ expr:
   | FLITERAL           { Litf($1) }
   | BLITERAL           { Litb($1) }
   | VARIABLE           { Var($1) }
-  | VARIABLE ASSIGN expr { Assi($1, $3) }
+  | VARIABLE ASSIGN expr { Assign($1, $3) }
   | expr LT expr       { Binop($1, Lt, $3) }
   | expr GT expr       { Binop($1, Gt, $3) }
   | expr EXP expr      { Binop($1, Exp, $3) }
@@ -96,7 +96,7 @@ fdecl:
   body = List.rev $8 } } 
 
 formals_opt:
-   { [] }
+    /* nothing */ { [] }
   | formal_list { $1 } 
 
 formal_list:
@@ -104,5 +104,5 @@ formal_list:
   | formal_list COMMA typ VARIABLE { ($3,$4) :: $1 } 
 
 stmt_list:
-   { [] }
+    /* nothing */ { [] }
   | stmt_list stmt { $2 :: $1 } 

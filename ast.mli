@@ -11,9 +11,25 @@ type expr =
     Liti of int
   | Litf of string
   | Litb of bool
-  | Id of string
+  | Var of string
   | Binop of expr * op * expr
-  | Unop of uop * expr
+  | Uniop of uop * expr
   | Assign of string * expr
   | Call of string * expr list
-  | Noexpr
+
+type stmt =
+    Block of stmt list
+  | Expr of expr
+  | Return of expr
+  | If of expr * stmt * stmt
+  | For of expr * expr * expr * stmt
+  | While of expr * stmt
+
+type func_decl = {
+    typ : typ;
+    fname : string;
+    formals : bind list;
+    body : stmt list;
+ }
+
+ type program = bind list * func_decl list

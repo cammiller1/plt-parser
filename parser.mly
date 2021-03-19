@@ -32,17 +32,15 @@
 %%
 /* Rules: context-free rules */
 
-
 program:
 	something EOF	{ $1 }
 
-something: 
-  expr { $1 }
-  | stmt { $1 }
-  | vdecl { }
+something:
+    vdecl { }
   | fdecl { }
+  | expr { $1 }
+  | stmt { $1 }
 
-/* 4 rules never reduced in here */
 typ: 
     INT                { Int }
   | FLOAT            { Float }

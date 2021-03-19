@@ -15,7 +15,6 @@ type expr =
   | Binop of expr * op * expr
   | Uniop of uop * expr
   | Assign of string * expr
-  | Call of string * expr list
 
 type stmt =
     Block of stmt list
@@ -30,6 +29,6 @@ type func_decl = {
     fname : string;
     formals : bind list;
     body : stmt list;
- }
+}
 
- type program = bind list * func_decl list
+type program = bind list * func_decl list

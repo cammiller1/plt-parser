@@ -5,7 +5,7 @@
 #test : testall.sh
 #	./testall.sh
 
-jpie: parser.ml parser.mli scanner.ml jpie.cmo
+jpie: parser.cmo scanner.cmo jpie.cmo
 	ocamlc -o jpie $^
 
 %.cmo : %.ml

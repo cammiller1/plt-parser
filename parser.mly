@@ -1,6 +1,4 @@
-%{
-open Ast
-%}
+%{ open Ast %}
 
 /* Declarations: tokens, precendence, etc. */
 
@@ -18,6 +16,7 @@ open Ast
 /* lowest to highest precedence */
 %nonassoc NOELSE
 %nonassoc ELSE
+%nonassoc UMINUS
 %right ASSIGN
 %left AND OR
 %left EQ NE
@@ -25,10 +24,10 @@ open Ast
 %left PLUS MINUS
 %left TIMES DIVIDE MOD EXP
 %left PP MM
-%nonassoc UMINUS
 
 %start program  /* the entry point */
 %type <Ast.program> program
+
 
 %%
 /* Rules: context-free rules */

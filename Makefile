@@ -1,4 +1,3 @@
-
 # "ocamlbuild jpie.native" will also build the calculator
 
 # "make test" Compiles everything and runs the regression tests
@@ -6,14 +5,13 @@
 #test : testall.sh
 #	./testall.sh
 
-jpie : parser.cmo scanner.cmo jpie.cmo
-	ocamlc -o jpie $^
+.PHONY : all
+all: parser.ml parser.mli scanner.ml 
+#%.cmo : %.ml
+#	ocamlc -c $<
 
-%.cmo : %.ml
-	ocamlc -c jpie $^
-
-%.cmi : %.mli
-	ocamlc -c $<
+#%.cmi : %.mli
+#	ocamlc -c $<
 
 scanner.ml : scanner.mll
 	ocamllex $^
@@ -21,17 +19,13 @@ scanner.ml : scanner.mll
 parser.ml parser.mli : parser.mly
 	ocamlyacc $^
 
-# need for printing
-jpie.out : jpie jpie.tb
-	./jpie < jpie.tb > jpie.out
-
 # Depedencies from ocamldep
-jpie.cmo : scanner.cmo parser.cmi microc_ast.cmi
-jpie.cmx : scanner.cmx parser.cmx microc_ast.cmi
-parser.cmo : microc_ast.cmi parser.cmi
-parser.cmx : microc_ast.cmi parser.cmi
-scanner.cmo : parser.cmi
-scanner.cmx : parser.cmx
+#calc.cmo : scanner.cmo parser.cmi ast.cmi
+#calc.cmx : scanner.cmx parser.cmx ast.cmi
+#parser.cmo : ast.cmi parser.cmi
+#parser.cmx : ast.cmi parser.cmi
+#scanner.cmo : parser.cmi
+#scanner.cmx : parser.cmx
 
 
 ##############################

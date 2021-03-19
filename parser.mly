@@ -39,16 +39,19 @@ program:
 something: 
   expr { $1 }
   | stmt { $1 }
+  | vdecl { }
 
-
+/* 4 rules never reduced in here */
 typ: 
-  INT                { Int }
+    INT                { Int }
   | FLOAT            { Float }
   | BOOL             { Boolean }
   | STRING           { String }
   /*/  | ARRAY OF T = typ { TypArray t }
 */
 
+vdecl:
+   typ VARIABLE SEMC { ($1, $2) }
 
 expr:
     expr PLUS   expr   { Binop($1, Add, $3) }
@@ -82,10 +85,9 @@ stmt:
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE LBRACE stmt RBRACE { If($3, $6, $10)}
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 
   | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
-// | ELIF // to be implemented
 
 
-fdecl:
+/* fdecl:
   DEF typ VARIABLE LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
   { { typ = $2;
   fname = $3;
@@ -93,7 +95,7 @@ fdecl:
   body = List.rev $8 } } 
 
 formals_opt:
-  /* nothing */ { [] }
+   { [] }
   | formal_list { $1 } 
 
 formal_list:
@@ -101,5 +103,6 @@ formal_list:
   | formal_list COMMA typ VARIABLE { ($3,$4) :: $1 } 
 
 stmt_list:
-  /* nothing */ { [] }
+   { [] }
   | stmt_list stmt { $2 :: $1 } 
+*/

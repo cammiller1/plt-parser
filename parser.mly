@@ -4,7 +4,7 @@
 
 %token ASSIGN PLUS MINUS TIMES DIVIDE LT GT LTE GTE EQ NE AND OR MOD  
 %token EXP SEMC PP MM
-%token IF ELSE /*ELIF*/ WHILE FOR DEF RETURN
+%token IF ELSE ELIF WHILE FOR DEF RETURN
 %token LPAREN RPAREN RBRACE LBRACE COMMA
 %token INT FLOAT BOOL STRING /*ARRAY OF*/
 %token <int> ILITERAL
@@ -16,7 +16,7 @@
 /* lowest to highest precedence */
 %nonassoc NOELSE
 %nonassoc ELSE
-%nonassoc UMINUS
+%right UMINUS
 %right ASSIGN
 %left AND OR
 %left EQ NE

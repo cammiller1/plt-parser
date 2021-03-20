@@ -1,31 +1,32 @@
-open Ast
+(* Top-level of the Jpie compiler: scan & parse the input,
+   check the resulting AST and generate an SAST from it, generate LLVM IR,
+   and dump the module *)
 
-module StringHash = Hashtbl.Make(struct
-  type t = string
-  let equal x y = x = y
-  let hash = Hashtbl.hash
-end);;
+type action = Ast | Sast | LLVM_IR | Compile
 
-let vals = StringHash.create 10;;
-
-let rec eval = function 
-    Lit(x)           -> x
-  | Var(x)           -> StringHash.find vals x
-  | Assnop(e1, e2)   ->
-      StringHash.add vals e1 (eval e2);
-      StringHash.find vals e1;
-  | Binop(e1, op, e2) ->
-      let v1  = eval e1 in
-      let v2 = eval e2 in
-      (match op with
-	Add -> v1 + v2
-      | Sub -> v1 - v2
-      | Mul -> v1 * v2
-      | Div -> v1 / v2
-      | Seq -> v2)
-
-let _ =
-  let lexbuf = Lexing.from_channel stdin in
-  let expr = Parser.expr Scanner.tokenize lexbuf in
-  let result = eval expr in
-  print_endline (string_of_int result)
+let () =
+  let action = ref Compile in
+  let set_action a () = action := a in
+  let speclist = [
+    ("-a", Arg.Unit (set_action Ast), "Print the AST");
+    ("-s", Arg.Unit (set_action Sast), "Print the SAST");
+    ("-l", Arg.Unit (set_action LLVM_IR), "Print the generated LLVM IR");
+    ("-c", Arg.Unit (set_action Compile),
+      "Check and print the generated LLVM IR (default)");
+  ] in  
+  let usage_msg = "usage: ./jpie.native [-a|-s|-l|-c] [file.jpie]" in
+  let channel = ref stdin in
+  Arg.parse speclist (fun filename -> channel := open_in filename) usage_msg;
+  
+  let lexbuf = Lexing.from_channel !channel in
+  let ast = Parser.program Scanner.token lexbuf in 
+  match !action with
+    Ast -> print_string (Ast.string_of_program ast)
+  | _ -> let sast = Semant.check ast in
+    match !action with
+      Ast     -> ()
+    | Sast    -> print_string (Sast.string_of_sprogram sast)
+    | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate sast))
+    | Compile -> let m = Codegen.translate sast in
+  Llvm_analysis.assert_valid_module m;
+  print_string (Llvm.string_of_llmodule m)

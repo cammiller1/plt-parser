@@ -1,31 +1,35 @@
 open Ast
 
-module StringHash = Hashtbl.Make(struct
-  type t = string
-  let equal x y = x = y
-  let hash = Hashtbl.hash
-end);;
+let string_of_op = function
+    Add -> "+"
+  | Sub -> "-"
+  | Mul -> "*"
+  | Div -> "/"
+  | Eq -> "=="
+  | Ne -> "!="
+  | Lt -> "<"
+  | Lte -> "<="
+  | Gt -> ">"
+  | Gte -> ">="
+  | And -> "&&"
+  | Or -> "||"
 
-let vals = StringHash.create 10;;
+let string_of_uop = function
+    Neg -> "-"
 
-let rec eval = function 
-    Lit(x)           -> x
-  | Var(x)           -> StringHash.find vals x
-  | Assnop(e1, e2)   ->
-      StringHash.add vals e1 (eval e2);
-      StringHash.find vals e1;
-  | Binop(e1, op, e2) ->
-      let v1  = eval e1 in
-      let v2 = eval e2 in
-      (match op with
-	Add -> v1 + v2
-      | Sub -> v1 - v2
-      | Mul -> v1 * v2
-      | Div -> v1 / v2
-      | Seq -> v2)
+let rec string_of_expr = function
+    Liti(l) -> string_of_int l
+  | Litf(l) -> string_of_float l
+  | Litb(true) -> "true"
+  | Litb(false) -> "false"
+  | Var(s) -> s
+  | Binop(e1, o, e2) ->
+      string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
+  | Uniop(o, e) -> string_of_uop o ^ string_of_expr e
+  | Assign(v, e) -> v ^ " = " ^ string_of_expr e
 
 let _ =
   let lexbuf = Lexing.from_channel stdin in
   let expr = Parser.expr Scanner.tokenize lexbuf in
-  let result = eval expr in
-  print_endline (string_of_int result)
+  let result = string_of_expr expr in
+  print_endline (result)

@@ -15,7 +15,7 @@ rule tokenize = parse
 | "int"   { INT }
 | "float" { FLOAT }
 | "bool"  { BOOL }
-| "string"{ STRING }
+| "string" { STRING }
 | ","     { COMMA }
 | "=="    { EQ }
 | "=<"    { LTE }
@@ -45,10 +45,10 @@ rule tokenize = parse
 | "while" { WHILE }
 | "for"   { FOR }
 | "def"   { DEF }
-| "return"{ RETURN }
+| "return" { RETURN }
 | eof     { EOF }
 | _ as char { raise (Failure("illegal character" ^ Char.escaped char)) } 
 
-and comment = parse 
- "##" 		{ token lexbuf }
- | _        { comment lexbuf }
+and comment = parse
+  "##" { tokenize lexbuf }
+| _    { comment lexbuf }

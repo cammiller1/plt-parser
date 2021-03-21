@@ -73,7 +73,15 @@ expr:
   | expr OR expr       { Binop($1, Or, $3) }
   | LPAREN expr RPAREN { $2 }
   | MINUS expr %prec UMINUS { Uniop(Neg, $2) }
+  | VARIABLE LPAREN args_opt RPAREN { Call($1, $3)  }
 
+args_opt:
+    /* nothing */ { [] }
+  | args_list  { List.rev $1 }
+
+args_list:
+    expr                    { [$1] }
+  | args_list COMMA expr { $3 :: $1 }
 
 stmt:
     expr SEMC { Expr $1 }
@@ -82,7 +90,6 @@ stmt:
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE LBRACE stmt RBRACE { If($3, $6, $10)}
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 
   | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
-
 
 fdecl:
   DEF typ VARIABLE LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
@@ -113,7 +120,7 @@ also need table for variable (think like hw 1)
 
 symbol table stuff done in codegen file
 
-things to add: arrays, slicing
+possible things to add: arrays, slicing
 ex: arr[1:2]
 ex: arr[1:4:2]
 */

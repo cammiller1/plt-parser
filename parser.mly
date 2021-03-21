@@ -102,3 +102,18 @@ formal_list:
 stmt_list:
     /* nothing */ { [] }
   | stmt_list stmt { $2 :: $1 } 
+
+/* add function call logic 
+put the function with its argument into a table
+- put locals back into fdecl file
+user-defined function calls and builtins treated the same
+check if function call is valid (built in, previously declare)
+built-in functions should be stored in sybmol table
+also need table for variable (think like hw 1)
+
+symbol table stuff done in codegen file
+
+things to add: arrays, slicing
+ex: arr[1:2]
+ex: arr[1:4:2]
+*/

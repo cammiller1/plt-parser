@@ -115,7 +115,7 @@ vdecl_list:
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
-   typ VARIABLE SEMI { ($1, $2) }
+   typ ID SEMC { ($1, $2) }
 
 
 

@@ -33,9 +33,10 @@ type token =
   | FLOAT
   | BOOL
   | STRING
+  | VOID
   | ILITERAL of (int)
   | FLITERAL of (float)
-  | VARIABLE of (string)
+  | ID of (string)
   | BLITERAL of (bool)
   | EOF
 

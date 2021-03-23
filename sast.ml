@@ -10,6 +10,7 @@ type sx =
   | SBinop of sexpr * op * sexpr
   | SUniop of uop * sexpr
   | SAssign of string * sexpr
+  | SCall of string * sexpr list
 
 type sstmt =
     SBlock of sstmt list

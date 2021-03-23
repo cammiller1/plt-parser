@@ -9,7 +9,7 @@
 %token INT FLOAT BOOL STRING VOID /*ARRAY OF*/
 %token <int> ILITERAL
 %token <float> FLITERAL
-%token <string> VARIABLE
+%token <string> ID
 %token <bool> BLITERAL
 %token EOF
 
@@ -31,7 +31,6 @@
 
 %%
 /* Rules: context-free rules */
-/* NOTE: think of variable as ID/identified */
 
 program:
   decls EOF { $1 }
@@ -52,10 +51,10 @@ typ:
 */
 
 fcall:
-  VARIABLE LPAREN args_opt RPAREN { Call($1, $3)  }
+  ID LPAREN args_opt RPAREN { Call($1, $3)  }
 
 vdecl:
-   typ VARIABLE SEMC { ($1, $2) }
+   typ ID SEMC { ($1, $2) }
 
 expr:
     expr PLUS   expr   { Binop($1, Add, $3) }
@@ -65,8 +64,8 @@ expr:
   | ILITERAL           { Liti($1) }
   | FLITERAL           { Litf($1) }
   | BLITERAL           { Litb($1) }
-  | VARIABLE           { Var($1) }
-  | VARIABLE ASSIGN expr { Assign($1, $3) }
+  | ID           { Var($1) }
+  | ID ASSIGN expr { Assign($1, $3) }
   | expr LT expr       { Binop($1, Lt, $3) }
   | expr GT expr       { Binop($1, Gt, $3) }
   | expr EXP expr      { Binop($1, Exp, $3) }
@@ -105,7 +104,7 @@ stmt_list:
   | stmt_list stmt { $2 :: $1 } 
 
 fdecl:
-  DEF typ VARIABLE LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
+  DEF typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
   { { typ = $2;
   fname = $3;
   formals = List.rev $5;
@@ -117,8 +116,8 @@ formals_opt:
   | formal_list { $1 } 
 
 formal_list:
-  typ VARIABLE { [($1,$2)] }
-  | formal_list COMMA typ VARIABLE { ($3,$4) :: $1 } 
+  typ ID { [($1,$2)] }
+  | formal_list COMMA typ ID { ($3,$4) :: $1 } 
 
 vdecl_list:
     /* nothing */    { [] }

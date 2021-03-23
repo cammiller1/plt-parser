@@ -76,6 +76,10 @@ expr:
   | MINUS expr %prec UMINUS { Uniop(Neg, $2) }
   | VARIABLE LPAREN args_opt RPAREN { Call($1, $3)  }
 
+expr_opt:
+    /* nothing */ { Noexpr }
+  | expr          { $1 }
+
 args_opt:
     /* nothing */ { [] }
   | args_list  { List.rev $1 }
@@ -92,12 +96,17 @@ stmt:
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 
   | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
 
+stmt_list:
+    /* nothing */ { [] }
+  | stmt_list stmt { $2 :: $1 } 
+
 fdecl:
-  DEF typ VARIABLE LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+  DEF typ VARIABLE LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
   { { typ = $2;
   fname = $3;
   formals = List.rev $5;
-  body = List.rev $8 } } 
+  locals = List.rev $8;
+  body = List.rev $9 } } 
 
 formals_opt:
     /* nothing */ { [] }
@@ -107,9 +116,14 @@ formal_list:
   typ VARIABLE { [($1,$2)] }
   | formal_list COMMA typ VARIABLE { ($3,$4) :: $1 } 
 
-stmt_list:
-    /* nothing */ { [] }
-  | stmt_list stmt { $2 :: $1 } 
+vdecl_list:
+    /* nothing */    { [] }
+  | vdecl_list vdecl { $2 :: $1 }
+
+vdecl:
+   typ VARIABLE SEMI { ($1, $2) }
+
+
 
 /* add function call logic 
 put the function with its argument into a table

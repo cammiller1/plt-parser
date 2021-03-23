@@ -31,6 +31,7 @@
 
 %%
 /* Rules: context-free rules */
+/* NOTE: think of variable as ID/identified */
 
 program:
   decls EOF { $1 }
@@ -39,6 +40,8 @@ decls:
    /* nothing */ { ([], [])               }
  | decls vdecl { (($2 :: fst $1), snd $1) }
  | decls fdecl { (fst $1, ($2 :: snd $1)) }
+ /* the content of the braces below probably doesn't work */
+ /* | decls fcall { (($2 :: fst $1), snd $1) } */
 
 typ: 
     INT              { Int }
@@ -48,7 +51,10 @@ typ:
   | VOID             { Void  }
   /*/  | ARRAY OF T = typ { TypArray t }
 */
-
+/*
+fcall:
+  VARIABLE LPAREN args_opt RPAREN { Call($1, $3)  }
+*/
 vdecl:
    typ VARIABLE SEMC { ($1, $2) }
 

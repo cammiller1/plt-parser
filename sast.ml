@@ -1,3 +1,4 @@
+(* Semantically-checked Abstract Syntax Tree*)
 open Ast
 
 type sexpr = typ * sx

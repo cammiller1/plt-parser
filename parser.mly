@@ -46,6 +46,7 @@ stmt:
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE LBRACE stmt RBRACE { If($3, $6, $10)}
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 
   | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
+  | fdecl              { FDefine($1) }  /* function declaration */
 
 expr:
     ILITERAL           { Liti($1) }
@@ -68,7 +69,6 @@ expr:
   | expr OR expr       { Binop($1, Or, $3) }
   | MINUS expr %prec UMINUS { Uniop(Neg, $2) }
   | ID ASSIGN expr { Assign($1, $3) }  /* replaces vdecl */
-  | fdecl              { FDefine($1) }  /* function declaration */
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }
 

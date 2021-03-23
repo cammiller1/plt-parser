@@ -7,6 +7,16 @@ type typ = Int | Float | Boolean | String | Void
 
 type bind = typ * string
 
+type expr =
+    Liti of int
+  | Litf of float
+  | Litb of bool
+  | Id of string
+  | Binop of expr * operator * expr
+  | Uniop of unary_operator * expr
+  | Assign of string * expr
+  | Call of string * expr list
+
 type stmt =
     Block of stmt list
   | Expr of expr
@@ -14,25 +24,13 @@ type stmt =
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
+  | FDefine of stmt
 
-
-type expr =
-    Liti of int
-  | Litf of float
-  | Litb of bool
-  | ID of string
-  | Binop of expr * operator * expr
-  | Uniop of unary_operator * expr
-  | Assign of string * expr
-  | Call of string * expr list
-
-
-type func_decl = {
-    typ : typ;
-    fname : string;
-    formals : bind list;
-    locals : bind list;
-    body : stmt list;
+type fdecl = {
+  typ : typ;
+  fname : string;
+  formals : bind list;
+  body : stmt list;
 }
 
 type program = stmt list

@@ -7,15 +7,6 @@ type typ = Int | Float | Boolean | String
 
 type bind = typ * string
 
-type expr =
-    Liti of int
-  | Litf of float
-  | Litb of bool
-  | Var of string
-  | Binop of expr * operator * expr
-  | Uniop of unary_operator * expr
-  | Assign of string * expr
-  | Call of string * expr list
 
 type stmt =
     Block of stmt list
@@ -25,6 +16,17 @@ type stmt =
   | For of expr * expr * expr * stmt
   | While of expr * stmt
 
+
+type expr =
+    Liti of int
+  | Litf of float
+  | Litb of bool
+  | Id of string
+  | Binop of expr * operator * expr
+  | Uniop of unary_operator * expr
+  | Assign of string * expr
+  | Call of string * expr list
+
 type func_decl = {
     typ : typ;
     fname : string;
@@ -32,4 +34,6 @@ type func_decl = {
     body : stmt list;
 }
 
-type program = bind list * func_decl list
+
+(* our program is just a list of statements *)
+type program = stmt list

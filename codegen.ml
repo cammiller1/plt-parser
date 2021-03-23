@@ -110,28 +110,46 @@ let translate (globals, functions) =
        value, if appropriate, and remember their values in the "local_vars" map *)
     (* the locals maps are going to be like sub-symbol tables like we learned in class *)
     let local_vars =
+    	(* m = map of names, t = the bind/type of the formal args, p = LLVM function parameter for it *)
+      	
+      	(* give the function a name, store the value*)
       let add_formal m (t, n) p = 
-        L.set_value_name n p;
-				(* build at the build *)
-	let local = L.build_alloca (ltype_of_typ t) n builder in
-        ignore (L.build_store p local builder);
-	StringMap.add n local m
+        
+        L.set_value_name n p;  (* give the value a name *)
+		(* build at the build. updates "build" as a side effect *)
+		
+		let local = L.build_alloca (ltype_of_typ t) n builder in  (* allocate memory for the formal param value *)
+        
+        ignore (L.build_store p local builder);  (* store the value of the formal param in the allocated location on the stack*)
+		
+		StringMap.add n local m (* add the local var to the local stringmap! *)
 
 
 	(* Allocate space for any locally declared variables and add the
-       * resulting registers to our map *)
+       * resulting registers to our map. This way we can "get the value of a formal arg later"! *)
       and add_local m (t, n) =
 	let local_var = L.build_alloca (ltype_of_typ t) n builder
 	in StringMap.add n local_var m 
       in
 
+      (* fold_left2 steps through 2 lists simultaneously *)
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
           (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals fdecl.slocals 
+      (* we are assigning the formals from the sast to the appropriate local vals *)
+      List.fold_left add_local formals fdecl.slocals
     in
 
 
+    (* purpose of locals: given a var name, where can we find the value of that var in memory? *)
+
+    (* Return the value for a variable or formal argument.
+       Check local names first, then global names *)
+    (* EITHER THE FIRST OR SECOND SHOULD ALWAYS WORK. IF NOT THE PROGRAM IS ILL-FORMED AND 
+     THE CHECKING SHOULD HAVE CAUGHT THE ISSUE *)
+    let lookup n = try StringMap.find n local_vars
+                   with Not_found -> StringMap.find n global_vars
+    in
 
 
 

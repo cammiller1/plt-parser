@@ -152,5 +152,13 @@ let translate (globals, functions) =
     in
 
 
+    (* Construct code for an expression; return its value *)
+    (* An expression in LLVM always turns into code in a single basic block (not true for stmts) *)
+    (* build instructions in the given builder that evaluate the expr; return the expr's value *)
+
+
+
+
+
 
 

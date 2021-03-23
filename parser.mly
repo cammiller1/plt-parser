@@ -41,7 +41,7 @@ stmt_list:
 
 stmt:
     expr SEMC { Expr $1 }
-  | RETURN expr SEMC { Return $2 }
+  | RETURN expr_opt SEMC { Return $2 }
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE %prec NOELSE { If($3, $6, Block([]))}
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE LBRACE stmt RBRACE { If($3, $6, $10)}
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 
@@ -51,7 +51,7 @@ expr:
     ILITERAL           { Liti($1) }
   | FLITERAL           { Litf($1) }
   | BLITERAL           { Litb($1) }
-  | ID           { Id($1) } 
+  | ID                 { Id($1) } 
   | expr PLUS   expr   { Binop($1, Add, $3) }
   | expr MINUS  expr   { Binop($1, Sub, $3) }
   | expr TIMES  expr   { Binop($1, Mul, $3) }
@@ -82,12 +82,11 @@ typ:
 */
 
 fdecl:
-  DEF typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
+  DEF typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
   { { typ = $2;
   fname = $3;
   formals = List.rev $5;
-  locals = List.rev $8;
-  body = List.rev $9 } } 
+  body = List.rev $8 } } 
 
 expr_opt:
     /* nothing */ { Noexpr }
@@ -108,14 +107,7 @@ formals_opt:
 
 formal_list:
   typ ID { [($1,$2)] }
-  | formal_list COMMA typ ID { ($3,$4) :: $1 } 
-
-vdecl_list:
-    /* nothing */    { [] }
-  | vdecl_list vdecl { $2 :: $1 }
-
-vdecl:
-   typ ID SEMC { ($1, $2) }
+  | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 
 

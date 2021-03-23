@@ -6,7 +6,7 @@
 %token EXP SEMC PP MM
 %token IF ELSE ELIF WHILE FOR DEF RETURN
 %token LPAREN RPAREN RBRACE LBRACE COMMA
-%token INT FLOAT BOOL STRING VOID /*ARRAY OF*/
+%token INT FLOAT BOOL STRING NONE /*ARRAY OF*/
 %token <int> ILITERAL
 %token <float> FLITERAL
 %token <string> ID
@@ -46,6 +46,7 @@ typ:
   | FLOAT            { Float }
   | BOOL             { Boolean }
   | STRING           { String }
+  | NONE             { None }
   /*/  | ARRAY OF T = typ { TypArray t }
 */
 
@@ -60,15 +61,6 @@ stmt:
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 
   | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
 
-/*
-fdecl:
- | DEF typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
-    { { typ = $2;
-        fname = $3;
-        formals = List.rev $5;
-        body = List.rev $8 } 
-    } 
-*/
 
 expr:
     ILITERAL           { Liti($1) }
@@ -90,7 +82,7 @@ expr:
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
   | MINUS expr %prec UMINUS { Uniop(Neg, $2) }
-  | ID ASSIGN expr { Assign($1, $3) }  /* replaces vdecl */
+  | typ ID ASSIGN expr { Assign($1, $2, $4) }  /* replaces vdecl */
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }
 
@@ -127,8 +119,4 @@ built-in functions should be stored in sybmol table
 also need table for variable (think like hw 1)
 
 symbol table stuff done in codegen file
-
-possible things to add: arrays, slicing
-ex: arr[1:2]
-ex: arr[1:4:2]
 */

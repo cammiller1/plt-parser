@@ -155,6 +155,22 @@ let translate (globals, functions) =
     (* Construct code for an expression; return its value *)
     (* An expression in LLVM always turns into code in a single basic block (not true for stmts) *)
     (* build instructions in the given builder that evaluate the expr; return the expr's value *)
+    (*
+    let rec expr builder ((_, e) : sexpr) = match e with
+	SLiti i  -> L.const_int i32_t i
+      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l -> L.const_float_of_string float_t l
+      (* | SNoexpr     -> L.const_int i32_t 0 *)
+      | SVar s       -> L.build_load (lookup s) s builder  (* get the value of the variable *)
+      | SAssign (s, e) -> let e' = expr builder e in  (* s - name of var we want to assign to, e - expr we want to generate code for *)
+                          ignore(L.build_store e' (lookup s) builder); e'
+    *)
+
+    (* a bunch of other stuff *)
+
+    List.iter build_function_body functions;
+  	the_module
+
 
 
 

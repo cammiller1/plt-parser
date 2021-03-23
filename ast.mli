@@ -16,6 +16,7 @@ type expr =
   | Uniop of unary_operator * expr
   | Assign of string * expr
   | Call of string * expr list
+  | Noexpr
 
 type stmt =
     Block of stmt list
@@ -24,13 +25,15 @@ type stmt =
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
-  | FDefine of stmt
+  | FDefine of typ * string * bind list * stmt list
 
-type fdecl = {
+(*
+type fdef = {
   typ : typ;
   fname : string;
   formals : bind list;
   body : stmt list;
 }
+*)
 
 type program = stmt list

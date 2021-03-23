@@ -8,7 +8,7 @@ type sx =
     SLiti of int
   | SLitf of string
   | SLitb of bool
-  | SVar of string
+  | SId of string
   | SBinop of sexpr * op * sexpr
   | SUniop of uop * sexpr
   | SAssign of styp * string * sexpr

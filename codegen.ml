@@ -29,7 +29,8 @@ let translate (globals, functions) =
   and i1_t       = L.i1_type        context  (* boolean type *)
   and float_t    = L.double_type    context  (* double/float type *)
   and void_t     = L.void_type      context  (* void type *)
-  and string_t   = L.pointer_type   i8_t     (* pointer type to char *)
+  (* and string_t   = L.pointer_type   i8_t     (* pointer type to char *)
+  *)
   in
 
 
@@ -65,17 +66,70 @@ let translate (globals, functions) =
   let printf_func : L.llvalue = 
       L.declare_function "printf" printf_t the_module in
 
-  (* We are basically defining function protoypes *)
+  (* We are basically defining function protoypes for all of the USER-DEFINED functions *)
   (* Define each function (arguments and return type) so we can 
    call it even before we've created its body *)
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
-      let name = fdecl.sfname
+      let name = fdecl.sfname  (* the name of the function *)
       and formal_types = 
 	Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
+	  (* ltype_of_type is the return type from the function declaration *)
       in let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
+      (* Call L.define_function from LLVM on our our function declaration (ie.e m fdecl above) *)
+      (* Add the result to the stringmap/our symbol table *)
       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
+    (* stuff all the function definitions into the stringmap *)
     List.fold_left function_decl StringMap.empty functions in
+
+
+  (* Fill in the body of the given function *)
+  (* very-much like C++, very stateful *)
+  let build_function_body fdecl =
+    (* "the_function" is going to be the one we created we created in let function_decls: *)
+    let (the_function, _) = 
+    	StringMap.find fdecl.sfname function_decls in  (* get function def from stringmap *)
+    let builder =
+    	(* entry_block - the initial basic block that every function has *)
+    	(* TODO: "context" may be an issue for how we are doing string pointer.... *) 
+    	L.builder_at_end context (L.entry_block the_function) in
+    (* The instruction builder is basically a pointer that keeps track of where in the 
+       current basic block we are going to put the next instructon
+     *)
+
+    (* below we are creating string literals that we are going to pass to printf *)
+    let int_format_str = 
+    	L.build_global_stringptr "%d\n" "fmt" builder  (* print integers *)
+    and float_format_str = 
+    	L.build_global_stringptr "%g\n" "fmt" builder (* print floats *) 
+    in
+
+
+    (* Construct the function's "locals": formal arguments and locally
+       declared variables.  Allocate each on the stack, initialize their
+       value, if appropriate, and remember their values in the "local_vars" map *)
+    (* the locals maps are going to be like sub-symbol tables like we learned in class *)
+    let local_vars =
+      let add_formal m (t, n) p = 
+        L.set_value_name n p;
+				(* build at the build *)
+	let local = L.build_alloca (ltype_of_typ t) n builder in
+        ignore (L.build_store p local builder);
+	StringMap.add n local m
+
+
+	(* Allocate space for any locally declared variables and add the
+       * resulting registers to our map *)
+      and add_local m (t, n) =
+	let local_var = L.build_alloca (ltype_of_typ t) n builder
+	in StringMap.add n local_var m 
+      in
+
+
+      let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
+          (Array.to_list (L.params the_function)) in
+      List.fold_left add_local formals fdecl.slocals 
+    in
 
 
 

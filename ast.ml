@@ -25,6 +25,10 @@ type stmt =
   | For of expr * expr * expr * stmt
   | While of expr * stmt
 
+type func_call = {
+  
+}
+
 type func_decl = {
     typ : typ;
     fname : string;
@@ -32,4 +36,6 @@ type func_decl = {
     body : stmt list;
 }
 
+
+(* vdecl not here because it goes down to expr *)
 type program = bind list * func_decl list

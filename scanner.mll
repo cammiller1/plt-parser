@@ -16,6 +16,7 @@ rule tokenize = parse
 | "float" { FLOAT }
 | "bool"  { BOOL }
 | "string" { STRING }
+| "void" { VOID }
 | ","     { COMMA }
 | "=="    { EQ }
 | "=<"    { LTE }

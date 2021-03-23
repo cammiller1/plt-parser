@@ -3,7 +3,7 @@ type operator = Add | Sub | Mul | Div | Seq | Lt | Gt | Exp | Mod | Lte | Gte
 
 type unary_operator = Pp | Mm | Neg
 
-type typ = Int | Float | Boolean | String
+type typ = Int | Float | Boolean | String | Void
 
 type bind = typ * string
 

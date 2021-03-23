@@ -6,7 +6,7 @@
 %token EXP SEMC PP MM
 %token IF ELSE ELIF WHILE FOR DEF RETURN
 %token LPAREN RPAREN RBRACE LBRACE COMMA
-%token INT FLOAT BOOL STRING /*ARRAY OF*/
+%token INT FLOAT BOOL STRING VOID /*ARRAY OF*/
 %token <int> ILITERAL
 %token <float> FLITERAL
 %token <string> VARIABLE
@@ -41,10 +41,11 @@ decls:
  | decls fdecl { (fst $1, ($2 :: snd $1)) }
 
 typ: 
-    INT                { Int }
+    INT              { Int }
   | FLOAT            { Float }
   | BOOL             { Boolean }
   | STRING           { String }
+  | VOID             { Void  }
   /*/  | ARRAY OF T = typ { TypArray t }
 */
 

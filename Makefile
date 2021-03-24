@@ -26,3 +26,4 @@ jpie.native :
 clean :
 	ocamlbuild -clean
 	rm -rf ocamlllvm *.diff
+	rm -rf _build

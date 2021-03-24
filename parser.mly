@@ -78,13 +78,10 @@ stmt_list:
     /* nothing */  { [] }
   | stmt_list stmt { $2 :: $1 }
 
-stmt_list:
-    /* nothing */ { [] }
-  | stmt_list stmt { $2 :: $1 } 
-
 stmt:
     expr SEMC { Expr $1 }
   | RETURN expr_opt SEMC { Return $2 }
+  | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
   /* function def */
   /* type, function name, formals, body */
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE %prec NOELSE { If($3, $6, Block([]))}
@@ -116,7 +113,7 @@ expr:
   | expr NE expr       { Binop($1, Ne, $3) }
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
-  | MINUS expr %prec UMINUS { Uniop(Neg, $2) }
+  /*| MINUS expr %prec UMINUS { Uniop(Neg, $2) } */
   | ID ASSIGN expr { Assign($1, $3) }  /* replaces vdecl */
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }

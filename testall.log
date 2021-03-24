@@ -1,0 +1,10 @@
+/usr/bin/lli
+
+###### Testing test-hello-world.jpie
+./jpie.native tests/test-hello-world.jpie > test-hello-world.jpie.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
+###### Testing fail-hello-world.jpie
+< tests/fail-hello-world.jpie 2> fail-hello-world.jpie.err >> testall.log
+###### FAILED

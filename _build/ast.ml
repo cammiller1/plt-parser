@@ -11,6 +11,7 @@ type expr =
     Liti of int
   | Litf of float
   | Litb of bool
+  | Lits of string
   | Id of string
   | Binop of expr * operator * expr
   | Uniop of unary_operator * expr

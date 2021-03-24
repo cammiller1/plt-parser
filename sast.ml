@@ -6,6 +6,7 @@ and sx =
     SLiti of int
   | SLitf of float
   | SLitb of bool
+  | SLits of string
   | SId of string
   | SBinop of sexpr * operator * sexpr
   | SUniop of unary_operator * sexpr

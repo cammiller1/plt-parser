@@ -37,6 +37,7 @@ type token =
   | ILITERAL of (int)
   | FLITERAL of (float)
   | ID of (string)
+  | SLITERAL of (string)
   | BLITERAL of (bool)
   | EOF
 

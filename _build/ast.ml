@@ -14,7 +14,7 @@ type expr =
   | Id of string
   | Binop of expr * operator * expr
   | Uniop of unary_operator * expr
-  | Assign of typ * string * expr
+  | Assign of string * expr
   | Call of string * expr list
   | Noexpr
 
@@ -25,15 +25,13 @@ type stmt =
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
-  | FDefine of typ * string * bind list * stmt list
 
-(*
-type fdef = {
-  typ : typ;
-  fname : string;
-  formals : bind list;
-  body : stmt list;
-}
-*)
+type func_decl = {
+    typ : typ;
+    fname : string;
+    formals : bind list;
+    locals : bind list;
+    body : stmt list;
+  }
 
-type program = stmt list
+type program = bind list * func_decl list

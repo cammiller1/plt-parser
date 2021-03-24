@@ -1,43 +1,28 @@
-# "ocamlbuild jpie.native" will also build the calculator
-
 # "make test" Compiles everything and runs the regression tests
+
 #.PHONY : test
-#test : testall.sh
+#test : all testall.sh
 #	./testall.sh
 
-all: jpie.out
+# "make all" builds the executable
 
-jpie: parser.cmo scanner.cmo jpie.cmo 
-	ocamlc -o jpie $^
+.PHONY : all
+all : jpie.native
 
-%.cmo : %.ml
-	ocamlc -c $<
+# "make jpie.native" compiles the compiler
+#
+# The _tags file controls the operation of ocamlbuild, e.g., by including
+# packages, enabling warnings
+#
+# See https://github.com/ocaml/ocamlbuild/blob/master/manual/manual.adoc
 
-%.cmi : %.mli
-	ocamlc -c $<
+jpie.native :
+	opam config exec -- \
+	ocamlbuild -use-ocamlfind jpie.native
 
-scanner.ml : scanner.mll
-	ocamllex $^
-
-parser.ml parser.mli : parser.mly
-	ocamlyacc $^
-
-# need for printing
-jpie.out : jpie jpie.tb
-	./jpie < jpie.tb > jpie.out
-
-# Depedencies from ocamldep
-jpie.cmo : scanner.cmo parser.cmi ast.cmi
-jpie.cmx : scanner.cmx parser.cmx ast.cmi
-parser.cmo : ast.cmi parser.cmi
-parser.cmx : ast.cmi parser.cmi
-scanner.cmo : parser.cmi
-scanner.cmx : parser.cmx
-
-##############################
-
-#TARFILES = README Makefile scanner.mll ast.mli parser.mly calc.ml calc.tb
+# "make clean" removes all generated files
 
 .PHONY : clean
 clean :
-	rm -rf *.cmi *.cmo parser.ml parser.mli scanner.ml jpie.out jpie
+	ocamlbuild -clean
+	rm -rf ocamlllvm *.diff

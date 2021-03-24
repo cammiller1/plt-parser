@@ -3,19 +3,9 @@ type operator = Add | Sub | Mul | Div | Seq | Lt | Gt | Exp | Mod | Lte | Gte
 
 type unary_operator = Pp | Mm | Neg
 
-type typ = Int | Float | Boolean | String
+type typ = Int | Float | Boolean | String | None
 
 type bind = typ * string
-
-
-type stmt =
-    Block of stmt list
-  | Expr of expr
-  | Return of expr
-  | If of expr * stmt * stmt
-  | For of expr * expr * expr * stmt
-  | While of expr * stmt
-
 
 type expr =
     Liti of int
@@ -26,14 +16,22 @@ type expr =
   | Uniop of unary_operator * expr
   | Assign of string * expr
   | Call of string * expr list
+  | Noexpr
+
+type stmt =
+    Block of stmt list
+  | Expr of expr
+  | Return of expr
+  | If of expr * stmt * stmt
+  | For of expr * expr * expr * stmt
+  | While of expr * stmt
 
 type func_decl = {
     typ : typ;
     fname : string;
     formals : bind list;
+    locals : bind list;
     body : stmt list;
-}
+  }
 
-
-(* our program is just a list of statements *)
-type program = stmt list
+type program = bind list * func_decl list

@@ -6,7 +6,7 @@
 %token EXP SEMC PP MM
 %token IF ELSE ELIF WHILE FOR DEF RETURN
 %token LPAREN RPAREN RBRACE LBRACE COMMA
-%token INT FLOAT BOOL STRING NONE /*ARRAY OF*/
+%token INT FLOAT BOOL STRING VOID /*ARRAY OF*/
 %token <int> ILITERAL
 %token <float> FLITERAL
 %token <string> ID
@@ -62,7 +62,7 @@ typ:
   | FLOAT            { Float }
   | BOOL             { Boolean }
   | STRING           { String }
-  | NONE             { None }
+  | VOID             { Void }
   /*/  | ARRAY OF T = typ { TypArray t }
 */
 
@@ -78,15 +78,10 @@ stmt_list:
     /* nothing */  { [] }
   | stmt_list stmt { $2 :: $1 }
 
-stmt_list:
-    /* nothing */ { [] }
-  | stmt_list stmt { $2 :: $1 } 
-
 stmt:
     expr SEMC { Expr $1 }
   | RETURN expr_opt SEMC { Return $2 }
-  /* function def */
-  /* type, function name, formals, body */
+  | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE %prec NOELSE { If($3, $6, Block([]))}
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE LBRACE stmt RBRACE { If($3, $6, $10)}
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 
@@ -116,7 +111,7 @@ expr:
   | expr NE expr       { Binop($1, Ne, $3) }
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
-  | MINUS expr %prec UMINUS { Uniop(Neg, $2) }
+  /*| MINUS expr %prec UMINUS { Uniop(Neg, $2) } */
   | ID ASSIGN expr { Assign($1, $3) }  /* replaces vdecl */
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }

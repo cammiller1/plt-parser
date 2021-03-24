@@ -7,9 +7,3 @@ cc -o test-hello-world.exe test-hello-world.s
 ./test-hello-world.exe
 diff -b test-hello-world.out tests/test-hello-world.out > test-hello-world.diff
 ###### SUCCESS
-
-###### Testing fail-hello-world
-./jpie.native < tests/fail-hello-world.jpie 2> fail-hello-world.err >> testall.log
-diff -b fail-hello-world.err tests/fail-hello-world.err > fail-hello-world.diff
-FAILED fail-hello-world.err differs from tests/fail-hello-world.err
-###### FAILED

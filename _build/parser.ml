@@ -33,7 +33,7 @@ type token =
   | FLOAT
   | BOOL
   | STRING
-  | NONE
+  | VOID
   | ILITERAL of (int)
   | FLITERAL of (float)
   | ID of (string)
@@ -80,7 +80,7 @@ let yytransl_const = [|
   288 (* FLOAT *);
   289 (* BOOL *);
   290 (* STRING *);
-  291 (* NONE *);
+  291 (* VOID *);
     0 (* EOF *);
     0|]
 
@@ -332,7 +332,7 @@ let yynames_const = "\
   FLOAT\000\
   BOOL\000\
   STRING\000\
-  NONE\000\
+  VOID\000\
   EOF\000\
   "
 
@@ -446,7 +446,7 @@ let yyact = [|
 ; (fun __caml_parser_env ->
     Obj.repr(
 # 65 "parser.mly"
-                     ( None )
+                     ( Void )
 # 451 "parser.ml"
                : 'typ))
 ; (fun __caml_parser_env ->

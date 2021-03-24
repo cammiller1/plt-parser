@@ -6,7 +6,7 @@
 %token EXP SEMC PP MM
 %token IF ELSE ELIF WHILE FOR DEF RETURN
 %token LPAREN RPAREN RBRACE LBRACE COMMA
-%token INT FLOAT BOOL STRING NONE /*ARRAY OF*/
+%token INT FLOAT BOOL STRING VOID /*ARRAY OF*/
 %token <int> ILITERAL
 %token <float> FLITERAL
 %token <string> ID
@@ -62,7 +62,7 @@ typ:
   | FLOAT            { Float }
   | BOOL             { Boolean }
   | STRING           { String }
-  | NONE             { None }
+  | VOID             { Void }
   /*/  | ARRAY OF T = typ { TypArray t }
 */
 

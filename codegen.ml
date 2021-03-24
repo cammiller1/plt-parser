@@ -37,7 +37,7 @@ let translate (globals, functions) =
       A.Int   -> i32_t
     | A.Boolean  -> i1_t
     | A.Float -> float_t
-    | A.None  -> void_t
+    | A.Void  -> void_t
     (* | A.String -> string_t *) (* added for our project *)
   in
 
@@ -120,6 +120,7 @@ let translate (globals, functions) =
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
       | SLitf l -> L.const_float float_t l
       | SNoexpr     -> L.const_int i32_t 0
+      | SId s       -> L.build_load (lookup s) s builder
 
       (* a bunch of stuff between here *) 
       
@@ -133,7 +134,7 @@ let translate (globals, functions) =
          let (fdef, fdecl) = StringMap.find f function_decls in
    let llargs = List.rev (List.map (expr builder) (List.rev args)) in
    let result = (match fdecl.styp with 
-                        A.None -> ""
+                        A.Void -> ""
                       | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list llargs) result builder
     in
@@ -157,7 +158,7 @@ let translate (globals, functions) =
         | SExpr e -> ignore(expr builder e); builder
         | SReturn e -> ignore(match fdecl.styp with
                               (* Special "return nothing" instr *)
-                              A.None -> L.build_ret_void builder 
+                              A.Void -> L.build_ret_void builder 
                               (* Build return statement *)
                             | _ -> L.build_ret (expr builder e) builder );
                      builder
@@ -169,7 +170,7 @@ let translate (globals, functions) =
 
     (* Add a return if the last block falls off the end *)
     add_terminal builder (match fdecl.styp with
-        A.None -> L.build_ret_void
+        A.Void -> L.build_ret_void
       | A.Float -> L.build_ret (L.const_float float_t 0.0)
       | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
   in

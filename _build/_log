@@ -30,37 +30,28 @@ File "codegen.ml", line 36, characters 21-126:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 String
-File "codegen.ml", line 118, characters 44-943:
+File "codegen.ml", line 118, characters 44-1000:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(SId _|SBinop (_, _, _)|SUniop (_, _)|SAssign (_, _))
-File "codegen.ml", line 155, characters 28-489:
+(SBinop (_, _, _)|SUniop (_, _)|SAssign (_, _))
+File "codegen.ml", line 156, characters 28-489:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SIf (_, _, _)|SFor (_, _, _, _)|SWhile (_, _))
-File "codegen.ml", line 107, characters 8-14:
-Warning 26: unused variable lookup.
 # Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml
 # Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
 + ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
-File "semant.ml", line 3, characters 0-8:
-Warning 45: this open statement shadows the constructor None (which is later used)
-File "semant.ml", line 18, characters 2-6:
-Warning 41: None belongs to several types: Ast.typ option
-The first one was selected. Please disambiguate if this is wrong.
-File "semant.ml", line 96, characters 19-696:
+File "semant.ml", line 96, characters 19-748:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(Id _|Binop (_, _, _)|Uniop (_, _)|Assign (_, _))
-File "semant.ml", line 116, characters 25-622:
+(Binop (_, _, _)|Uniop (_, _)|Assign (_, _))
+File "semant.ml", line 117, characters 25-803:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(Return _|If (_, _, _)|For (_, _, _, _)|While (_, _))
-File "semant.ml", line 90, characters 8-26:
-Warning 26: unused variable type_of_identifier.
-File "semant.ml", line 101, characters 8-33:
+(If (_, _, _)|For (_, _, _, _)|While (_, _))
+File "semant.ml", line 102, characters 8-33:
 Warning 26: unused variable call.
 # Target: jpie.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:jpie.cmo, file:jpie.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o jpie.cmo jpie.ml
@@ -77,9 +68,6 @@ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmx s
 ocamlfind ocamldep -package llvm -package llvm.analysis -modules parser.ml > parser.ml.depends
 # Target: parser.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parser.cmx parser.ml
-+ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parser.cmx parser.ml
-File "parser.mly", line 1, characters 1-9:
-Warning 45: this open statement shadows the constructor None (which is later used)
 # Target: codegen.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:codegen.cmx, file:codegen.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
 + ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
@@ -87,37 +75,28 @@ File "codegen.ml", line 36, characters 21-126:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 String
-File "codegen.ml", line 118, characters 44-943:
+File "codegen.ml", line 118, characters 44-1000:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(SId _|SBinop (_, _, _)|SUniop (_, _)|SAssign (_, _))
-File "codegen.ml", line 155, characters 28-489:
+(SBinop (_, _, _)|SUniop (_, _)|SAssign (_, _))
+File "codegen.ml", line 156, characters 28-489:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SIf (_, _, _)|SFor (_, _, _, _)|SWhile (_, _))
-File "codegen.ml", line 107, characters 8-14:
-Warning 26: unused variable lookup.
 # Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmx scanner.ml
 # Target: semant.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
 + ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
-File "semant.ml", line 3, characters 0-8:
-Warning 45: this open statement shadows the constructor None (which is later used)
-File "semant.ml", line 18, characters 2-6:
-Warning 41: None belongs to several types: Ast.typ option
-The first one was selected. Please disambiguate if this is wrong.
-File "semant.ml", line 96, characters 19-696:
+File "semant.ml", line 96, characters 19-748:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(Id _|Binop (_, _, _)|Uniop (_, _)|Assign (_, _))
-File "semant.ml", line 116, characters 25-622:
+(Binop (_, _, _)|Uniop (_, _)|Assign (_, _))
+File "semant.ml", line 117, characters 25-803:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(Return _|If (_, _, _)|For (_, _, _, _)|While (_, _))
-File "semant.ml", line 90, characters 8-26:
-Warning 26: unused variable type_of_identifier.
-File "semant.ml", line 101, characters 8-33:
+(If (_, _, _)|For (_, _, _, _)|While (_, _))
+File "semant.ml", line 102, characters 8-33:
 Warning 26: unused variable call.
 # Target: jpie.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:jpie.cmx, file:jpie.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o jpie.cmx jpie.ml

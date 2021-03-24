@@ -15,7 +15,7 @@ let check (globals, functions) =
   (* Verify a list of bindings has no void types or duplicate names *)
   let check_binds (kind : string) (binds : bind list) =
     List.iter (function
-	(None, b) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
+	(Void, b) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
       | _ -> ()) binds;
     let rec dups = function
         [] -> ()
@@ -35,7 +35,7 @@ let check (globals, functions) =
   (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls = 
     let add_bind map (name, ty) = StringMap.add name {
-      typ = None;
+      typ = Void;
       fname = name; 
       formals = [(ty, "x")];
       locals = []; body = [] } map
@@ -97,7 +97,8 @@ let check (globals, functions) =
         Liti l -> (Int, SLiti l)
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
-      | Noexpr     -> (None, SNoexpr)
+      | Noexpr     -> (Void, SNoexpr)
+      | Id s       -> (type_of_identifier s, SId s)
       | Call(fname, args) as call -> 
           let fd = find_func fname in
           let param_length = List.length fd.formals in
@@ -115,6 +116,10 @@ let check (globals, functions) =
     (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt = function
         Expr e -> SExpr (expr e)
+        | Return e -> let (t, e') = expr e in
+          if t = func.typ then SReturn (t, e')
+          else raise (
+            Failure ("return gives invalid or unexpected type"))
 	    (* A block is correct if each statement is correct and nothing
 	       follows any Return statement.  Nested blocks are flattened. *)
       | Block sl -> 

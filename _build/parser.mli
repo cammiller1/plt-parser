@@ -33,7 +33,7 @@ type token =
   | FLOAT
   | BOOL
   | STRING
-  | NONE
+  | VOID
   | ILITERAL of (int)
   | FLITERAL of (float)
   | ID of (string)

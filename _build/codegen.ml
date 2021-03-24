@@ -28,7 +28,7 @@ let translate (globals, functions) =
   and i8_t       = L.i8_type        context  (* caracters *)
   and i1_t       = L.i1_type        context  (* boolean type *)
   and float_t    = L.double_type    context  (* double/float type *)
-  (* and void_t     = L.void_type      context   void type *)
+  and void_t     = L.void_type      context   (* void type *)
   (* and string_t   = L.pointer_type   i8_t      pointer type to char *)
   in
 
@@ -37,7 +37,7 @@ let translate (globals, functions) =
       A.Int   -> i32_t
     | A.Boolean  -> i1_t
     | A.Float -> float_t
-    (* | A.Void  -> void_t *)
+    | A.None  -> void_t
     (* | A.String -> string_t *) (* added for our project *)
   in
 
@@ -133,10 +133,20 @@ let translate (globals, functions) =
          let (fdef, fdecl) = StringMap.find f function_decls in
    let llargs = List.rev (List.map (expr builder) (List.rev args)) in
    let result = (match fdecl.styp with 
-                        A.Void -> ""
+                        A.None -> ""
                       | _ -> f ^ "_result") in
          L.build_call fdef (Array.of_list llargs) result builder
     in
+
+
+    (* LLVM insists each basic block end with exactly one "terminator" 
+       instruction that transfers control.  This function runs "instr builder"
+       if the current block does not already have a terminator.  Used,
+       e.g., to handle the "fall off the end of the function" case. *)
+    let add_terminal builder instr =
+      match L.block_terminator (L.insertion_block builder) with
+    Some _ -> ()
+      | None -> ignore (instr builder) in
 
 
     (* Build the code for the given statement; return the builder for
@@ -150,6 +160,13 @@ let translate (globals, functions) =
 
      (* Build the code for each statement in the function *)
     let builder = stmt builder (SBlock fdecl.sbody) in
+
+    (* Add a return if the last block falls off the end *)
+    add_terminal builder (match fdecl.styp with
+        A.None -> L.build_ret_void
+      | A.Float -> L.build_ret (L.const_float float_t 0.0)
+      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
+  in
 
     List.iter build_function_body functions;
     the_module  (* return the LLVM module result *)

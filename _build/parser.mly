@@ -117,7 +117,7 @@ expr:
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
   | MINUS expr %prec UMINUS { Uniop(Neg, $2) }
-  | typ ID ASSIGN expr { Assign($1, $2, $4) }  /* replaces vdecl */
+  | ID ASSIGN expr { Assign($1, $3) }  /* replaces vdecl */
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }
 

@@ -1,9 +1,7 @@
 (* Semantically-checked Abstract Syntax Tree*)
 open Ast
 
-type styp = SInt | SFloat | SBoolean | SString | Snone
-
-type sexpr = styp * sx
+type sexpr = typ * sx
 and sx =
     SLiti of int
   | SLitf of float
@@ -11,7 +9,7 @@ and sx =
   | SId of string
   | SBinop of sexpr * operator * sexpr
   | SUniop of unary_operator * sexpr
-  | SAssign of styp * string * sexpr
+  | SAssign of string * sexpr
   | SCall of string * sexpr list
   | SNoexpr
 

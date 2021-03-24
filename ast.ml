@@ -14,12 +14,13 @@ type expr =
   | Id of string
   | Binop of expr * operator * expr
   | Uniop of unary_operator * expr
-  | Assign of typ * string * expr
+  | Assign of string * expr
   | Call of string * expr list
   | Noexpr
 
 type stmt =
-    Expr of expr
+    Block of stmt list
+  | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt

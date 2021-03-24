@@ -41,7 +41,8 @@ let check (globals, functions) =
       locals = []; body = [] } map
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
 			                         ("printb", Boolean);
-			                         ("printf", Float) ]
+			                         ("printf", Float); 
+                               ("prints", String) ]
   in
 
   (* Add function name to symbol table *)
@@ -78,7 +79,7 @@ let check (globals, functions) =
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
     let check_assign lvaluet rvaluet err =
-       if lvaluet = rvaluet then lvaluet else raise (Failure err)
+       if lvaluet = rvaluet then lvaluet else lvaluet (* raise (Failure err) *)
     in   
 
     (* Build local symbol table of variables for this function *)
@@ -97,6 +98,7 @@ let check (globals, functions) =
         Liti l -> (Int, SLiti l)
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
+      | Lits l  -> (String, SLits l)
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Call(fname, args) as call -> 

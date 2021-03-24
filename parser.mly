@@ -10,6 +10,7 @@
 %token <int> ILITERAL
 %token <float> FLITERAL
 %token <string> ID
+%token <string> SLITERAL
 %token <bool> BLITERAL
 %token EOF
 
@@ -96,6 +97,7 @@ expr:
     ILITERAL           { Liti($1) }
   | FLITERAL           { Litf($1) }
   | BLITERAL           { Litb($1) }
+  | SLITERAL           { Lits($1) }
   | ID                 { Id($1) } 
   | expr PLUS   expr   { Binop($1, Add, $3) }
   | expr MINUS  expr   { Binop($1, Sub, $3) }

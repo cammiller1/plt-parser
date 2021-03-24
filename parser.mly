@@ -82,8 +82,6 @@ stmt:
     expr SEMC { Expr $1 }
   | RETURN expr_opt SEMC { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
-  /* function def */
-  /* type, function name, formals, body */
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE %prec NOELSE { If($3, $6, Block([]))}
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE LBRACE stmt RBRACE { If($3, $6, $10)}
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 

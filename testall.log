@@ -2,7 +2,7 @@
 
 ###### Testing test-hello-world.jpie
 ./jpie.native tests/test-hello-world.jpie > test-hello-world.jpie.ll
-Fatal error: exception Parsing.Parse_error
+Fatal error: exception Match_failure("semant.ml", 116, 25)
 ###### FAILED
 
 ###### Testing fail-hello-world.jpie

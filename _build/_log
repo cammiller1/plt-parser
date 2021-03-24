@@ -34,10 +34,10 @@ File "codegen.ml", line 118, characters 44-943:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SId _|SBinop (_, _, _)|SUniop (_, _)|SAssign (_, _))
-File "codegen.ml", line 155, characters 28-141:
+File "codegen.ml", line 155, characters 28-489:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(SReturn _|SIf (_, _, _)|SFor (_, _, _, _)|SWhile (_, _))
+(SIf (_, _, _)|SFor (_, _, _, _)|SWhile (_, _))
 File "codegen.ml", line 107, characters 8-14:
 Warning 26: unused variable lookup.
 # Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
@@ -91,10 +91,10 @@ File "codegen.ml", line 118, characters 44-943:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
 (SId _|SBinop (_, _, _)|SUniop (_, _)|SAssign (_, _))
-File "codegen.ml", line 155, characters 28-141:
+File "codegen.ml", line 155, characters 28-489:
 Warning 8: this pattern-matching is not exhaustive.
 Here is an example of a case that is not matched:
-(SReturn _|SIf (_, _, _)|SFor (_, _, _, _)|SWhile (_, _))
+(SIf (_, _, _)|SFor (_, _, _, _)|SWhile (_, _))
 File "codegen.ml", line 107, characters 8-14:
 Warning 26: unused variable lookup.
 # Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet, traverse }

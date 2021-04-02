@@ -54,16 +54,16 @@ stmt_list:
 stmt:
     expr SEMC { Expr $1 }
   | DEF typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
-     { { typ = $2;
-         fname = $3;
-        formals = List.rev $5;
-        locals = List.rev $8;
-        body = List.rev $8 } 
+     { FuncDef(
+        func_decl(
+          { typ = $2;
+            fname = $3;
+             formals = List.rev $5;
+            locals = List.rev $8;
+            body = List.rev $8 })
+        )
      }
-  
   | typ ID ASSIGN expr SEMC { DeclareAssign($1, $2, $4) } /* variable declaration (with assign) */
-  
-
   | typ ID SEMC { Declare($1, $2) }  /* variable declaration (no assign) */
   | RETURN expr_opt SEMC { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
@@ -81,7 +81,6 @@ formals_opt:
 formal_list:
   typ ID { [($1,$2)] }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
-/* =================================== */
 
 
 /* type-relevant parsing */
@@ -121,14 +120,9 @@ expr:
   | expr NE expr       { Binop($1, Ne, $3) }
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
-  
   /* assignment for when variable has been declared already! */
   | ID ASSIGN expr     { Assign($1, $3) } 
-  
-
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
-  
-  
   | LPAREN expr RPAREN { $2 }
 
 args_opt:

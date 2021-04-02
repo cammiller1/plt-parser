@@ -1,11 +1,17 @@
 type operator = Add | Sub | Mul | Div | Seq | Lt | Gt | Exp | Mod | Lte | Gte
 			| Eq | Ne | And | Or
 
-type unary_operator = Pp | Mm | Neg
+type unary_operator = Pp | Mm
 
-type typ = Int | Float | Boolean | String | Void
+type typ = Int | Float | Boolean | Void | String | Array
 
-type bind = typ * string
+type func_decl = {
+    typ : typ;
+    fname : string;
+    formals : bind list;
+    locals : bind list;
+    body : stmt list;
+  }
 
 type expr =
     Liti of int
@@ -21,18 +27,15 @@ type expr =
 
 type stmt =
     Block of stmt list
+  | DeclareAssign of typ * string * expr
+  | Declare of typ * string
+  | FuncDef of func_decl
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
 
-type func_decl = {
-    typ : typ;
-    fname : string;
-    formals : bind list;
-    locals : bind list;
-    body : stmt list;
-  }
 
-type program = bind list * func_decl list
+
+type program = stmt list

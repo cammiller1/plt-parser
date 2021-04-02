@@ -7,18 +7,18 @@ test : all testall.sh
 # "make all" builds the executable
 
 .PHONY : all
-all : jpie.native
+all : compyled.native
 
-# "make jpie.native" compiles the compiler
+# "make compyled.native" compiles the compiler
 #
 # The _tags file controls the operation of ocamlbuild, e.g., by including
 # packages, enabling warnings
 #
 # See https://github.com/ocaml/ocamlbuild/blob/master/manual/manual.adoc
 
-jpie.native :
+compyled.native :
 	opam config exec -- \
-	ocamlbuild -use-ocamlfind jpie.native
+	ocamlbuild -use-ocamlfind compyled.native
 
 # "make clean" removes all generated files
 

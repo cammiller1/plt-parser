@@ -19,7 +19,7 @@ let translate (globals, functions) =
 
   (* Create the LLVM compilation module into which
      we will generate code *)
-  let the_module = L.create_module context "jpie" in
+  let the_module = L.create_module context "complyed" in
 
 
   (* Get types from the context *)
@@ -32,7 +32,7 @@ let translate (globals, functions) =
   and string_t   = L.pointer_type   (L.i8_type context)      (* pointer type to char *)
   in
 
-  (* Return the LLVM type for a Jpie type *)
+  (* Return the LLVM type for a complyed type *)
   let ltype_of_typ = function
       A.Int   -> i32_t
     | A.Boolean  -> i1_t

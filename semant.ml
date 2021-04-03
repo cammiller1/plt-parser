@@ -12,14 +12,6 @@ module StringMap = Map.Make(String)
 
 let check (statements) =
 
-
-
-  
-
-  (* create a fake main function to wrap the program in
-    later should have the "body" of our fake main function have all of the statements
-  *)
-
   (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls = 
     let add_bind map (name, ty) = StringMap.add name {
@@ -33,13 +25,6 @@ let check (statements) =
                                ("prints", String) ]
   in
 
-  (* add the main function  
-  let built_in_decls = StringMap.add "main" {typ = Void; fname = "main"; formals = []; body = [] } built_in_decls
-  
-  in
-  *)
-
-
 
   (* Return a function from our built_in symbol table *)
   let find_func s = 
@@ -50,6 +35,31 @@ let check (statements) =
 
 
   let check_statement statements = 
+
+   (* Raise an exception if the given rvalue type cannot be assigned to
+       the given lvalue type *)
+    let check_assign lvaluet rvaluet err =
+       if lvaluet = rvaluet then lvaluet else raise (Failure err)
+    in   
+
+
+    (* Build global symbol table of variables *)
+    let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+                  StringMap.empty []
+    in
+
+    (* Return a variable from our local symbol table *)
+    let type_of_identifier s =
+      try StringMap.find s symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
+    (* check if variable has already been declared *)
+    let check_already_declared s =
+      let declared = StringMap.find s symbols in
+      if declared then raise (Failure ("variable " ^ s ^ " already declared" ))
+      else s
+    in
 
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
@@ -64,6 +74,12 @@ let check (statements) =
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
       | Noexpr     -> (Void, SNoexpr)
+      | Id s       -> (type_of_identifier s, SId s)
+      | Assign(var, e) as ex -> 
+          let lt = type_of_identifier var
+          and (rt, e') = expr e in
+          let err = "illegal assignment "
+          in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in
           let param_length = List.length fd.formals in
@@ -81,6 +97,16 @@ let check (statements) =
     (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt = function
         Expr e -> SExpr (expr e)
+      | Declare (typ, str) -> 
+          (* check valid declaration and add to symbol table *)
+          let ty = match typ with
+            Void -> raise ( Failure ("illegal void assignment variable " ^ str) )
+            | _ -> typ
+          and name = check_already_declared str
+          in StringMap.add name ty symbols in
+          let name2 = name
+          in SDeclare(ty, name2)
+
       | Return e -> let (t, e') = expr e in
           SReturn (t, e')
       | Block sl -> 

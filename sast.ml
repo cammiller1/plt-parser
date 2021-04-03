@@ -17,8 +17,6 @@ and sx =
 
 type sstmt =
     SBlock of sstmt list
-  | SDeclareAssign of typ * string * sexpr
-  | SDeclare of typ * string
   | SExpr of sexpr
   | SReturn of sexpr
   | SIf of sexpr * sstmt * sstmt
@@ -32,4 +30,4 @@ type sfunc_decl = {
     sbody : sstmt list;
 }
 
-type sprogram = sstmt list * sfunc_decl
+type sprogram = bind list * sfunc_decl list * sstmt list

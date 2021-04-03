@@ -22,8 +22,6 @@ type expr =
 
 type stmt =
     Block of stmt list
-  | DeclareAssign of typ * string * expr
-  | Declare of typ * string
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
@@ -37,4 +35,4 @@ type func_decl = {
     body : stmt list;
 }
 
-type program = stmt list * func_decl list
+type program = bind list * func_decl list * stmt list

@@ -45,10 +45,10 @@ program:
 
 /* fdecl { (fst $1, ($2 :: snd $1)) } */
 highest:
-   /* nothing */ { ([], [])               }
- | highest vdecl { (($2 :: fst $1), snd $1) }
- | highest fdecl { (fst $1, ($2 :: snd $1)) }
- | highest stmt { ([$1], []) }
+   /* nothing */ { ([], [], [])             }
+ | highest fdecl { (fst $1, ($2 :: snd $1), []) }
+ | highest vdecl { (($2 :: fst $1), snd $1, []) }
+ | highest stmt { ([], [], [$1])  }
 
 /* statement-relevant parsing */
 

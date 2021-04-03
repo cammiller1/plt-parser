@@ -14,7 +14,7 @@ module StringMap = Map.Make(String)
 internally: some C++ class 
 REMINDER: L.pointer_type i8_t IS A CHAR POINTER. WILL NEED FOR STRINGS
 *)
-let translate (statements, functions) =
+let translate (globals, functions, statements) =
   let context    = L.global_context () in
 
   (* Create the LLVM compilation module into which

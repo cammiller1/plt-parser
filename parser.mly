@@ -48,18 +48,12 @@ highest:
    /* nothing */ { ([], [])               }
  | highest vdecl { (($2 :: fst $1), snd $1) }
  | highest fdecl { (fst $1, ($2 :: snd $1)) }
- | highest stmt { (fst $1, ($2 :: snd $1)) }
+ | highest stmt { ([$1], []) }
 
 /* statement-relevant parsing */
-stmt_list:
-    /* nothing */  { [], [] }
-  | stmt_list fdecl { $2 :: $1 }
-  | stmt_list stmt { $2 :: $1 }
 
 stmt:
     expr SEMC { Expr $1 }
-  | typ ID ASSIGN expr SEMC { DeclareAssign($1, $2, $4) } /* variable declaration (with assign) */
-  | typ ID SEMC { Declare($1, $2) }  /* variable declaration (no assign) */
   | RETURN expr_opt SEMC { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE %prec NOELSE { If($3, $6, Block([]))}
@@ -74,7 +68,7 @@ stmt_list:
 
 
 vdecl:
-   typ ID SEMI { ($1, $2) }
+   typ ID SEMC { ($1, $2) }
 
 
 fdecl:

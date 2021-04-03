@@ -94,6 +94,34 @@ let translate (statements) =
   in
 
 
+  (* Construct the function's "locals": formal arguments and locally
+       declared variables.  Allocate each on the stack, initialize their
+       value, if appropriate, and remember their values in the "locals" map *)
+    let local_vars =
+      let add_formal m (t, n) p = 
+        L.set_value_name n p;
+  let local = L.build_alloca (ltype_of_typ t) n builder in
+        ignore (L.build_store p local builder);
+  StringMap.add n local m 
+
+      (* Allocate space for any locally declared variables and add the
+       * resulting registers to our map *)
+      and add_local m (t, n) =
+  let local_var = L.build_alloca (ltype_of_typ t) n builder
+  in StringMap.add n local_var m 
+      in
+
+      let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
+          (Array.to_list (L.params the_function)) in
+      List.fold_left add_local formals fdecl.slocals 
+    in
+
+     (* Return the value for a variable or formal argument.
+       Check local names first, then global names *)
+    let lookup n = try StringMap.find n local_vars
+                   with Not_found -> StringMap.find n global_vars
+    in
+
 
         (* Construct code for an expression; return its value *)
     (* An expression in LLVM always turns into code in a single basic block (not true for stmts) *)
@@ -128,6 +156,9 @@ let translate (statements) =
      let rec stmt builder = function
         SBlock sl -> List.fold_left stmt builder sl
         | SExpr e -> ignore(expr builder e); builder
+        | SVDeclare (typ, str) -> 
+            let L.build_alloca (ltype_of_typ typ) str builder
+            in add_local local_vars (typ, str)
 
     in
 

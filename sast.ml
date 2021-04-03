@@ -19,18 +19,17 @@ type sstmt =
     SBlock of sstmt list
   | SDeclareAssign of typ * string * sexpr
   | SDeclare of typ * string
-  | SFuncDef of sfunc_decl
   | SExpr of sexpr
   | SReturn of sexpr
   | SIf of sexpr * sstmt * sstmt
   | SFor of sexpr * sexpr * sexpr * sstmt
   | SWhile of sexpr * sstmt
 
-and sfunc_decl = {
+type sfunc_decl = {
     styp : typ;
     sfname : string;
     sformals : bind list;
     sbody : sstmt list;
 }
 
-type sprogram = sstmt list
+type sprogram = sstmt list * sfunc_decl

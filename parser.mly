@@ -40,27 +40,24 @@
 /* Rules: context-free rules */
 
 program:
-  stmt_list EOF { $1 }
+  highest EOF { $1 }
 
 
 /* fdecl { (fst $1, ($2 :: snd $1)) } */
+highest:
+   /* nothing */ { ([], [])               }
+ | highest vdecl { (($2 :: fst $1), snd $1) }
+ | highest fdecl { (fst $1, ($2 :: snd $1)) }
+ | highest stmt { (fst $1, ($2 :: snd $1)) }
 
-
- /* statement-relevant parsing */
+/* statement-relevant parsing */
 stmt_list:
-    /* nothing */  { [] }
+    /* nothing */  { [], [] }
+  | stmt_list fdecl { $2 :: $1 }
   | stmt_list stmt { $2 :: $1 }
 
 stmt:
     expr SEMC { Expr $1 }
-  | DEF typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
-     { FuncDef(
-        { typ = $2;
-          fname = $3;
-          formals = List.rev $5;
-          body = List.rev $8 }
-        )
-      }
   | typ ID ASSIGN expr SEMC { DeclareAssign($1, $2, $4) } /* variable declaration (with assign) */
   | typ ID SEMC { Declare($1, $2) }  /* variable declaration (no assign) */
   | RETURN expr_opt SEMC { Return $2 }
@@ -71,6 +68,21 @@ stmt:
   | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
 /* =================================== */
 
+stmt_list:
+    /* nothing */  { [] }
+  | stmt_list stmt { $2 :: $1 }
+
+
+vdecl:
+   typ ID SEMI { ($1, $2) }
+
+
+fdecl:
+  DEF typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+  { { typ = $2;
+          fname = $3;
+          formals = List.rev $5;
+          body = List.rev $8 } }
 
 formals_opt:
     /* nothing */ { [] }

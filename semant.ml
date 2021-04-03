@@ -10,7 +10,7 @@ module StringMap = Map.Make(String)
 
    Check each global variable, then check each function *)
 
-let check (statements) =
+let check (statements, functions) =
 
 
 
@@ -99,4 +99,4 @@ let check (statements) =
       | _ -> raise (Failure ("internal error: block didn't become a block?"))
 
 
-  in (check_statement statements)
+  in (check_statement statements, functions)

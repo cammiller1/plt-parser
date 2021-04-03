@@ -24,18 +24,17 @@ type stmt =
     Block of stmt list
   | DeclareAssign of typ * string * expr
   | Declare of typ * string
-  | FuncDef of func_decl
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
 
-and func_decl = {
+type func_decl = {
     typ : typ;
     fname : string;
     formals : bind list;
     body : stmt list;
 }
 
-type program = stmt list
+type program = stmt list * func_decl list

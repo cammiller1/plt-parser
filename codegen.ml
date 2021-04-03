@@ -14,12 +14,12 @@ module StringMap = Map.Make(String)
 internally: some C++ class 
 REMINDER: L.pointer_type i8_t IS A CHAR POINTER. WILL NEED FOR STRINGS
 *)
-let translate (globals, functions) =
+let translate (statements) =
   let context    = L.global_context () in
 
   (* Create the LLVM compilation module into which
      we will generate code *)
-  let the_module = L.create_module context "jpie" in
+  let the_module = L.create_module context "complyed" in
 
 
   (* Get types from the context *)
@@ -32,7 +32,7 @@ let translate (globals, functions) =
   and string_t   = L.pointer_type   (L.i8_type context)      (* pointer type to char *)
   in
 
-  (* Return the LLVM type for a Jpie type *)
+  (* Return the LLVM type for a complyed type *)
   let ltype_of_typ = function
       A.Int   -> i32_t
     | A.Boolean  -> i1_t
@@ -40,16 +40,6 @@ let translate (globals, functions) =
     | A.Void  -> void_t
     | A.String -> string_t (* added for our project *)
   in
-
-   (* Create a map of global variables after creating each *)
-  let global_vars : L.llvalue StringMap.t =
-    let global_var m (t, n) = 
-      let init = match t with
-          A.Float -> L.const_float (ltype_of_typ t) 0.0
-        | _ -> L.const_int (ltype_of_typ t) 0
-      in StringMap.add n (L.define_global n init the_module) m in
-    (* the below empty list is supposed to be empty list of tuples. if error find this *)
-    List.fold_left global_var StringMap.empty globals in
 
 
   (* Declaring external functions *)
@@ -61,59 +51,50 @@ let translate (globals, functions) =
   let printf_func : L.llvalue = 
       L.declare_function "printf" printf_t the_module in
 
+  (* create fake main function *)
+  let main_t : L.lltype = 
+      (* the [| and |] indicates an Ocaml array*)
+      L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
+  (*  (* below LLVM's connection to a built-in function *)
+  let main_func : L.llvalue = 
+      L.declare_function "main" printf_t the_module in *)
+
+
   (* Define each function (arguments and return type) so we can 
-     call it even before we've created its body *)
-  let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
-    let function_decl m fdecl =
-      let name = fdecl.sfname
-      and formal_types = 
-  Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
-      in let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
-      StringMap.add name (L.define_function name ftype the_module, fdecl) m in
-    List.fold_left function_decl StringMap.empty functions in
-  
-  (* Fill in the body of the given function *)
-  let build_function_body fdecl =
-    let (the_function, _) = StringMap.find fdecl.sfname function_decls in
-    let builder = L.builder_at_end context (L.entry_block the_function) in
-
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
-    and float_format_str = L.build_global_stringptr "%f\n" "fmt" builder
-    and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
-    in
-
-    (* Construct the function's "locals": formal arguments and locally
-       declared variables.  Allocate each on the stack, initialize their
-       value, if appropriate, and remember their values in the "locals" map *)
-    let local_vars =
-      let add_formal m (t, n) p = 
-        L.set_value_name n p;
-  let local = L.build_alloca (ltype_of_typ t) n builder in
-        ignore (L.build_store p local builder);
-  StringMap.add n local m 
-
-      (* Allocate space for any locally declared variables and add the
-       * resulting registers to our map *)
-      and add_local m (t, n) =
-  let local_var = L.build_alloca (ltype_of_typ t) n builder
-  in StringMap.add n local_var m 
-      in
-
-      let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
-          (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals fdecl.slocals 
-    in
-
-    (* Return the value for a variable or formal argument.
-       Check local names first, then global names *)
-    let lookup n = try StringMap.find n local_vars
-                   with Not_found -> StringMap.find n global_vars
-    in
-
-
-  (* purpose of locals: given a var name, where can we find the value of that var in memory? *)
+      call it even before we've created its body *)
+   (* define a main function to wrap out program in *)
+   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
+     let function_decl m fdecl =
+       let name = fdecl.sfname
+       and formal_types = 
+   Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
+       in let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
+       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
+     List.fold_left function_decl StringMap.empty [] in
+ 
+ 
+    let function_decls = StringMap.add "main" (L.define_function "main" main_t the_module, ({styp = Int; sfname = "main"; sformals = []; sbody = [] })) function_decls
+ 
+ 
+  in
 
     
+  (* entry point *)
+  let build_statements statements =
+
+      (* this needs to get moved when we have user functions *)
+      (* creating a fake main funcion to wrap the entire script in *)
+      (* Needs to occur outside of the build_statement function *)
+     let (the_function, _) = StringMap.find "main" function_decls in
+     let builder = L.builder_at_end context (L.entry_block the_function) in
+ 
+     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
+     and float_format_str = L.build_global_stringptr "%f\n" "fmt" builder
+     and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
+  in
+
+
+
         (* Construct code for an expression; return its value *)
     (* An expression in LLVM always turns into code in a single basic block (not true for stmts) *)
     (* build instructions in the given builder that evaluate the expr; return the expr's value *)
@@ -123,7 +104,7 @@ let translate (globals, functions) =
       | SLitf l -> L.const_float float_t l
       | SLits s -> L.build_global_stringptr s "str" builder
       | SNoexpr     -> L.const_int i32_t 0
-      | SId s       -> L.build_load (lookup s) s builder
+      (* | SId s       -> L.build_load (lookup s) s builder *)
 
       (* a bunch of stuff between here *) 
       
@@ -138,24 +119,7 @@ let translate (globals, functions) =
       | SCall ("printf", [e]) -> 
           L.build_call printf_func [| float_format_str ; (expr builder e) |]
           "printf" builder
-          | SCall (f, args) ->
-         let (fdef, fdecl) = StringMap.find f function_decls in
-   let llargs = List.rev (List.map (expr builder) (List.rev args)) in
-   let result = (match fdecl.styp with 
-                        A.Void -> ""
-                      | _ -> f ^ "_result") in
-         L.build_call fdef (Array.of_list llargs) result builder
     in
-
-
-    (* LLVM insists each basic block end with exactly one "terminator" 
-       instruction that transfers control.  This function runs "instr builder"
-       if the current block does not already have a terminator.  Used,
-       e.g., to handle the "fall off the end of the function" case. *)
-    let add_terminal builder instr =
-      match L.block_terminator (L.insertion_block builder) with
-    Some _ -> ()
-      | None -> ignore (instr builder) in
 
 
     (* Build the code for the given statement; return the builder for
@@ -164,25 +128,15 @@ let translate (globals, functions) =
      let rec stmt builder = function
         SBlock sl -> List.fold_left stmt builder sl
         | SExpr e -> ignore(expr builder e); builder
-        | SReturn e -> ignore(match fdecl.styp with
-                              (* Special "return nothing" instr *)
-                              A.Void -> L.build_ret_void builder 
-                              (* Build return statement *)
-                            | _ -> L.build_ret (expr builder e) builder );
-                     builder
+
     in
 
+     (* Build the code for each statement *)
+    let builder = stmt builder (SBlock statements) in
 
-     (* Build the code for each statement in the function *)
-    let builder = stmt builder (SBlock fdecl.sbody) in
-
-    (* Add a return if the last block falls off the end *)
-    add_terminal builder (match fdecl.styp with
-        A.Void -> L.build_ret_void
-      | A.Float -> L.build_ret (L.const_float float_t 0.0)
-      | A.String -> L.build_ret (L.build_global_stringptr "" "str" builder)
-      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
+    (* Add a return for the simulated main function *)
+    L.build_ret (L.const_int i32_t 0) builder
   in
 
-    List.iter build_function_body functions;
+    build_statements statements;
     the_module  (* return the LLVM module result *)

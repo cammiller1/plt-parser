@@ -13,43 +13,46 @@ let string_literal = ('"'[' '-'~']*'"')
 
 rule tokenize = parse
  [' ' '\t' '\r' '\n'] { tokenize lexbuf }
-| "##"    { comment lexbuf }
-| "True"  { BLITERAL (true) }
-| "False" { BLITERAL (false) }
-| "int"   { INT }
-| "float" { FLOAT }
-| "bool"  { BOOL }
+| "##"     { comment lexbuf }
+| "True"   { BLITERAL (true) }
+| "False"  { BLITERAL (false) }
+| "int"    { INT }
+| "float"  { FLOAT }
+| "bool"   { BOOL }
+| "void"   { VOID }
 | "string" { STRING }
-| "Void"  { VOID }
-| ","     { COMMA }
-| "=="    { EQ }
-| "=<"    { LTE }
-| ">="    { GTE }
-| "!="    { NE }
-| "**"    { EXP }
-| "and"   { AND }
-| "or"    { OR }
-| "++"    { PP }
-| "--"    { MM }
-| '%'     { MOD }
-| '>'     { GT }
-| '<'     { LT }
-| '+'     { PLUS }
-| '-'     { MINUS }
-| '*'     { TIMES }
-| '/'     { DIVIDE }
-| ';'     { SEMC }
-| '='     { ASSIGN }
-| '('     { LPAREN }
-| ')'     { RPAREN }
-| '{'     { LBRACE }
-| '}'     { RBRACE }
-| "if"    { IF }
-| "else"  { ELSE }
-| "elif"  { ELIF }
-| "while" { WHILE }
-| "for"   { FOR }
-| "def"   { DEF }
+| "array"  { ARRAY }
+| ","      { COMMA }
+| "=="     { EQ }
+| "=<"     { LTE }
+| ">="     { GTE }
+| '!'	   { NOT }
+| "!="     { NE }
+| "**"     { EXP }
+| "and"    { AND }
+| "or"     { OR }
+| "in"	   { IN }
+| "++"     { PP }
+| "--"     { MM }
+| '%'      { MOD }
+| '>'      { GT }
+| '<'      { LT }
+| '+'      { PLUS }
+| '-'      { MINUS }
+| '*'      { TIMES }
+| '/'      { DIVIDE }
+| ';'      { SEMC }
+| '='      { ASSIGN }
+| '('      { LPAREN }
+| ')'      { RPAREN }
+| '{'      { LBRACE }
+| '}'      { RBRACE }
+| "if"     { IF }
+| "elif"   { ELIF }
+| "else"   { ELSE }
+| "while"  { WHILE }
+| "for"    { FOR }
+| "def"    { DEF }
 | "return" { RETURN }
 | string_literal as lxm { SLITERAL(remove_quotes lxm) }
 | digit+ as lxm { ILITERAL(int_of_string lxm) }

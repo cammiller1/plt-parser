@@ -1,9 +1,19 @@
 type token =
+  | INT
+  | FLOAT
+  | BOOL
+  | STRING
+  | VOID
+  | ARRAY
   | ASSIGN
   | PLUS
   | MINUS
   | TIMES
   | DIVIDE
+  | EXP
+  | SEMC
+  | PP
+  | MM
   | LT
   | GT
   | LTE
@@ -13,10 +23,8 @@ type token =
   | AND
   | OR
   | MOD
-  | EXP
-  | SEMC
-  | PP
-  | MM
+  | NOT
+  | IN
   | IF
   | ELSE
   | ELIF
@@ -29,11 +37,6 @@ type token =
   | RBRACE
   | LBRACE
   | COMMA
-  | INT
-  | FLOAT
-  | BOOL
-  | STRING
-  | VOID
   | ILITERAL of (int)
   | FLITERAL of (float)
   | ID of (string)

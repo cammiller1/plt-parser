@@ -1,7 +1,7 @@
 /usr/bin/lli
 
 ###### Testing test-hello-world
-./jpie.native tests/test-hello-world.jpie > test-hello-world.ll
+./compyled.native tests/test-hello-world.cp > test-hello-world.ll
 llc -relocation-model=pic test-hello-world.ll > test-hello-world.s
 cc -o test-hello-world.exe test-hello-world.s
 ./test-hello-world.exe

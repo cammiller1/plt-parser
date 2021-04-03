@@ -1,0 +1,30 @@
+### Starting build.
+# Target: compyled.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:compyled.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules compyled.ml > compyled.ml.depends
+# Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules codegen.ml > codegen.ml.depends
+# Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:ast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules ast.ml > ast.ml.depends
+# Target: sast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:sast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules sast.ml > sast.ml.depends
+# Target: ast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
+# Target: sast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:sast.cmo, file:sast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmo sast.ml
+# Target: parser.mly, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet, traverse }
+ocamlyacc parser.mly
+# Target: parser.mli.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mli, file:parser.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules parser.mli > parser.mli.depends
+# Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet, traverse }
+ocamllex.opt -q scanner.mll
+# Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules scanner.ml > scanner.ml.depends
+# Target: parser.cmi, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o parser.cmi parser.mli
+# Target: semant.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:semant.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules semant.ml > semant.ml.depends
++ ocamlfind ocamldep -package llvm -package llvm.analysis -modules semant.ml > semant.ml.depends
+File "semant.ml", line 110, characters 6-7:
+Error: Syntax error
+Command exited with code 2.
+# Compilation unsuccessful.

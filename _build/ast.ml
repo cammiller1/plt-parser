@@ -22,7 +22,8 @@ type expr =
 
 type stmt =
     Block of stmt list
-  | VDeclare of typ * string * expr option
+  | DeclareAssign of typ * string * expr
+  | Declare of typ * string
   | FuncDef of func_decl
   | Expr of expr
   | Return of expr

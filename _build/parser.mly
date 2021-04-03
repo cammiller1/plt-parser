@@ -59,7 +59,8 @@ stmt:
           body = List.rev $8 }
         )
       }
-  | typ ID assign_opt SEMC { VDeclare($1, $2, $3) }
+  | typ ID ASSIGN expr SEMC { DeclareAssign($1, $2, $4) } /* variable declaration (with assign) */
+  | typ ID SEMC { Declare($1, $2) }  /* variable declaration (no assign) */
   | RETURN expr_opt SEMC { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE %prec NOELSE { If($3, $6, Block([]))}
@@ -67,10 +68,6 @@ stmt:
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 
   | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
 
-
-assign_opt:
-  { None }
-  | ASSIGN expr { $2 }
 
 /* possible alternative to functions
 fdecl:
@@ -111,7 +108,6 @@ expr:
   | BLITERAL           { Litb($1) }
   | SLITERAL           { Lits($1) }
   | ID                 { Id($1) } 
-  | expr ASSIGN expr   { Assign($1, $3) }  /* assignment for when variable has been declared already! */
   | expr PLUS   expr   { Binop($1, Add, $3) }
   | expr MINUS  expr   { Binop($1, Sub, $3) }
   | expr TIMES  expr   { Binop($1, Mul, $3) }
@@ -126,6 +122,7 @@ expr:
   | expr NE expr       { Binop($1, Ne, $3) }
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
+  | ID ASSIGN expr     { Assign($1, $3) } /* assignment for when variable has been declared already! */
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }
 

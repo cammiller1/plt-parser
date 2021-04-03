@@ -51,8 +51,6 @@ Here is an example of a case that is not matched:
 SFor (_, _, _, _)|SWhile (_, _))
 File "codegen.ml", line 141, characters 4-31:
 Warning 10: this expression should have type unit.
-File "codegen.ml", line 59, characters 6-15:
-Warning 26: unused variable main_func.
 # Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml
 # Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet, traverse }
@@ -114,8 +112,6 @@ Here is an example of a case that is not matched:
 SFor (_, _, _, _)|SWhile (_, _))
 File "codegen.ml", line 141, characters 4-31:
 Warning 10: this expression should have type unit.
-File "codegen.ml", line 59, characters 6-15:
-Warning 26: unused variable main_func.
 # Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet, traverse }
 ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmx scanner.ml
 # Target: semant.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet, traverse }

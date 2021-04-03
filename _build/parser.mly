@@ -40,7 +40,7 @@
 /* Rules: context-free rules */
 
 program:
-  stmt_list stmt { List.rev $1 }
+  stmt_list EOF { $1 }
 
 
 /* fdecl { (fst $1, ($2 :: snd $1)) } */

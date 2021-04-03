@@ -1,5 +1,20 @@
 /usr/bin/lli
 
+###### Testing test-assign-no-dec1
+./compyled.native tests/test-assign-no-dec1.cp > test-assign-no-dec1.ll
+Fatal error: exception Match_failure("semant.ml", 98, 25)
+###### FAILED
+
+###### Testing test-assign-with-dec1
+./compyled.native tests/test-assign-with-dec1.cp > test-assign-with-dec1.ll
+Fatal error: exception Match_failure("semant.ml", 98, 25)
+###### FAILED
+
+###### Testing test-func1
+./compyled.native tests/test-func1.cp > test-func1.ll
+Fatal error: exception Parsing.Parse_error
+###### FAILED
+
 ###### Testing test-hello-world
 ./compyled.native tests/test-hello-world.cp > test-hello-world.ll
 llc -relocation-model=pic test-hello-world.ll > test-hello-world.s

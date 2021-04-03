@@ -1,0 +1,154 @@
+### Starting build.
+# Target: compyled.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:compyled.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules compyled.ml > compyled.ml.depends
+# Target: codegen.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:codegen.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules codegen.ml > codegen.ml.depends
+# Target: ast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:ast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules ast.ml > ast.ml.depends
+# Target: sast.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:sast.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules sast.ml > sast.ml.depends
+# Target: ast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:ast.cmo, file:ast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmo ast.ml
+# Target: sast.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:sast.cmo, file:sast.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmo sast.ml
+# Target: parser.mly, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet, traverse }
+ocamlyacc parser.mly
+# Target: parser.mli.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mli, file:parser.mli, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules parser.mli > parser.mli.depends
+# Target: scanner.mll, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:mll, file:scanner.mll, lexer, ocaml, ocamllex, quiet, traverse }
+ocamllex.opt -q scanner.mll
+# Target: scanner.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:scanner.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules scanner.ml > scanner.ml.depends
+# Target: parser.cmi, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o parser.cmi parser.mli
+# Target: semant.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:semant.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules semant.ml > semant.ml.depends
+# Target: codegen.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:codegen.cmo, file:codegen.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmo codegen.ml
+File "codegen.ml", line 36, characters 21-153:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+Array
+File "codegen.ml", line 76, characters 100-103:
+Warning 40: Int was selected from type Ast.typ.
+It is not visible in the current scope, and will not 
+be selected if the type becomes unknown.
+File "codegen.ml", line 76, characters 100-103:
+Warning 42: this use of Int relies on type-directed disambiguation,
+it will not compile with OCaml 4.00 or earlier.
+File "codegen.ml", line 101, characters 44-860:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SCall ("printf", _::_::_)|SCall ("printf", [])|SCall ("prints", _::_::_)|
+SCall ("prints", [])|SCall ("printb", _::_::_)|SCall ("printb", [])|
+SCall ("print", _::_::_)|SCall ("print", [])|SCall ("", _)|SId _|
+SBinop (_, _, _)|SUniop (_, _)|SAssign (_, _))
+File "codegen.ml", line 128, characters 28-141:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SVDeclareAssign (_, _, _)|SVDeclare (_, _)|SFuncDef _|SReturn _|
+SIf (_, _, _)|SFor (_, _, _, _)|SWhile (_, _))
+File "codegen.ml", line 141, characters 4-31:
+Warning 10: this expression should have type unit.
+# Target: scanner.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:scanner.cmo, file:scanner.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmo scanner.ml
+# Target: semant.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:semant.cmo, file:semant.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmo semant.ml
+File "semant.ml", line 71, characters 19-999:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Binop (_, _, _)|Uniop (_, _))
+File "semant.ml", line 98, characters 25-1101:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(VDeclareAssign (_, _, _)|VDeclare (_, _)|FuncDef _|If (_, _, _)|
+For (_, _, _, _)|While (_, _))
+File "semant.ml", line 41, characters 8-20:
+Warning 26: unused variable check_assign.
+File "semant.ml", line 58, characters 8-30:
+Warning 26: unused variable check_already_declared.
+File "semant.ml", line 66, characters 37-40:
+Warning 27: unused variable err.
+File "semant.ml", line 78, characters 8-28:
+Warning 26: unused variable ex.
+File "semant.ml", line 83, characters 8-33:
+Warning 26: unused variable call.
+# Target: compyled.cmo, tags: { package(llvm), package(llvm.analysis), warn(+a-4), byte, compile, extension:cmo, extension:ml, file:compyled.cmo, file:compyled.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o compyled.cmo compyled.ml
++ ocamlfind ocamlc -c -w +a-4 -package llvm -package llvm.analysis -o compyled.cmo compyled.ml
+File "compyled.ml", line 26, characters 4-328:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Ast|Sast|LLVM_IR)
+# Target: ast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:ast.cmx, file:ast.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o ast.cmx ast.ml
+# Target: sast.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:sast.cmx, file:sast.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o sast.cmx sast.ml
+# Target: parser.ml.depends, tags: { package(llvm), package(llvm.analysis), warn(+a-4), extension:ml, file:parser.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package llvm -package llvm.analysis -modules parser.ml > parser.ml.depends
+# Target: parser.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:parser.cmx, file:parser.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o parser.cmx parser.ml
+# Target: codegen.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:codegen.cmx, file:codegen.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o codegen.cmx codegen.ml
+File "codegen.ml", line 36, characters 21-153:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+Array
+File "codegen.ml", line 76, characters 100-103:
+Warning 40: Int was selected from type Ast.typ.
+It is not visible in the current scope, and will not 
+be selected if the type becomes unknown.
+File "codegen.ml", line 76, characters 100-103:
+Warning 42: this use of Int relies on type-directed disambiguation,
+it will not compile with OCaml 4.00 or earlier.
+File "codegen.ml", line 101, characters 44-860:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SCall ("printf", _::_::_)|SCall ("printf", [])|SCall ("prints", _::_::_)|
+SCall ("prints", [])|SCall ("printb", _::_::_)|SCall ("printb", [])|
+SCall ("print", _::_::_)|SCall ("print", [])|SCall ("", _)|SId _|
+SBinop (_, _, _)|SUniop (_, _)|SAssign (_, _))
+File "codegen.ml", line 128, characters 28-141:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(SVDeclareAssign (_, _, _)|SVDeclare (_, _)|SFuncDef _|SReturn _|
+SIf (_, _, _)|SFor (_, _, _, _)|SWhile (_, _))
+File "codegen.ml", line 141, characters 4-31:
+Warning 10: this expression should have type unit.
+# Target: scanner.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:scanner.cmx, file:scanner.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o scanner.cmx scanner.ml
+# Target: semant.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:semant.cmx, file:semant.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o semant.cmx semant.ml
+File "semant.ml", line 71, characters 19-999:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Binop (_, _, _)|Uniop (_, _))
+File "semant.ml", line 98, characters 25-1101:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(VDeclareAssign (_, _, _)|VDeclare (_, _)|FuncDef _|If (_, _, _)|
+For (_, _, _, _)|While (_, _))
+File "semant.ml", line 41, characters 8-20:
+Warning 26: unused variable check_assign.
+File "semant.ml", line 58, characters 8-30:
+Warning 26: unused variable check_already_declared.
+File "semant.ml", line 66, characters 37-40:
+Warning 27: unused variable err.
+File "semant.ml", line 78, characters 8-28:
+Warning 26: unused variable ex.
+File "semant.ml", line 83, characters 8-33:
+Warning 26: unused variable call.
+# Target: compyled.cmx, tags: { package(llvm), package(llvm.analysis), warn(+a-4), compile, extension:cmx, extension:ml, file:compyled.cmx, file:compyled.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o compyled.cmx compyled.ml
++ ocamlfind ocamlopt -c -w +a-4 -package llvm -package llvm.analysis -o compyled.cmx compyled.ml
+File "compyled.ml", line 26, characters 4-328:
+Warning 8: this pattern-matching is not exhaustive.
+Here is an example of a case that is not matched:
+(Ast|Sast|LLVM_IR)
+# Target: compyled.native, tags: { package(llvm), package(llvm.analysis), warn(+a-4), dont_link_with, extension:native, file:compyled.native, link, native, ocaml, program, quiet, traverse }
+ocamlfind ocamlopt -linkpkg -package llvm -package llvm.analysis ast.cmx sast.cmx codegen.cmx parser.cmx scanner.cmx semant.cmx compyled.cmx -o compyled.native
+# Compilation successful.

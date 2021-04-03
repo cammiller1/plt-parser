@@ -1,4 +1,12 @@
-%{ open Ast %}
+%{
+open Ast
+
+let fst (a,_,_) = a;;
+let snd (_,b,_) = b;;
+let trd (_,_,c) = c;;
+
+%}
+
 
 /* Declarations: tokens, precendence, etc. */
 
@@ -40,29 +48,27 @@
 /* Rules: context-free rules */
 
 program:
-  stmt_list EOF { $1 }
+  highest EOF { $1 }
 
 
 /* fdecl { (fst $1, ($2 :: snd $1)) } */
+highest:
+   /* nothing */ { ([], [], [])             }
+ | highest vdecl { (($2 :: fst $1), snd $1, trd $1) }
+ | highest fdecl { (fst $1, ($2 :: snd $1), trd $1) }
+ | highest stmt { (fst $1, snd $1, ($2 :: trd $1))  }
+ /* (fdecl vdecl ) stmt */
+ /* { ((List.rev $2::fst $1), snd $1, trd $1)} */
+ /*
+  first - fdecl
+  second - vdecl
+  thid - stmt
+ */
 
-
- /* statement-relevant parsing */
-stmt_list:
-    /* nothing */  { [] }
-  | stmt_list stmt { $2 :: $1 }
+/* statement-relevant parsing */
 
 stmt:
     expr SEMC { Expr $1 }
-  | DEF typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
-     { FuncDef(
-        { typ = $2;
-          fname = $3;
-          formals = List.rev $5;
-          body = List.rev $8 }
-        )
-      }
-  | typ ID ASSIGN expr SEMC { DeclareAssign($1, $2, $4) } /* variable declaration (with assign) */
-  | typ ID SEMC { Declare($1, $2) }  /* variable declaration (no assign) */
   | RETURN expr_opt SEMC { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
   | IF LPAREN expr RPAREN LBRACE stmt RBRACE %prec NOELSE { If($3, $6, Block([]))}
@@ -71,6 +77,21 @@ stmt:
   | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
 /* =================================== */
 
+stmt_list:
+    /* nothing */  { [] }
+  | stmt_list stmt { $2 :: $1 }
+
+
+vdecl:
+   typ ID SEMC { ($1, $2) }
+
+
+fdecl:
+  DEF typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+  { { typ = $2;
+          fname = $3;
+          formals = List.rev $5;
+          body = List.rev $8 } }
 
 formals_opt:
     /* nothing */ { [] }
@@ -118,7 +139,6 @@ expr:
   | expr NE expr       { Binop($1, Ne, $3) }
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
-  /* assignment for when variable has been declared already! */
   | ID ASSIGN expr     { Assign($1, $3) } 
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }

@@ -1,9 +1,6 @@
 /usr/bin/lli
 
 ###### Testing test-hello-world
-./jpie.native tests/test-hello-world.jpie > test-hello-world.ll
-llc -relocation-model=pic test-hello-world.ll > test-hello-world.s
-cc -o test-hello-world.exe test-hello-world.s
-./test-hello-world.exe
-diff -b test-hello-world.out tests/test-hello-world.out > test-hello-world.diff
-###### SUCCESS
+./complyed.native tests/test-hello-world.cp > test-hello-world.ll
+./testall.sh: 1: eval: ./complyed.native: not found
+###### FAILED

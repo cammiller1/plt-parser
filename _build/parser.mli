@@ -24,6 +24,7 @@ type token =
   | OR
   | MOD
   | NOT
+  | IN
   | IF
   | ELSE
   | ELIF

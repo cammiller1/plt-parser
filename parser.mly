@@ -1,4 +1,12 @@
-%{ open Ast %}
+%{
+open Ast
+
+let fst (a,_,_) = a;;
+let snd (_,b,_) = b;;
+let trd (_,_,c) = c;;
+
+%}
+
 
 /* Declarations: tokens, precendence, etc. */
 
@@ -46,9 +54,16 @@ program:
 /* fdecl { (fst $1, ($2 :: snd $1)) } */
 highest:
    /* nothing */ { ([], [], [])             }
- | highest fdecl { (fst $1, ($2 :: snd $1), []) }
- | highest vdecl { (($2 :: fst $1), snd $1, []) }
- | highest stmt { ([], [], [$1])  }
+ | highest vdecl { (($2 :: fst $1), snd $1, trd $1) }
+ | highest fdecl { (fst $1, ($2 :: snd $1), trd $1) }
+ | highest stmt { (fst $1, snd $1, ($2 :: trd $1))  }
+ /* (fdecl vdecl ) stmt */
+ /* { ((List.rev $2::fst $1), snd $1, trd $1)} */
+ /*
+  first - fdecl
+  second - vdecl
+  thid - stmt
+ */
 
 /* statement-relevant parsing */
 
@@ -124,7 +139,6 @@ expr:
   | expr NE expr       { Binop($1, Ne, $3) }
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
-  /* assignment for when variable has been declared already! */
   | ID ASSIGN expr     { Assign($1, $3) } 
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }

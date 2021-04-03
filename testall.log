@@ -2,12 +2,12 @@
 
 ###### Testing test-assign-no-dec1
 ./compyled.native tests/test-assign-no-dec1.cp > test-assign-no-dec1.ll
-Fatal error: exception Match_failure("semant.ml", 98, 25)
+Fatal error: exception Match_failure("semant.ml", 96, 25)
 ###### FAILED
 
 ###### Testing test-assign-with-dec1
 ./compyled.native tests/test-assign-with-dec1.cp > test-assign-with-dec1.ll
-Fatal error: exception Match_failure("semant.ml", 98, 25)
+Fatal error: exception Failure("undeclared identifier x")
 ###### FAILED
 
 ###### Testing test-func1
@@ -22,3 +22,8 @@ cc -o test-hello-world.exe test-hello-world.s
 ./test-hello-world.exe
 diff -b test-hello-world.out tests/test-hello-world.out > test-hello-world.diff
 ###### SUCCESS
+
+###### Testing test-var-decl1
+./compyled.native tests/test-var-decl1.cp > test-var-decl1.ll
+Fatal error: exception Match_failure("codegen.ml", 128, 28)
+###### FAILED

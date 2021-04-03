@@ -24,14 +24,14 @@ type stmt =
     Block of stmt list
   | VDeclareAssign of typ * string * expr
   | VDeclare of typ * string
-  | FuncDef of func_decl
+  | FuncDef of sfunc_decl
   | Expr of expr
   | Return of expr
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
 
-and func_decl = {
+and sfunc_decl = {
     typ : typ;
     fname : string;
     formals : bind list;

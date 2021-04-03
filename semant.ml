@@ -6,9 +6,7 @@ open Sast
 module StringMap = Map.Make(String)
 
 (* Semantic checking of the AST. Returns an SAST if successful,
-   throws an exception if something is wrong.
-
-   Check each global variable, then check each function *)
+   throws an exception if something is wrong. *)
 
 let check (statements) =
 
@@ -97,20 +95,11 @@ let check (statements) =
     (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt = function
         Expr e -> SExpr (expr e)
-      (* | VDeclare (typ, str, e) -> 
-          match e with
-          None -> SVDecl(typ, str, None)
-          | _ -> let e' = expr e in
-            SVDeclare(ty, name, e')
-          (*
-          let e' = expr e in
-          (* check valid declaration and add to symbol table *)
-          let ty = match typ with
-            Void -> raise ( Failure ("illegal void assignment variable " ^ str) )
-            | _ -> typ
-          and name = check_already_declared str
-           in StringMap.add name ty symbols in
-          let name2 = name *) *)
+       | VDeclare (typ, str) -> let id = str in
+            (* Check that it is not a void type *)
+            if typ = Void then raise ( Failure ("Cannot assign void to a variable") )
+            else SVDeclare (typ, id) 
+
 
       | Return e -> let (t, e') = expr e in
           SReturn (t, e')

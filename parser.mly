@@ -44,9 +44,9 @@ program:
 
 
 stmt_list:
-    /* nothing */  { [] }
     /* possible alternative to functions 
   | stmt_list fdecl { (fst $1, ($2 :: snd $1)) } */
+   /* nothing */  { [] }
   | stmt_list stmt { $2 :: $1 }
 
 stmt:

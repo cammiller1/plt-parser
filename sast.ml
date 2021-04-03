@@ -17,7 +17,7 @@ and sx =
 
 type sstmt =
     SBlock of sstmt list
-  | VDeclare of typ * string * sexpr option
+  | SVDeclare of typ * string * sexpr option
   | SFuncDef of sfunc_decl
   | SExpr of sexpr
   | SReturn of sexpr

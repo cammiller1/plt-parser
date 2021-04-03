@@ -97,15 +97,20 @@ let check (statements) =
     (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt = function
         Expr e -> SExpr (expr e)
-      | Declare (typ, str) -> 
+      | VDeclare (typ, str, e) -> 
+          match e with
+          None -> SVDecl(typ, str, None)
+          | _ -> let e' = expr e in
+            SVDeclare(ty, name, e')
+          (*
+          let e' = expr e in
           (* check valid declaration and add to symbol table *)
           let ty = match typ with
             Void -> raise ( Failure ("illegal void assignment variable " ^ str) )
             | _ -> typ
           and name = check_already_declared str
-          in StringMap.add name ty symbols in
-          let name2 = name
-          in SDeclare(ty, name2)
+           in StringMap.add name ty symbols in
+          let name2 = name *)
 
       | Return e -> let (t, e') = expr e in
           SReturn (t, e')

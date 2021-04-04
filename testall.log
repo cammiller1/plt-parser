@@ -1,5 +1,22 @@
 /usr/bin/lli
 
+###### Testing test-assign1
+./compyled.native tests/test-assign1.cp > test-assign1.ll
+llc -relocation-model=pic test-assign1.ll > test-assign1.s
+cc -o test-assign1.exe test-assign1.s
+./test-assign1.exe
+diff -b test-assign1.out tests/test-assign1.out > test-assign1.diff
+FAILED test-assign1.out differs from tests/test-assign1.out
+###### FAILED
+
+###### Testing test-decl1
+./compyled.native tests/test-decl1.cp > test-decl1.ll
+llc -relocation-model=pic test-decl1.ll > test-decl1.s
+cc -o test-decl1.exe test-decl1.s
+./test-decl1.exe
+diff -b test-decl1.out tests/test-decl1.out > test-decl1.diff
+###### SUCCESS
+
 ###### Testing test-hello-world
 ./compyled.native tests/test-hello-world.cp > test-hello-world.ll
 llc -relocation-model=pic test-hello-world.ll > test-hello-world.s

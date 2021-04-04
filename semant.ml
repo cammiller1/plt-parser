@@ -13,7 +13,22 @@ module StringMap = Map.Make(String)
 let check (globals, functions, statements) =
 
 
+   (* Verify a list of bindings has no void types or duplicate names *)
+  let check_binds (kind : string) (binds : bind list) =
+    List.iter (function
+      (Void, b) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
+      | _ -> ()) binds;
+    let rec dups = function
+        [] -> ()
+      | ((_,n1) :: (_,n2) :: _) when n1 = n2 ->
+    raise (Failure ("duplicate " ^ kind ^ " " ^ n1))
+      | _ :: t -> dups t
+    in dups (List.sort (fun (_,a) (_,b) -> compare a b) binds)
+  in
 
+  (**** Check global variables ****)
+
+  check_binds "global" globals;
   
 
   (* create a fake main function to wrap the program in
@@ -51,6 +66,18 @@ let check (globals, functions, statements) =
 
   let check_statement statements = 
 
+
+     (* Build local symbol table of variables for this function *)
+    let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+                  StringMap.empty (globals)
+    in
+
+    (* Return a variable from our local symbol table *)
+    let type_of_identifier s =
+      try StringMap.find s symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
     let check_assign lvaluet rvaluet err =
@@ -64,6 +91,12 @@ let check (globals, functions, statements) =
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
       | Noexpr     -> (Void, SNoexpr)
+      | Id s       -> (type_of_identifier s, SId s)
+      | Assign(var, e) as ex -> 
+          let lt = type_of_identifier var
+          and (rt, e') = expr e in
+          let err = "illegal assignment"
+          in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in
           let param_length = List.length fd.formals in
@@ -100,3 +133,4 @@ let check (globals, functions, statements) =
 
 
   in (globals, functions, check_statement statements)
+

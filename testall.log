@@ -6,8 +6,7 @@ llc -relocation-model=pic test-assign1.ll > test-assign1.s
 cc -o test-assign1.exe test-assign1.s
 ./test-assign1.exe
 diff -b test-assign1.out tests/test-assign1.out > test-assign1.diff
-FAILED test-assign1.out differs from tests/test-assign1.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-decl1
 ./compyled.native tests/test-decl1.cp > test-decl1.ll

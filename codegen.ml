@@ -41,6 +41,15 @@ let translate (globals, functions, statements) =
     | A.String -> string_t (* added for our project *)
   in
 
+  (* Create a map of global variables after creating each *)
+  let global_vars : L.llvalue StringMap.t =
+    let global_var m (t, n) = 
+      let init = match t with
+          A.Float -> L.const_float (ltype_of_typ t) 0.0
+        | _ -> L.const_int (ltype_of_typ t) 0
+      in StringMap.add n (L.define_global n init the_module) m in
+    List.fold_left global_var StringMap.empty globals in
+
 
   (* Declaring external functions *)
   (* create a link to the C library's "printf" *)
@@ -93,6 +102,12 @@ let translate (globals, functions, statements) =
      and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
   in
 
+  (* Return the value for a variable or formal argument.
+       Check local names first, then global names *)
+    let lookup n = StringMap.find n global_vars
+                   (* with Not_found -> StringMap.find n global_vars *)
+    in
+
 
 
         (* Construct code for an expression; return its value *)
@@ -104,10 +119,9 @@ let translate (globals, functions, statements) =
       | SLitf l -> L.const_float float_t l
       | SLits s -> L.build_global_stringptr s "str" builder
       | SNoexpr     -> L.const_int i32_t 0
-      (* | SId s       -> L.build_load (lookup s) s builder *)
-
-      (* a bunch of stuff between here *) 
-      
+      | SId s       -> L.build_load (lookup s) s builder
+      | SAssign (s, e) -> let e' = expr builder e in
+                          ignore(L.build_store e' (lookup s) builder); e'
       | SCall ("print", [e]) | SCall ("printb", [e]) ->
           L.build_call printf_func [| int_format_str ; (expr builder e) |]
             "printf" builder

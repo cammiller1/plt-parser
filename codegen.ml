@@ -262,7 +262,7 @@ let translate (globals, functions, statements) =
     (* Add a return for the simulated main function *)
     L.build_ret (L.const_int i32_t 0) builder
   in
-
-    build_statements statements;
+    
     List.iter build_function_body functions;
+    List.iter build_statements statements;
     the_module  (* return the LLVM module result *)

@@ -104,6 +104,38 @@ cc -o test-for1.exe test-for1.s
 diff -b test-for1.out tests/test-for1.out > test-for1.diff
 ###### SUCCESS
 
+###### Testing test-func1
+./compyled.native tests/test-func1.cp > test-func1.ll
+llc -relocation-model=pic test-func1.ll > test-func1.s
+cc -o test-func1.exe test-func1.s
+./test-func1.exe
+diff -b test-func1.out tests/test-func1.out > test-func1.diff
+###### SUCCESS
+
+###### Testing test-func2
+./compyled.native tests/test-func2.cp > test-func2.ll
+llc -relocation-model=pic test-func2.ll > test-func2.s
+cc -o test-func2.exe test-func2.s
+./test-func2.exe
+diff -b test-func2.out tests/test-func2.out > test-func2.diff
+###### SUCCESS
+
+###### Testing test-func3
+./compyled.native tests/test-func3.cp > test-func3.ll
+llc -relocation-model=pic test-func3.ll > test-func3.s
+cc -o test-func3.exe test-func3.s
+./test-func3.exe
+diff -b test-func3.out tests/test-func3.out > test-func3.diff
+###### SUCCESS
+
+###### Testing test-func4
+./compyled.native tests/test-func4.cp > test-func4.ll
+llc -relocation-model=pic test-func4.ll > test-func4.s
+cc -o test-func4.exe test-func4.s
+./test-func4.exe
+diff -b test-func4.out tests/test-func4.out > test-func4.diff
+###### SUCCESS
+
 ###### Testing test-hello-world
 ./compyled.native tests/test-hello-world.cp > test-hello-world.ll
 llc -relocation-model=pic test-hello-world.ll > test-hello-world.s

@@ -45,8 +45,24 @@ let check (globals, functions, statements) =
                                ("prints", String) ]
   in
 
+  (* Add function name to symbol table *)
+  let add_func map fd = 
+    let built_in_err = "function " ^ fd.fname ^ " may not be defined"
+    and dup_err = "duplicate function " ^ fd.fname
+    and make_err er = raise (Failure er)
+    and n = fd.fname (* Name of the function *)
+    in match fd with (* No duplicate functions or redefinitions of built-ins *)
+         _ when StringMap.mem n built_in_decls -> make_err built_in_err
+       | _ when StringMap.mem n map -> make_err dup_err  
+       | _ ->  StringMap.add n fd map 
+  in
+
+  (* Collect all function names into one symbol table *)
+  let function_decls = List.fold_left add_func built_in_decls functions
+  in
+
   (* add the main function *)
-  let built_in_decls = StringMap.add "main" {typ = Void; fname = "main"; formals = []; locals = []; body = [] } built_in_decls
+  let function_decls = StringMap.add "main" {typ = Void; fname = "main"; formals = []; locals = []; body = [] } function_decls
   
   
   in
@@ -58,7 +74,7 @@ let check (globals, functions, statements) =
 
   (* Return a function from our built_in symbol table *)
   let find_func s = 
-    try StringMap.find s built_in_decls
+    try StringMap.find s function_decls
     with Not_found -> raise (Failure ("unrecognized function " ^ s))
   in
 
@@ -177,7 +193,7 @@ let check (globals, functions, statements) =
 
   (* Return a function from our built_in symbol table *)
   let find_func s = 
-    try StringMap.find s built_in_decls
+    try StringMap.find s function_decls
     with Not_found -> raise (Failure ("unrecognized function " ^ s))
   in
   
@@ -278,4 +294,4 @@ let check (globals, functions, statements) =
   
 
 
-  in (globals, functions, check_statement statements)
+  in (globals, List.map check_function functions, check_statement statements)

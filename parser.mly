@@ -85,13 +85,18 @@ stmt_list:
 vdecl:
    typ ID SEMC { ($1, $2) }
 
+vdecl_list:
+    /* nothing */    { [] }
+  | vdecl_list vdecl { $2 :: $1 }
+
 
 fdecl:
-  DEF typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+  DEF typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
   { { typ = $2;
           fname = $3;
           formals = List.rev $5;
-          body = List.rev $8 } }
+          locals = List.rev $8;
+          body = List.rev $9 } }
 
 formals_opt:
     /* nothing */ { [] }

@@ -61,16 +61,21 @@ let check (globals, functions, statements) =
     try StringMap.find s built_in_decls
     with Not_found -> raise (Failure ("unrecognized function " ^ s))
   in
+
+  let check_function func =
+    (* Make sure no formals or locals are void or duplicates *)
+    check_binds "formal" func.formals;
+    check_binds "local" func.locals;
+
+  (* Build local symbol table of variables for this function *)
+    let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+                  StringMap.empty (globals @ func.formals @ func.locals )
+    in
   
 
 
   let check_statement statements = 
 
-
-     (* Build local symbol table of variables for this function *)
-    let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
-                  StringMap.empty (globals)
-    in
 
     (* Return a variable from our local symbol table *)
     let type_of_identifier s =
@@ -152,12 +157,22 @@ let check (globals, functions, statements) =
             | []              -> []
           in SBlock(check_stmt_list sl)
 
-    in
+
+    in (* body of check_function *)
+    { styp = func.typ;
+      sfname = func.fname;
+      sformals = func.formals;
+      slocals  = func.locals;
+      sbody = match check_stmt (Block func.body) with
+  SBlock(sl) -> sl
+      | _ -> raise (Failure ("internal error: block didn't become a block?"))
+    }
+
+  in
     
     match check_stmt (Block statements) with
         SBlock(sl) -> sl
       | _ -> raise (Failure ("internal error: block didn't become a block?"))
 
 
-  in (globals, functions, check_statement statements)
-
+  in (globals, List.map check_function functions, check_statement statements)

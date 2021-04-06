@@ -6,8 +6,7 @@ llc -relocation-model=pic test-arithm-float-add.ll > test-arithm-float-add.s
 cc -o test-arithm-float-add.exe test-arithm-float-add.s
 ./test-arithm-float-add.exe
 diff -b test-arithm-float-add.out tests/test-arithm-float-add.out > test-arithm-float-add.diff
-FAILED test-arithm-float-add.out differs from tests/test-arithm-float-add.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-arithm-float-divide
 ./compyled.native tests/test-arithm-float-divide.cp > test-arithm-float-divide.ll
@@ -15,8 +14,7 @@ llc -relocation-model=pic test-arithm-float-divide.ll > test-arithm-float-divide
 cc -o test-arithm-float-divide.exe test-arithm-float-divide.s
 ./test-arithm-float-divide.exe
 diff -b test-arithm-float-divide.out tests/test-arithm-float-divide.out > test-arithm-float-divide.diff
-FAILED test-arithm-float-divide.out differs from tests/test-arithm-float-divide.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-arithm-float-multiply
 ./compyled.native tests/test-arithm-float-multiply.cp > test-arithm-float-multiply.ll
@@ -32,8 +30,7 @@ llc -relocation-model=pic test-arithm-float-sub.ll > test-arithm-float-sub.s
 cc -o test-arithm-float-sub.exe test-arithm-float-sub.s
 ./test-arithm-float-sub.exe
 diff -b test-arithm-float-sub.out tests/test-arithm-float-sub.out > test-arithm-float-sub.diff
-FAILED test-arithm-float-sub.out differs from tests/test-arithm-float-sub.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-arithm-int-add
 ./compyled.native tests/test-arithm-int-add.cp > test-arithm-int-add.ll
@@ -97,8 +94,7 @@ llc -relocation-model=pic test-float1.ll > test-float1.s
 cc -o test-float1.exe test-float1.s
 ./test-float1.exe
 diff -b test-float1.out tests/test-float1.out > test-float1.diff
-FAILED test-float1.out differs from tests/test-float1.out
-###### FAILED
+###### SUCCESS
 
 ###### Testing test-hello-world
 ./compyled.native tests/test-hello-world.cp > test-hello-world.ll

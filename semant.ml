@@ -127,9 +127,17 @@ let check (globals, functions, statements) =
           in (fd.typ, SCall(fname, args'))
     in
 
+
+    let check_bool_expr e = 
+      let (t', e') = expr e
+      and err = "expected Boolean expression in ____"
+      in if t' != Boolean then raise (Failure err) else (t', e') 
+    in
+
     (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt = function
         Expr e -> SExpr (expr e)
+      | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
       | Return e -> let (t, e') = expr e in
           SReturn (t, e')
       | Block sl -> 

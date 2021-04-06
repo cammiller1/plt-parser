@@ -1,4 +1,4 @@
-(* Semantic checking for the Jpie compiler *)
+(* Semantic checking for the ComPyled compiler *)
 
 open Ast
 open Sast
@@ -7,7 +7,6 @@ module StringMap = Map.Make(String)
 
 (* Semantic checking of the AST. Returns an SAST if successful,
    throws an exception if something is wrong.
-
    Check each global variable, then check each function *)
 
 let check (globals, functions, statements) =
@@ -41,6 +40,7 @@ let check (globals, functions, statements) =
       typ = Void;
       fname = name; 
       formals = [(ty, "x")];
+      locals = [];
       body = [] } map 
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
                                ("printb", Boolean);
@@ -48,34 +48,45 @@ let check (globals, functions, statements) =
                                ("prints", String) ]
   in
 
-  (* add the main function  
-  let built_in_decls = StringMap.add "main" {typ = Void; fname = "main"; formals = []; body = [] } built_in_decls
+
+  (* Add function name to symbol table *)
+  let add_func map fd = 
+    let built_in_err = "function " ^ fd.fname ^ " may not be defined"
+    and dup_err = "duplicate function " ^ fd.fname
+    and make_err er = raise (Failure er)
+    and n = fd.fname (* Name of the function *)
+    in match fd with (* No duplicate functions or redefinitions of built-ins *)
+         _ when StringMap.mem n built_in_decls -> make_err built_in_err
+       | _ when StringMap.mem n map -> make_err dup_err  
+       | _ ->  StringMap.add n fd map 
+  in
+
+  (* add the main function *)
+  let built_in_decls = StringMap.add "main" {typ = Void; fname = "main"; formals = []; locals = []; body = [] } built_in_decls
   
   in
-  *)
+
+  (* Collect all function names into one symbol table *)
+  let function_decls = List.fold_left add_func built_in_decls functions
+  in
 
 
 
   (* Return a function from our built_in symbol table *)
   let find_func s = 
-    try StringMap.find s built_in_decls
+    try StringMap.find s function_decls
     with Not_found -> raise (Failure ("unrecognized function " ^ s))
   in
-
-  let check_function func =
-    (* Make sure no formals or locals are void or duplicates *)
-    check_binds "formal" func.formals;
-    check_binds "local" func.locals;
-
-  (* Build local symbol table of variables for this function *)
-    let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
-                  StringMap.empty (globals @ func.formals @ func.locals )
-    in
   
 
 
   let check_statement statements = 
 
+
+     (* Build local symbol table of variables for this function *)
+    let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
+                  StringMap.empty (globals)
+    in
 
     (* Return a variable from our local symbol table *)
     let type_of_identifier s =
@@ -157,22 +168,11 @@ let check (globals, functions, statements) =
             | []              -> []
           in SBlock(check_stmt_list sl)
 
-
-    in (* body of check_function *)
-    { styp = func.typ;
-      sfname = func.fname;
-      sformals = func.formals;
-      slocals  = func.locals;
-      sbody = match check_stmt (Block func.body) with
-  SBlock(sl) -> sl
-      | _ -> raise (Failure ("internal error: block didn't become a block?"))
-    }
-
-  in
+    in
     
     match check_stmt (Block statements) with
         SBlock(sl) -> sl
       | _ -> raise (Failure ("internal error: block didn't become a block?"))
 
 
-  in (globals, List.map check_function functions, check_statement statements)
+  in (globals, functions, check_statement statements)

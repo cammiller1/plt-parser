@@ -1,6 +1,5 @@
 (* Code generation: translate takes a semantically checked AST and
 produces LLVM IR
-
 *)
 
 module L = Llvm
@@ -79,15 +78,13 @@ let translate (globals, functions, statements) =
    Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
        in let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
        StringMap.add name (L.define_function name ftype the_module, fdecl) m in
-     List.fold_left function_decl StringMap.empty functions in
+     List.fold_left function_decl StringMap.empty [] in
  
  
-    (* may need to make the locals and formals of this intertwined with globals *)
     let function_decls = StringMap.add "main" (L.define_function "main" main_t the_module, ({styp = Int; sfname = "main"; sformals = []; slocals = []; sbody = [] })) function_decls
-
-
-    in
-
+ 
+ 
+  in
 
     
   (* entry point *)
@@ -104,44 +101,11 @@ let translate (globals, functions, statements) =
      and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
   in
 
-
-  (* Fill in the body of the given function *)
-    let build_function_body fdecl =
-    let (the_function, _) = StringMap.find fdecl.sfname function_decls in
-    let builder = L.builder_at_end context (L.entry_block the_function) in
-
-    let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
-    and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder in
-
-    (* Construct the function's "locals": formal arguments and locally
-       declared variables.  Allocate each on the stack, initialize their
-       value, if appropriate, and remember their values in the "locals" map *)
-    let local_vars =
-      let add_formal m (t, n) p = 
-        L.set_value_name n p;
-      let local = L.build_alloca (ltype_of_typ t) n builder in
-            ignore (L.build_store p local builder);
-            StringMap.add n local m 
-
-      (* Allocate space for any locally declared variables and add the
-       * resulting registers to our map *)
-      and add_local m (t, n) =
-  let local_var = L.build_alloca (ltype_of_typ t) n builder
-  in StringMap.add n local_var m 
-      in
-
-      let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
-          (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals fdecl.slocals 
-    in
-
   (* Return the value for a variable or formal argument.
        Check local names first, then global names *)
     let lookup n = StringMap.find n global_vars
                    (* with Not_found -> StringMap.find n global_vars *)
     in
-
-  
 
 
 
@@ -262,7 +226,6 @@ let translate (globals, functions, statements) =
     (* Add a return for the simulated main function *)
     L.build_ret (L.const_int i32_t 0) builder
   in
-    
-    List.iter build_function_body functions;
-    List.iter build_statements statements;
+
+    build_statements statements;
     the_module  (* return the LLVM module result *)

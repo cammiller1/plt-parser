@@ -104,6 +104,30 @@ cc -o test-hello-world.exe test-hello-world.s
 diff -b test-hello-world.out tests/test-hello-world.out > test-hello-world.diff
 ###### SUCCESS
 
+###### Testing test-if-else1
+./compyled.native tests/test-if-else1.cp > test-if-else1.ll
+llc -relocation-model=pic test-if-else1.ll > test-if-else1.s
+cc -o test-if-else1.exe test-if-else1.s
+./test-if-else1.exe
+diff -b test-if-else1.out tests/test-if-else1.out > test-if-else1.diff
+###### SUCCESS
+
+###### Testing test-if-else2
+./compyled.native tests/test-if-else2.cp > test-if-else2.ll
+llc -relocation-model=pic test-if-else2.ll > test-if-else2.s
+cc -o test-if-else2.exe test-if-else2.s
+./test-if-else2.exe
+diff -b test-if-else2.out tests/test-if-else2.out > test-if-else2.diff
+###### SUCCESS
+
+###### Testing test-if-no-else1
+./compyled.native tests/test-if-no-else1.cp > test-if-no-else1.ll
+llc -relocation-model=pic test-if-no-else1.ll > test-if-no-else1.s
+cc -o test-if-no-else1.exe test-if-no-else1.s
+./test-if-no-else1.exe
+diff -b test-if-no-else1.out tests/test-if-no-else1.out > test-if-no-else1.diff
+###### SUCCESS
+
 ###### Testing test-while1
 ./compyled.native tests/test-while1.cp > test-while1.ll
 llc -relocation-model=pic test-while1.ll > test-while1.s

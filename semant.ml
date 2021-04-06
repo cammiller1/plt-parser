@@ -97,6 +97,22 @@ let check (globals, functions, statements) =
           and (rt, e') = expr e in
           let err = "illegal assignment"
           in (check_assign lt rt err, SAssign(var, (rt, e')))
+      | Binop(e1, op, e2) as e -> 
+          let (t1, e1') = expr e1 
+          and (t2, e2') = expr e2 in
+          (* All binary operators require operands of the same type *)
+          let same = t1 = t2 in
+          (* Determine expression type based on operator and operand types *)
+          let ty = match op with
+            Add | Sub | Mul | Div when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div when same && t1 = Float -> Float
+          | Eq | Ne            when same               -> Boolean
+          | Lt | Lte | Gt | Gte
+                     when same && (t1 = Int || t1 = Float) -> Boolean
+          | And | Or when same && t1 = Boolean -> Boolean
+          | _ -> raise (
+        Failure ("illegal binary operator ") )
+          in (ty, SBinop((t1, e1'), op, (t2, e2')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in
           let param_length = List.length fd.formals in
@@ -111,9 +127,20 @@ let check (globals, functions, statements) =
           in (fd.typ, SCall(fname, args'))
     in
 
+
+    let check_bool_expr e = 
+      let (t', e') = expr e
+      and err = "expected Boolean expression in ____"
+      in if t' != Boolean then raise (Failure err) else (t', e') 
+    in
+
     (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt = function
         Expr e -> SExpr (expr e)
+      | If(p, b1, b2) -> SIf(check_bool_expr p, check_stmt b1, check_stmt b2)
+      | For(e1, e2, e3, st) ->
+          SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)
+      | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
       | Return e -> let (t, e') = expr e in
           SReturn (t, e')
       | Block sl -> 

@@ -71,10 +71,10 @@ stmt:
     expr SEMC { Expr $1 }
   | RETURN expr_opt SEMC { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
-  | IF LPAREN expr RPAREN LBRACE stmt RBRACE %prec NOELSE { If($3, $6, Block([]))}
-  | IF LPAREN expr RPAREN LBRACE stmt RBRACE ELSE LBRACE stmt RBRACE { If($3, $6, $10)}
-  | FOR LPAREN expr SEMC expr SEMC expr RPAREN LBRACE stmt RBRACE { For($3, $5, $7, $10) } 
-  | WHILE LPAREN expr RPAREN LBRACE stmt RBRACE { While($3, $6) } 
+  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([]))}
+  | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7)}
+  | FOR LPAREN expr SEMC expr SEMC expr RPAREN stmt { For($3, $5, $7, $9) } 
+  | WHILE LPAREN expr RPAREN stmt { While($3, $5) } 
 /* =================================== */
 
 stmt_list:

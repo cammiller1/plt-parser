@@ -180,7 +180,7 @@ let check (globals, functions, statements) =
     }
 
 
-  in (globals, List.map check_function functions, statements);
+  in (globals, functions, statements);
 
 
 

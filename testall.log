@@ -128,6 +128,14 @@ cc -o test-if-else2.exe test-if-else2.s
 diff -b test-if-else2.out tests/test-if-else2.out > test-if-else2.diff
 ###### SUCCESS
 
+###### Testing test-if-else3
+./compyled.native tests/test-if-else3.cp > test-if-else3.ll
+llc -relocation-model=pic test-if-else3.ll > test-if-else3.s
+cc -o test-if-else3.exe test-if-else3.s
+./test-if-else3.exe
+diff -b test-if-else3.out tests/test-if-else3.out > test-if-else3.diff
+###### SUCCESS
+
 ###### Testing test-if-no-else1
 ./compyled.native tests/test-if-no-else1.cp > test-if-no-else1.ll
 llc -relocation-model=pic test-if-no-else1.ll > test-if-no-else1.s

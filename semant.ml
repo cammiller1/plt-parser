@@ -97,6 +97,22 @@ let check (globals, functions, statements) =
           and (rt, e') = expr e in
           let err = "illegal assignment"
           in (check_assign lt rt err, SAssign(var, (rt, e')))
+      | Binop(e1, op, e2) as e -> 
+          let (t1, e1') = expr e1 
+          and (t2, e2') = expr e2 in
+          (* All binary operators require operands of the same type *)
+          let same = t1 = t2 in
+          (* Determine expression type based on operator and operand types *)
+          let ty = match op with
+            Add | Sub | Mul | Div when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div when same && t1 = Float -> Float
+          | Eq | Ne            when same               -> Boolean
+          | Lt | Lte | Gt | Gte
+                     when same && (t1 = Int || t1 = Float) -> Boolean
+          | And | Or when same && t1 = Boolean -> Boolean
+          | _ -> raise (
+        Failure ("illegal binary operator ") )
+          in (ty, SBinop((t1, e1'), op, (t2, e2')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in
           let param_length = List.length fd.formals in

@@ -1,5 +1,80 @@
 /usr/bin/lli
 
+###### Testing test-arithm-float-add
+./compyled.native tests/test-arithm-float-add.cp > test-arithm-float-add.ll
+llc -relocation-model=pic test-arithm-float-add.ll > test-arithm-float-add.s
+cc -o test-arithm-float-add.exe test-arithm-float-add.s
+./test-arithm-float-add.exe
+diff -b test-arithm-float-add.out tests/test-arithm-float-add.out > test-arithm-float-add.diff
+FAILED test-arithm-float-add.out differs from tests/test-arithm-float-add.out
+###### FAILED
+
+###### Testing test-arithm-float-divide
+./compyled.native tests/test-arithm-float-divide.cp > test-arithm-float-divide.ll
+llc -relocation-model=pic test-arithm-float-divide.ll > test-arithm-float-divide.s
+cc -o test-arithm-float-divide.exe test-arithm-float-divide.s
+./test-arithm-float-divide.exe
+diff -b test-arithm-float-divide.out tests/test-arithm-float-divide.out > test-arithm-float-divide.diff
+FAILED test-arithm-float-divide.out differs from tests/test-arithm-float-divide.out
+###### FAILED
+
+###### Testing test-arithm-float-multiply
+./compyled.native tests/test-arithm-float-multiply.cp > test-arithm-float-multiply.ll
+llc -relocation-model=pic test-arithm-float-multiply.ll > test-arithm-float-multiply.s
+cc -o test-arithm-float-multiply.exe test-arithm-float-multiply.s
+./test-arithm-float-multiply.exe
+diff -b test-arithm-float-multiply.out tests/test-arithm-float-multiply.out > test-arithm-float-multiply.diff
+###### SUCCESS
+
+###### Testing test-arithm-float-sub
+./compyled.native tests/test-arithm-float-sub.cp > test-arithm-float-sub.ll
+llc -relocation-model=pic test-arithm-float-sub.ll > test-arithm-float-sub.s
+cc -o test-arithm-float-sub.exe test-arithm-float-sub.s
+./test-arithm-float-sub.exe
+diff -b test-arithm-float-sub.out tests/test-arithm-float-sub.out > test-arithm-float-sub.diff
+FAILED test-arithm-float-sub.out differs from tests/test-arithm-float-sub.out
+###### FAILED
+
+###### Testing test-arithm-int-add
+./compyled.native tests/test-arithm-int-add.cp > test-arithm-int-add.ll
+llc -relocation-model=pic test-arithm-int-add.ll > test-arithm-int-add.s
+cc -o test-arithm-int-add.exe test-arithm-int-add.s
+./test-arithm-int-add.exe
+diff -b test-arithm-int-add.out tests/test-arithm-int-add.out > test-arithm-int-add.diff
+###### SUCCESS
+
+###### Testing test-arithm-int-divide
+./compyled.native tests/test-arithm-int-divide.cp > test-arithm-int-divide.ll
+llc -relocation-model=pic test-arithm-int-divide.ll > test-arithm-int-divide.s
+cc -o test-arithm-int-divide.exe test-arithm-int-divide.s
+./test-arithm-int-divide.exe
+diff -b test-arithm-int-divide.out tests/test-arithm-int-divide.out > test-arithm-int-divide.diff
+###### SUCCESS
+
+###### Testing test-arithm-int-multiply
+./compyled.native tests/test-arithm-int-multiply.cp > test-arithm-int-multiply.ll
+llc -relocation-model=pic test-arithm-int-multiply.ll > test-arithm-int-multiply.s
+cc -o test-arithm-int-multiply.exe test-arithm-int-multiply.s
+./test-arithm-int-multiply.exe
+diff -b test-arithm-int-multiply.out tests/test-arithm-int-multiply.out > test-arithm-int-multiply.diff
+###### SUCCESS
+
+###### Testing test-arithm-int-sub
+./compyled.native tests/test-arithm-int-sub.cp > test-arithm-int-sub.ll
+llc -relocation-model=pic test-arithm-int-sub.ll > test-arithm-int-sub.s
+cc -o test-arithm-int-sub.exe test-arithm-int-sub.s
+./test-arithm-int-sub.exe
+diff -b test-arithm-int-sub.out tests/test-arithm-int-sub.out > test-arithm-int-sub.diff
+###### SUCCESS
+
+###### Testing test-assign-arithm-add
+./compyled.native tests/test-assign-arithm-add.cp > test-assign-arithm-add.ll
+llc -relocation-model=pic test-assign-arithm-add.ll > test-assign-arithm-add.s
+cc -o test-assign-arithm-add.exe test-assign-arithm-add.s
+./test-assign-arithm-add.exe
+diff -b test-assign-arithm-add.out tests/test-assign-arithm-add.out > test-assign-arithm-add.diff
+###### SUCCESS
+
 ###### Testing test-assign1
 ./compyled.native tests/test-assign1.cp > test-assign1.ll
 llc -relocation-model=pic test-assign1.ll > test-assign1.s
@@ -15,6 +90,15 @@ cc -o test-decl1.exe test-decl1.s
 ./test-decl1.exe
 diff -b test-decl1.out tests/test-decl1.out > test-decl1.diff
 ###### SUCCESS
+
+###### Testing test-float1
+./compyled.native tests/test-float1.cp > test-float1.ll
+llc -relocation-model=pic test-float1.ll > test-float1.s
+cc -o test-float1.exe test-float1.s
+./test-float1.exe
+diff -b test-float1.out tests/test-float1.out > test-float1.diff
+FAILED test-float1.out differs from tests/test-float1.out
+###### FAILED
 
 ###### Testing test-hello-world
 ./compyled.native tests/test-hello-world.cp > test-hello-world.ll

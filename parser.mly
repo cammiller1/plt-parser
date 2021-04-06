@@ -51,22 +51,14 @@ program:
   highest EOF { $1 }
 
 
-/* fdecl { (fst $1, ($2 :: snd $1)) } */
 highest:
    /* nothing */ { ([], [], [])             }
  | highest vdecl { (($2 :: fst $1), snd $1, trd $1) }
  | highest fdecl { (fst $1, ($2 :: snd $1), trd $1) }
  | highest stmt { (fst $1, snd $1, (trd $1 @ [$2]))  }
- /* (fdecl vdecl ) stmt */
- /* { ((List.rev $2::fst $1), snd $1, trd $1)} */
- /*
-  first - fdecl
-  second - vdecl
-  thid - stmt
- */
+
 
 /* statement-relevant parsing */
-
 stmt:
     expr SEMC { Expr $1 }
   | RETURN expr_opt SEMC { Return $2 }
@@ -85,13 +77,18 @@ stmt_list:
 vdecl:
    typ ID SEMC { ($1, $2) }
 
+vdecl_list:
+    /* nothing */    { [] }
+  | vdecl_list vdecl { $2 :: $1 }
+
 
 fdecl:
-  DEF typ ID LPAREN formals_opt RPAREN LBRACE stmt_list RBRACE
+  DEF typ ID LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
   { { typ = $2;
           fname = $3;
           formals = List.rev $5;
-          body = List.rev $8 } }
+          locals = List.rev $8;
+          body = List.rev $9 } }
 
 formals_opt:
     /* nothing */ { [] }

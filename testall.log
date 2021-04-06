@@ -96,6 +96,14 @@ cc -o test-float1.exe test-float1.s
 diff -b test-float1.out tests/test-float1.out > test-float1.diff
 ###### SUCCESS
 
+###### Testing test-for1
+./compyled.native tests/test-for1.cp > test-for1.ll
+llc -relocation-model=pic test-for1.ll > test-for1.s
+cc -o test-for1.exe test-for1.s
+./test-for1.exe
+diff -b test-for1.out tests/test-for1.out > test-for1.diff
+###### SUCCESS
+
 ###### Testing test-hello-world
 ./compyled.native tests/test-hello-world.cp > test-hello-world.ll
 llc -relocation-model=pic test-hello-world.ll > test-hello-world.s

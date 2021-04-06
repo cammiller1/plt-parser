@@ -104,6 +104,15 @@ cc -o test-for1.exe test-for1.s
 diff -b test-for1.out tests/test-for1.out > test-for1.diff
 ###### SUCCESS
 
+###### Testing test-func-with-main
+./compyled.native tests/test-func-with-main.cp > test-func-with-main.ll
+Terminator found in the middle of a basic block!
+label %entry
+Basic Block in function 'main0' does not have terminator!
+label %entry
+LLVM ERROR: Broken module found, compilation aborted!
+###### FAILED
+
 ###### Testing test-func1
 ./compyled.native tests/test-func1.cp > test-func1.ll
 llc -relocation-model=pic test-func1.ll > test-func1.s

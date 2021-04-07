@@ -83,6 +83,7 @@ let translate (globals, functions, statements) =
 
 
 
+
   (******** BUILD FUNCTIONS ************)
 
   (* Fill in the body of the given function *)
@@ -265,40 +266,39 @@ let translate (globals, functions, statements) =
 
 
 
+    (****** build statements *********)
+
+     let main_name = "main" in
 
 
-
-    
-  (****** build statements *********)
-  let build_statements statements =
-
-     let find_main name =
+     let test_main_name main_name =
         try 
-            let (_,the_function) = StringMap.find name function_decls
-            in the_function.sfname 
-        with Not_found -> ""
-     in
+          let (_,the_function) = StringMap.find main_name function_decls
+          in the_function.sfname
+        with Not_found -> main_name
 
-
-     let main_name = "main" in 
-
-    (* add the main function. If user defined a function with same name, recurse to 
-       create one with a name they didn't use.
-       Just keep adding a "0" after main's function name until no matches
-     *)
-    let rec create_main name = match find_main name with
-        "" -> StringMap.add name (L.define_function name main_t the_module, ({styp = Int; sfname = name; sformals = []; slocals = []; sbody = [] })) function_decls
-       | _ -> let main_name = (main_name ^ "0") in create_main main_name
     in 
-    
-    let function_decls = create_main main_name
+
+    let rec generate_main_name name = (* match test_main_name name with *)
+      if test_main_name name == name then name
+      else generate_main_name (name ^ "0")
+
+
+  in let main_name = generate_main_name main_name in
+
+  let function_decls = StringMap.add main_name (L.define_function main_name main_t the_module, ({styp = Int; sfname = main_name; sformals = []; slocals = []; sbody = [] })) function_decls
+
     
 
   in
 
-      (* this needs to get moved when we have user functions *)
+    
+  
+  let build_statements statements =
+
       (* creating a fake main funcion to wrap the entire script in *)
       (* Needs to occur outside of the build_statement function *)
+      (* Need to find the main function with the most zeros at the end *)
      let (the_function, _) = StringMap.find main_name function_decls in
      let builder = L.builder_at_end context (L.entry_block the_function) in
  

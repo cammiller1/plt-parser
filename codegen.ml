@@ -79,14 +79,6 @@ let translate (globals, functions, statements) =
        in let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
        StringMap.add name (L.define_function name ftype the_module, fdecl) m in
      List.fold_left function_decl StringMap.empty functions in
- 
- 
-    let function_decls = StringMap.add "main" (L.define_function "main" main_t the_module, ({styp = Int; sfname = "main"; sformals = []; slocals = []; sbody = [] })) function_decls
- 
- 
-  in
-
-
 
 
 
@@ -274,17 +266,40 @@ let translate (globals, functions, statements) =
 
 
 
+    (****** build statements *********)
+
+     let main_name = "main" in
 
 
+     let test_main_name main_name =
+        try 
+          let (_,the_function) = StringMap.find main_name function_decls
+          in the_function.sfname
+        with Not_found -> main_name
+
+    in 
+
+    let rec generate_main_name name = (* match test_main_name name with *)
+      if test_main_name name == name then name
+      else generate_main_name (name ^ "0")
+
+
+  in let main_name = generate_main_name main_name in
+
+  let function_decls = StringMap.add main_name (L.define_function main_name main_t the_module, ({styp = Int; sfname = main_name; sformals = []; slocals = []; sbody = [] })) function_decls
 
     
-  (****** build statements *********)
+
+  in
+
+    
+  
   let build_statements statements =
 
-      (* this needs to get moved when we have user functions *)
       (* creating a fake main funcion to wrap the entire script in *)
       (* Needs to occur outside of the build_statement function *)
-     let (the_function, _) = StringMap.find "main" function_decls in
+      (* Need to find the main function with the most zeros at the end *)
+     let (the_function, _) = StringMap.find main_name function_decls in
      let builder = L.builder_at_end context (L.entry_block the_function) in
  
      let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder

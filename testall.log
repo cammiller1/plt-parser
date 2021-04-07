@@ -104,6 +104,14 @@ cc -o test-for1.exe test-for1.s
 diff -b test-for1.out tests/test-for1.out > test-for1.diff
 ###### SUCCESS
 
+###### Testing test-func-with-main
+./compyled.native tests/test-func-with-main.cp > test-func-with-main.ll
+llc -relocation-model=pic test-func-with-main.ll > test-func-with-main.s
+cc -o test-func-with-main.exe test-func-with-main.s
+./test-func-with-main.exe
+diff -b test-func-with-main.out tests/test-func-with-main.out > test-func-with-main.diff
+###### SUCCESS
+
 ###### Testing test-func1
 ./compyled.native tests/test-func1.cp > test-func1.ll
 llc -relocation-model=pic test-func1.ll > test-func1.s

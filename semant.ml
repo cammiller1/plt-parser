@@ -61,9 +61,25 @@ let check (globals, functions, statements) =
   let function_decls = List.fold_left add_func built_in_decls functions
   in
 
-  (* add the main function *)
-  let function_decls = StringMap.add "main" {typ = Void; fname = "main"; formals = []; locals = []; body = [] } function_decls
-  
+  let main_name = "main"
+  in
+
+  let find_main name =
+    try (StringMap.find name function_decls).fname
+    with Not_found -> ""
+  in
+
+
+  (* add the main function. If user defined a function with same name, recurse to 
+     create one with a name they didn't use.
+     Just keep adding a "0" after main's function name until no matches
+   *)
+
+  let rec create_main name = match find_main name with
+        "" -> StringMap.add name {typ = Int; fname = name; formals = []; locals = []; body = [] } function_decls
+       | _ -> create_main (name ^ "0")
+  in 
+  let function_decls = create_main main_name
   
   in
 
@@ -180,7 +196,7 @@ let check (globals, functions, statements) =
     }
 
 
-  in (globals, List.map check_function functions, statements);
+  in (globals, functions, statements);
 
 
 

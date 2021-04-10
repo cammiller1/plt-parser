@@ -192,6 +192,14 @@ cc -o test-if-no-else1.exe test-if-no-else1.s
 diff -b test-if-no-else1.out tests/test-if-no-else1.out > test-if-no-else1.diff
 ###### SUCCESS
 
+###### Testing test-initialize-var
+./compyled.native tests/test-initialize-var.cp > test-initialize-var.ll
+llc -relocation-model=pic test-initialize-var.ll > test-initialize-var.s
+cc -o test-initialize-var.exe test-initialize-var.s
+./test-initialize-var.exe
+diff -b test-initialize-var.out tests/test-initialize-var.out > test-initialize-var.diff
+###### SUCCESS
+
 ###### Testing test-while1
 ./compyled.native tests/test-while1.cp > test-while1.ll
 llc -relocation-model=pic test-while1.ll > test-while1.s

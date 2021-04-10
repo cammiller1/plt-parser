@@ -5,8 +5,6 @@ type unary_operator = Pp | Mm
 
 type typ = Int | Float | Boolean | Void | String | Array
 
-type bind = typ * string
-
 type expr =
     Liti of int
   | Litf of float
@@ -27,6 +25,8 @@ type stmt =
   | If of expr * stmt * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
+
+type bind = typ * string * expr
 
 type func_decl = {
     typ : typ;

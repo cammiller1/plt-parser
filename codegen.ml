@@ -40,12 +40,30 @@ let translate (globals, functions, statements) =
     | A.String -> string_t (* added for our project *)
   in
 
+
+    (********* THIS EXPR BUILDER IS SOLELY FOR INITIALIZATION!!!! ******)
+    (* Construct code for an expression in the INITIALIZATION; return its value *)
+    let rec expr ((_, e) : sexpr) = match e with
+        SLiti i  -> L.const_int i32_t i
+      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l -> L.const_float float_t l
+      (* | SLits s -> L.build_global_stringptr s "str" builder *)
+      | SNoexpr     -> L.const_int i32_t 0
+      (* | SId s       -> L.build_load (lookup s) s builder *)
+      | SAssign (s, e) -> expr e
+
+  in
+
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
-    let global_var m (t, n) = 
-      let init = match t with
-          A.Float -> L.const_float (ltype_of_typ t) 0.0
-        | _ -> L.const_int (ltype_of_typ t) 0
+    let global_var m (t, n, se) = 
+      let init = match se with
+        (A.Void, _) ->  (
+            match t with
+              A.Float -> L.const_float (ltype_of_typ t) 0.0
+            | _ -> L.const_int (ltype_of_typ t) 0
+          )
+        | _ -> expr se
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
 
@@ -75,7 +93,7 @@ let translate (globals, functions, statements) =
      let function_decl m fdecl =
        let name = fdecl.sfname
        and formal_types = 
-   Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
+   Array.of_list (List.map (fun (t,_, e) -> ltype_of_typ t) fdecl.sformals)
        in let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
        StringMap.add name (L.define_function name ftype the_module, fdecl) m in
      List.fold_left function_decl StringMap.empty functions in
@@ -99,7 +117,7 @@ let translate (globals, functions, statements) =
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
     let local_vars =
-      let add_formal m (t, n) p = 
+      let add_formal m (t, n, e) p = 
         L.set_value_name n p;
   let local = L.build_alloca (ltype_of_typ t) n builder in
         ignore (L.build_store p local builder);
@@ -107,7 +125,7 @@ let translate (globals, functions, statements) =
 
       (* Allocate space for any locally declared variables and add the
        * resulting registers to our map *)
-      and add_local m (t, n) =
+      and add_local m (t, n, e) =
   let local_var = L.build_alloca (ltype_of_typ t) n builder
   in StringMap.add n local_var m 
       in

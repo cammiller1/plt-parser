@@ -18,7 +18,7 @@ let trd (_,_,c) = c;;
 /* comparators */
 %token LT GT LTE GTE EQ NE AND OR MOD NOT IN
 
-%token IF ELSE ELIF WHILE FOR DEF RETURN
+%token IF ELSE WHILE FOR DEF RETURN
 %token LPAREN RPAREN RBRACE LBRACE COMMA
 
 %token <int> ILITERAL
@@ -63,10 +63,10 @@ stmt:
     expr SEMC { Expr $1 }
   | RETURN expr_opt SEMC { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
-  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([]))}
+  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, $7)}
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN stmt { For($3, $5, $7, $9) } 
-  | WHILE LPAREN expr RPAREN stmt { While($3, $5) } 
+  | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 /* =================================== */
 
 stmt_list:

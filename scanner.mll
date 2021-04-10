@@ -48,7 +48,6 @@ rule tokenize = parse
 | '{'      { LBRACE }
 | '}'      { RBRACE }
 | "if"     { IF }
-| "elif"   { ELIF }
 | "else"   { ELSE }
 | "while"  { WHILE }
 | "for"    { FOR }

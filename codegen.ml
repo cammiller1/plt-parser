@@ -231,7 +231,7 @@ let translate (globals, functions, statements) =
                               (* Build return statement *)
                             | _ -> L.build_ret (expr builder e) builder );
                      builder
-        | SIf (predicate, then_stmt, else_stmt) ->
+        | SIf (predicate, then_stmt, elif_statements, else_stmt) ->
          let bool_val = expr builder predicate in
          let merge_bb = L.append_block context "merge" the_function in
          let build_br_merge = L.build_br merge_bb in (* partial function *)
@@ -422,7 +422,7 @@ let translate (globals, functions, statements) =
                               (* Build return statement *)
                             | _ -> L.build_ret (expr builder e) builder );
                      builder *)
-        | SIf (predicate, then_stmt, else_stmt) ->
+        | SIf (predicate, then_stmt, elif_statements, else_stmt) ->
          let bool_val = expr builder predicate in
          let merge_bb = L.append_block context "merge" the_function in
          let build_br_merge = L.build_br merge_bb in (* partial function *)

@@ -64,7 +64,7 @@ stmt:
   | RETURN expr_opt SEMC { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([]))}
-  | IF LPAREN expr RPAREN stmt elif_list ELSE stmt { If($3, $5, $8)}
+  | IF LPAREN expr RPAREN stmt elif_list ELSE stmt { If($3, $5, $6, $8)}
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN stmt { For($3, $5, $7, $9) } 
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 /* =================================== */

@@ -57,15 +57,13 @@ let translate (globals, functions, statements) =
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
     let global_var m (t, n, se) = 
-      let init = (* match se with
-         None ->
-          (
+      let init = match se with
+        (A.Void, _) ->  (
             match t with
               A.Float -> L.const_float (ltype_of_typ t) 0.0
             | _ -> L.const_int (ltype_of_typ t) 0
           )
-        | _ -> *)
-        expr se
+        | _ -> expr se
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
 

@@ -79,7 +79,7 @@ vdecl:
 
 vdecl_assign:
   { Noexpr }
-  | ASSIGN expr { Some($2) } 
+  | ASSIGN expr { $2 } 
 
 
 vdecl_list:

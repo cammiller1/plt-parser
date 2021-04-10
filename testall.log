@@ -126,7 +126,8 @@ llc -relocation-model=pic test-float1.ll > test-float1.s
 cc -o test-float1.exe test-float1.s
 ./test-float1.exe
 diff -b test-float1.out tests/test-float1.out > test-float1.diff
-###### SUCCESS
+FAILED test-float1.out differs from tests/test-float1.out
+###### FAILED
 
 ###### Testing test-for1
 ./compyled.native tests/test-for1.cp > test-for1.ll

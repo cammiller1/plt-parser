@@ -188,17 +188,26 @@ let translate (globals, functions, statements) =
             | A.Gt -> L.build_icmp L.Icmp.Sgt
             | A.Gte     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" builder
-      | SCall ("print", [e]) | SCall ("printb", [e]) ->
-          L.build_call printf_func [| int_format_str ; (expr builder e) |]
-            "printf" builder
-
-      | SCall ("prints", [e]) ->
-          L.build_call printf_func [| string_format_str ; (expr builder e) |]
-            "printf" builder
-      
-      | SCall ("printf", [e]) -> 
-          L.build_call printf_func [| float_format_str ; (expr builder e) |]
-          "printf" builder
+      | SCall ("print", [e]) ->
+          let e' = expr builder e in
+          ( match e with
+              (_, SLiti i)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+            | (_, SLitb b)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+            | (_, SLitf l) -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+            | (_, SLits s) -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
+            | (_, SId s) ->
+                ( match (lookup s) with
+                      i32_t -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                    | i1_t -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                    | float_t -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+                    | string_t  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
+                    | _ -> raise (Failure "invalid argument called on the print function")
+                )
+            | (_, SBinop ((A.Float,_ ) as e1, op, e2)) ->  L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+            | (_, SBinop (e1, op, e2)) ->  L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+            | (_, SCall(f, args)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+            | (_,_) ->  raise (Failure "invalid argument called on the print function")
+          )
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
            let llargs = List.rev (List.map (expr builder) (List.rev args)) in
@@ -362,7 +371,7 @@ let translate (globals, functions, statements) =
             | A.And | A.Or ->
                 raise (Failure "internal error: semant should have rejected and/or on float")
             ) e1' e2' "tmp" builder
-              | SBinop (e1, op, e2) ->
+      | SBinop (e1, op, e2) ->
             let e1' = expr builder e1
             and e2' = expr builder e2 in
             (match op with
@@ -379,6 +388,42 @@ let translate (globals, functions, statements) =
             | A.Gt -> L.build_icmp L.Icmp.Sgt
             | A.Gte     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" builder
+      | SCall ("print", [e]) ->
+          let e' = expr builder e in
+          ( match e with
+              (_, SLiti i)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+            | (_, SLitb b)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+            | (_, SLitf l) -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+            | (_, SLits s) -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
+            | (_, SId s) ->
+                ( match (lookup s) with
+                      i32_t -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                    | i1_t -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                    | float_t -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+                    | string_t  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
+                    | _ -> raise (Failure "invalid argument called on the print function")
+                )
+            | (_, SBinop ((A.Float,_ ) as e1, op, e2)) ->  L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+            | (_, SBinop (e1, op, e2)) ->  L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+            | (_, SCall(f, args)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+            | (_,_) ->  raise (Failure "invalid argument called on the print function")
+          )
+(*
+              (A.Int, _)      ->  L.build_call printf_func [| int_format_str ; expr builder e |] "printf" builder
+            | (A.Boolean, _)  ->  L.build_call printf_func [| int_format_str ; expr builder e |] "printf" builder
+            | (A.Float, _)    ->  L.build_call printf_func [| float_format_str ; expr builder e |] "printf" builder
+            | (A.String, _)   ->  L.build_call printf_func [| string_format_str ; expr builder e |] "printf" builder
+            | _        ->  raise (Failure "invalid argument called on the print function")
+          ) *)
+      | SCall (f, args) ->
+         let (fdef, fdecl) = StringMap.find f function_decls in
+           let llargs = List.rev (List.map (expr builder) (List.rev args)) in
+           let result = (match fdecl.styp with 
+              A.Void -> ""
+             | _ -> f ^ "_result") in
+           L.build_call fdef (Array.of_list llargs) result builder
+
+      (*
       | SCall ("print", [e]) | SCall ("printb", [e]) ->
           L.build_call printf_func [| int_format_str ; (expr builder e) |]
             "printf" builder
@@ -389,14 +434,7 @@ let translate (globals, functions, statements) =
       
       | SCall ("printf", [e]) -> 
           L.build_call printf_func [| float_format_str ; (expr builder e) |]
-          "printf" builder
-      | SCall (f, args) ->
-         let (fdef, fdecl) = StringMap.find f function_decls in
-           let llargs = List.rev (List.map (expr builder) (List.rev args)) in
-           let result = (match fdecl.styp with 
-              A.Void -> ""
-             | _ -> f ^ "_result") in
-           L.build_call fdef (Array.of_list llargs) result builder
+          "printf" builder *)
     in
 
 

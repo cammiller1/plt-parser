@@ -23,6 +23,8 @@ type sstmt =
   | SFor of sexpr * sexpr * sexpr * sstmt
   | SWhile of sexpr * sstmt
 
+type sbind = typ * string * sexpr option
+
 type sfunc_decl = {
     styp : typ;
     sfname : string;
@@ -31,4 +33,4 @@ type sfunc_decl = {
     sbody : sstmt list;
 }
 
-type sprogram = bind list * sfunc_decl list * sstmt list
+type sprogram = sbind list * sfunc_decl list * sstmt list

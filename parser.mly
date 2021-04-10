@@ -100,8 +100,8 @@ formals_opt:
   | formal_list { $1 }
 
 formal_list:
-  typ ID { [($1,$2)] }
-  | formal_list COMMA typ ID { ($3,$4) :: $1 }
+  typ ID { [($1,$2, None)] }
+  | formal_list COMMA typ ID { ($3,$4, None) :: $1 }
 
 
 /* type-relevant parsing */

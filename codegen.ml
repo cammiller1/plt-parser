@@ -61,7 +61,8 @@ let translate (globals, functions, statements) =
         (A.Void, _) ->  (
             match t with
               A.Float -> L.const_float (ltype_of_typ t) 0.0
-            | _ -> L.const_int (ltype_of_typ t) 0
+            | A.Int -> L.const_int (ltype_of_typ t) 0
+            | A.Boolean -> L.const_int (ltype_of_typ t) 0
           )
         | _ -> expr se
       in StringMap.add n (L.define_global n init the_module) m in
@@ -334,10 +335,38 @@ let translate (globals, functions, statements) =
      and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
   in
 
+
+   (********* THIS EXPR BUILDER IS SOLELY FOR INITIALIZATION!!!! ******)
+    (* Construct code for an expression in the INITIALIZATION; return its value *)
+    let rec expr ((_, e) : sexpr) = match e with
+        SLiti i  -> L.const_int i32_t i
+      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l -> L.const_float float_t l
+      | SLits s -> L.build_global_stringptr s "str" builder
+      | SNoexpr     -> L.const_int i32_t 0
+      | SAssign (s, e) -> expr e
+
+  in
+
+  (* Create a map of global variables after creating each *)
+  let global_vars : L.llvalue StringMap.t =
+    let global_var m (t, n, se) = 
+      let init = match se with
+        (A.Void, _) ->  (
+            match t with
+              A.Float  -> L.const_float (ltype_of_typ t) 0.0
+            | A.String -> L.build_global_stringptr "" "str" builder
+            | A.Boolean -> L.const_int (ltype_of_typ t) 0
+            | _ -> L.const_int (ltype_of_typ t) 0
+          )
+        | _ -> expr se
+      in StringMap.add n (L.define_global n init the_module) m in
+    List.fold_left global_var StringMap.empty globals in
+
   (* Return the value for a variable or formal argument.
        Check local names first, then global names *)
-    let lookup n = StringMap.find n global_vars
-                   (* with Not_found -> StringMap.find n global_vars *)
+    let lookup n = try StringMap.find n global_vars
+        with Not_found -> (raise (Failure "global variable not found"))
     in
 
 

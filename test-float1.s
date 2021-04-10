@@ -13,7 +13,7 @@ main:                                   # @main
 # %bb.0:                                # %entry
 	pushq	%rax
 	.cfi_def_cfa_offset 16
-	movq	x@GOTPCREL(%rip), %rax
+	movq	x.3@GOTPCREL(%rip), %rax
 	movabsq	$4616820122002590269, %rcx # imm = 0x40123D70A3D70A3D
 	movq	%rcx, (%rax)
 	leaq	.Lfmt(%rip), %rdi
@@ -50,6 +50,14 @@ x:
 .Lfmt.2:
 	.asciz	"%s\n"
 	.size	.Lfmt.2, 4
+
+	.type	x.3,@object             # @x.3
+	.bss
+	.globl	x.3
+	.p2align	3
+x.3:
+	.quad	0                       # double 0
+	.size	x.3, 8
 
 
 	.section	".note.GNU-stack","",@progbits

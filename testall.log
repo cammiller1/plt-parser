@@ -88,6 +88,13 @@ cc -o test-decl1.exe test-decl1.s
 diff -b test-decl1.out tests/test-decl1.out > test-decl1.diff
 ###### SUCCESS
 
+###### Testing test-elif1
+./compyled.native tests/test-elif1.cp > test-elif1.ll
+Basic Block in function 'main' does not have terminator!
+label %then
+LLVM ERROR: Broken module found, compilation aborted!
+###### FAILED
+
 ###### Testing test-float1
 ./compyled.native tests/test-float1.cp > test-float1.ll
 llc -relocation-model=pic test-float1.ll > test-float1.s

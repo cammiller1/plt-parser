@@ -71,7 +71,10 @@ stmt:
 
 elif_list:
     /* nothing */  { [] }
-  | elif_list ELIF LPAREN expr RPAREN stmt { $2 :: $1 }
+  | elif elif_list { $1 :: $2 }
+
+elif:
+  ELIF LPAREN expr RPAREN stmt { Elif($3, $5) }
 
 
 stmt_list:

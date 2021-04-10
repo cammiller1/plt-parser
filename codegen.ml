@@ -40,12 +40,32 @@ let translate (globals, functions, statements) =
     | A.String -> string_t (* added for our project *)
   in
 
+
+    (********* THIS EXPR BUILDER IS SOLELY FOR INITIALIZATION!!!! ******)
+    (* Construct code for an expression in the INITIALIZATION; return its value *)
+    let rec expr ((_, e) : sexpr) = match e with
+        SLiti i  -> L.const_int i32_t i
+      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l -> L.const_float float_t l
+      (* | SLits s -> L.build_global_stringptr s "str" builder *)
+      | SNoexpr     -> L.const_int i32_t 0
+      (* | SId s       -> L.build_load (lookup s) s builder *)
+      | SAssign (s, e) -> expr e
+
+  in
+
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
-    let global_var m (t, n, e) = 
-      let init = match t with
-          A.Float -> L.const_float (ltype_of_typ t) 0.0
-        | _ -> L.const_int (ltype_of_typ t) 0
+    let global_var m (t, n, se) = 
+      let init = (* match se with
+         None ->
+          (
+            match t with
+              A.Float -> L.const_float (ltype_of_typ t) 0.0
+            | _ -> L.const_int (ltype_of_typ t) 0
+          )
+        | _ -> *)
+        expr se
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
 

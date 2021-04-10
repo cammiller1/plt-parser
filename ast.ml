@@ -26,7 +26,7 @@ type stmt =
   | For of expr * expr * expr * stmt
   | While of expr * stmt
 
-type bind = typ * string * expr option
+type bind = typ * string * expr
 
 type func_decl = {
     typ : typ;

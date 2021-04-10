@@ -12,7 +12,7 @@ module StringMap = Map.Make(String)
 let check (globals, functions, statements) =
 
 
-   (* Verify a list of bindings has no void types or duplicate names *)
+  (* Verify a list of bindings has no void types or duplicate names *)
   let check_binds (kind : string) (binds : bind list) =
     List.iter (function
       (Void, b, e) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
@@ -30,13 +30,76 @@ let check (globals, functions, statements) =
   check_binds "global" globals;
 
 
+  (***** CHECK expressions of global variables ****)
+   (* Return a semantically-checked expression, i.e., with a type *)
+
+   (* Raise an exception if the given rvalue type cannot be assigned to
+       the given lvalue type *)
+
+   (* Build temp symbol table to check the types of the initializations *)
+    (* drop the expression "e" from being stored in the symbol table*)
+    let tmp_symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
+                  StringMap.empty globals
+    in
+
+    (* Return a variable from our temp symbol table *)
+    let type_of_identifier s =
+      try StringMap.find s tmp_symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
+    let check_assign lvaluet rvaluet err =
+       if lvaluet = rvaluet then lvaluet else raise (Failure err)
+    in   
+
+    let rec expr = function
+        Liti l -> (Int, SLiti l)
+      | Litf l -> (Float, SLitf l)
+      | Litb l  -> (Boolean, SLitb l)
+      | Lits l  -> (String, SLits l)
+      | Noexpr     -> (Void, SNoexpr)
+      | Assign(var, e) as ex -> 
+          let lt = type_of_identifier var
+          and (rt, e') = expr e in
+          let err = "illegal assignment"
+          in (check_assign lt rt err, SAssign(var, (rt, e')))
+      | Binop(e1, op, e2) as e -> 
+          let (t1, e1') = expr e1 
+          and (t2, e2') = expr e2 in
+          (* All binary operators require operands of the same type *)
+          let same = t1 = t2 in
+          (* Determine expression type based on operator and operand types *)
+          let ty = match op with
+            Add | Sub | Mul | Div when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div when same && t1 = Float -> Float
+          | Eq | Ne            when same               -> Boolean
+          | Lt | Lte | Gt | Gte
+                     when same && (t1 = Int || t1 = Float) -> Boolean
+          | And | Or when same && t1 = Boolean -> Boolean
+          | _ -> raise (
+        Failure ("illegal binary operator ") )
+          in (ty, SBinop((t1, e1'), op, (t2, e2')))
+
+  in
+  
+  let check_globals global= 
+
+    let return_checked_global (t, s, e) =
+      (t, s, expr e)
+
+    in return_checked_global global
+
+  in (globals, functions, statements);   
+
+
+
 
   (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls = 
     let add_bind map (name, ty) = StringMap.add name {
       typ = Void;
       fname = name; 
-      formals = [(ty, "x", None)];
+      formals = [(ty, "x", Noexpr)];
       locals = [];
       body = [] } map 
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
@@ -311,4 +374,4 @@ let check (globals, functions, statements) =
   
 
 
-  in (globals, List.map check_function functions, check_statement statements)
+  in (List.map check_globals globals, List.map check_function functions, check_statement statements)

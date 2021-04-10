@@ -23,7 +23,7 @@ type sstmt =
   | SFor of sexpr * sexpr * sexpr * sstmt
   | SWhile of sexpr * sstmt
 
-type sbind = typ * string * sexpr option
+type sbind = typ * string * sexpr
 
 type sfunc_decl = {
     styp : typ;

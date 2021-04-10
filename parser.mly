@@ -78,7 +78,7 @@ vdecl:
     typ ID vdecl_assign SEMC { ($1, $2, $3) } /* declaration with or w.o assignment */
 
 vdecl_assign:
-  { None }
+  { Noexpr }
   | ASSIGN expr { Some($2) } 
 
 
@@ -100,8 +100,8 @@ formals_opt:
   | formal_list { $1 }
 
 formal_list:
-  typ ID { [($1,$2, None)] }
-  | formal_list COMMA typ ID { ($3,$4, None) :: $1 }
+  typ ID { [($1,$2, Noexpr)] }
+  | formal_list COMMA typ ID { ($3,$4, Noexpr) :: $1 }
 
 
 /* type-relevant parsing */

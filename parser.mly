@@ -75,7 +75,12 @@ stmt_list:
 
 
 vdecl:
-   typ ID SEMC { ($1, $2) }
+    typ ID vdecl_assign SEMC { ($1, $2, $3) } /* declaration with or w.o assignment */
+
+vdecl_assign:
+  { None }
+  | ASSIGN expr { Some($2) } 
+
 
 vdecl_list:
     /* nothing */    { [] }

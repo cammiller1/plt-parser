@@ -90,10 +90,35 @@ diff -b test-decl1.out tests/test-decl1.out > test-decl1.diff
 
 ###### Testing test-elif1
 ./compyled.native tests/test-elif1.cp > test-elif1.ll
-Basic Block in function 'main' does not have terminator!
-label %then
-LLVM ERROR: Broken module found, compilation aborted!
-###### FAILED
+llc -relocation-model=pic test-elif1.ll > test-elif1.s
+cc -o test-elif1.exe test-elif1.s
+./test-elif1.exe
+diff -b test-elif1.out tests/test-elif1.out > test-elif1.diff
+###### SUCCESS
+
+###### Testing test-elif2
+./compyled.native tests/test-elif2.cp > test-elif2.ll
+llc -relocation-model=pic test-elif2.ll > test-elif2.s
+cc -o test-elif2.exe test-elif2.s
+./test-elif2.exe
+diff -b test-elif2.out tests/test-elif2.out > test-elif2.diff
+###### SUCCESS
+
+###### Testing test-elif3
+./compyled.native tests/test-elif3.cp > test-elif3.ll
+llc -relocation-model=pic test-elif3.ll > test-elif3.s
+cc -o test-elif3.exe test-elif3.s
+./test-elif3.exe
+diff -b test-elif3.out tests/test-elif3.out > test-elif3.diff
+###### SUCCESS
+
+###### Testing test-elif4
+./compyled.native tests/test-elif4.cp > test-elif4.ll
+llc -relocation-model=pic test-elif4.ll > test-elif4.s
+cc -o test-elif4.exe test-elif4.s
+./test-elif4.exe
+diff -b test-elif4.out tests/test-elif4.out > test-elif4.diff
+###### SUCCESS
 
 ###### Testing test-float1
 ./compyled.native tests/test-float1.cp > test-float1.ll

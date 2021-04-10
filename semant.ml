@@ -234,7 +234,7 @@ let check (globals, functions, statements) =
     (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt = function
         Expr e -> SExpr (expr e)
-      | If(p, b1, elif_list, b2) -> SIf(check_bool_expr p, check_stmt b1, check_stmt_list elif_list, check_stmt b2)
+      | If(p, b1, elif, b2) -> SIf(check_bool_expr p, check_stmt b1, check_stmt elif, check_stmt b2)
       | Elif(p, b1) -> SElif(check_bool_expr p, check_stmt b1)
       | For(e1, e2, e3, st) ->
           SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)
@@ -352,7 +352,7 @@ let check (globals, functions, statements) =
     (* Return a semantically-checked statement i.e. containing sexprs *)
     let rec check_stmt = function
         Expr e -> SExpr (expr e)
-      | If(p, b1, elifs, b2) -> SIf(check_bool_expr p, check_stmt b1, Elif(elifs), check_stmt b2)
+      | If(p, b1, elif, b2) -> SIf(check_bool_expr p, check_stmt b1, check_stmt elif, check_stmt b2)
       | Elif(p, b1) -> SElif(check_bool_expr p, check_stmt b1)
       | For(e1, e2, e3, st) ->
           SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)

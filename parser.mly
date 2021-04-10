@@ -31,6 +31,8 @@ let trd (_,_,c) = c;;
 /* lowest to highest precedence */
 %nonassoc NOELSE
 %nonassoc ELSE
+%nonassoc ELIF
+%nonassoc NOELIF
 %right UMINUS
 %right ASSIGN
 %left AND OR
@@ -63,8 +65,9 @@ stmt:
     expr SEMC { Expr $1 }
   | RETURN expr_opt SEMC { Return $2 }
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
-  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([]))}
-  | IF LPAREN expr RPAREN stmt elif_list ELSE stmt { If($3, $5, $6, $8)}
+  | IF LPAREN expr RPAREN stmt ELSE stmt { If($3, $5, Block([]), $7)}
+  | IF LPAREN expr RPAREN stmt %prec NOELIF %prec NOELSE { If($3, $5, Block([]), Block([])) }
+  | IF LPAREN expr RPAREN stmt elif_list ELSE stmt { If($3, $5, Block([]), $8)}
   | FOR LPAREN expr SEMC expr SEMC expr RPAREN stmt { For($3, $5, $7, $9) } 
   | WHILE LPAREN expr RPAREN stmt { While($3, $5) }
 /* =================================== */
@@ -74,7 +77,7 @@ elif_list:
   | elif elif_list { $1 :: $2 }
 
 elif:
-  ELIF LPAREN expr RPAREN stmt { Elif($3, $5) }
+  ELIF expr stmt { Elif($2, $3) }
 
 
 stmt_list:

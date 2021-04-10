@@ -22,7 +22,7 @@ type stmt =
     Block of stmt list
   | Expr of expr
   | Return of expr
-  | If of expr * stmt * stmt
+  | If of expr * stmt * stmt list * stmt
   | For of expr * expr * expr * stmt
   | While of expr * stmt
 

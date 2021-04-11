@@ -80,6 +80,14 @@ cc -o test-assign1.exe test-assign1.s
 diff -b test-assign1.out tests/test-assign1.out > test-assign1.diff
 ###### SUCCESS
 
+###### Testing test-assign2
+./compyled.native tests/test-assign2.cp > test-assign2.ll
+llc -relocation-model=pic test-assign2.ll > test-assign2.s
+cc -o test-assign2.exe test-assign2.s
+./test-assign2.exe
+diff -b test-assign2.out tests/test-assign2.out > test-assign2.diff
+###### SUCCESS
+
 ###### Testing test-decl1
 ./compyled.native tests/test-decl1.cp > test-decl1.ll
 llc -relocation-model=pic test-decl1.ll > test-decl1.s

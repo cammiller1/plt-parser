@@ -1,5 +1,5 @@
 if (False) {
-	prints("went to if branch"); 
+	print("went to if branch"); 
 } else {
-	prints("went to else branch"); 
+	print("went to else branch"); 
 }

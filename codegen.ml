@@ -150,11 +150,34 @@ let translate (globals, functions, statements) =
       in StringMap.add n t m in
     List.fold_left local_var StringMap.empty fdecl.slocals in
 
+
+   (********* THIS EXPR BUILDER IS SOLELY FOR INITIALIZATION!!!! ******)
+    (* Construct code for an expression in the INITIALIZATION; return its value *)
+    let rec expr ((_, e) : sexpr) = match e with
+        SLiti i  -> L.const_int i32_t i
+      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l -> L.const_float float_t l
+      (* | SLits s -> L.build_global_stringptr s "str" builder *)
+      | SNoexpr     -> L.const_int i32_t 0
+      (* | SId s       -> L.build_load (lookup s) s builder *)
+      | SAssign (s, e) -> expr e
+
+  in
+  
+
+
     (* Return the value for a variable or formal argument.
        Check local names first, then global names *)
     let lookup n = try StringMap.find n local_vars
                    with Not_found -> StringMap.find n global_vars
     in
+
+      (* initialize local vars. no use for the stringmap, just to assist in building *)
+    let initialize_local_vars (t, n, se) = L.build_store se (lookup n) builder)
+
+      in List.iter initialize_local_vars fdecl.slocals
+
+  in
 
     let find_type n = try StringMap.find n local_var_types
                    with Not_found -> raise (Failure "local variable type not found")

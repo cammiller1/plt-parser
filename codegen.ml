@@ -139,7 +139,7 @@ let translate (globals, functions, statements) =
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
     let local_vars =
-      let add_formal m (t, n, e) p = 
+      let add_formal m (t, n, se) p = 
         L.set_value_name n p;
       let local = L.build_alloca (ltype_of_typ t) n builder 
           in ignore (L.build_store p local builder); 
@@ -147,10 +147,10 @@ let translate (globals, functions, statements) =
 
       (* Allocate space for any locally declared variables and add the
        * resulting registers to our map *)
-      and add_local m (t, n, e) =
-        L.set_value_name n (expr e);
+      and add_local m (t, n, se) =
+        L.set_value_name n (expr se);
         let local_var = L.build_alloca (ltype_of_typ t) n builder
-          in ignore (L.build_store (expr e) local_var builder);
+          in ignore (L.build_store (expr se) local_var builder);
         StringMap.add n local_var m 
       in
 

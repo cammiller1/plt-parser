@@ -238,8 +238,15 @@ llc -relocation-model=pic test-initialize-var-in-func1.ll > test-initialize-var-
 cc -o test-initialize-var-in-func1.exe test-initialize-var-in-func1.s
 ./test-initialize-var-in-func1.exe
 diff -b test-initialize-var-in-func1.out tests/test-initialize-var-in-func1.out > test-initialize-var-in-func1.diff
-FAILED test-initialize-var-in-func1.out differs from tests/test-initialize-var-in-func1.out
-###### FAILED
+###### SUCCESS
+
+###### Testing test-initialize-var-in-func2
+./compyled.native tests/test-initialize-var-in-func2.cp > test-initialize-var-in-func2.ll
+llc -relocation-model=pic test-initialize-var-in-func2.ll > test-initialize-var-in-func2.s
+cc -o test-initialize-var-in-func2.exe test-initialize-var-in-func2.s
+./test-initialize-var-in-func2.exe
+diff -b test-initialize-var-in-func2.out tests/test-initialize-var-in-func2.out > test-initialize-var-in-func2.diff
+###### SUCCESS
 
 ###### Testing test-initialize-var
 ./compyled.native tests/test-initialize-var.cp > test-initialize-var.ll

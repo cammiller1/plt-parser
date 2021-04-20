@@ -19,11 +19,9 @@ entry:
   store i32 %b, i32* %b2
   %c = alloca i32
   %a3 = load i32, i32* %a1
-  %b4 = load i32, i32* %b2
-  %tmp = add i32 %a3, %b4
-  %c5 = load i32, i32* %c
-  %tmp6 = add i32 %tmp, %c5
-  ret i32 %tmp6
+  %c4 = load i32, i32* %c
+  %tmp = add i32 %a3, %c4
+  ret i32 %tmp
 }
 
 define i32 @main(i8*, ...) {

@@ -6,12 +6,10 @@
 add_3_to:                               # @add_3_to
 	.cfi_startproc
 # %bb.0:                                # %entry
-                                        # kill: def %esi killed %esi def %rsi
-                                        # kill: def %edi killed %edi def %rdi
 	movl	%edi, -4(%rsp)
 	movl	%esi, -8(%rsp)
-	leal	(%rdi,%rsi), %eax
-	addl	-12(%rsp), %eax
+	addl	-12(%rsp), %edi
+	movl	%edi, %eax
 	retq
 .Lfunc_end0:
 	.size	add_3_to, .Lfunc_end0-add_3_to

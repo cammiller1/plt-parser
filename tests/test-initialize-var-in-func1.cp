@@ -2,7 +2,7 @@
 
 def int add_3_to(int a, int b) {
   int c = 3;
-  return a + b + c;
+  return a + c;
 }
 
 int a;

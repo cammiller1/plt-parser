@@ -225,6 +225,10 @@ let translate (globals, functions, statements) =
             | A.Gt -> L.build_icmp L.Icmp.Sgt
             | A.Gte     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" builder
+      | SUniop(op, ((t, _) as e)) ->
+          let e' = expr builder e in
+        (match op with
+            A.Not -> L.build_not) e' "tmp" builder
       | SCall ("print", [e]) ->
           let e' = expr builder e in
           ( match e with
@@ -429,6 +433,10 @@ let translate (globals, functions, statements) =
             | A.Gt -> L.build_icmp L.Icmp.Sgt
             | A.Gte     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" builder
+      | SUniop(op, ((t, _) as e)) ->
+          let e' = expr builder e in
+        (match op with
+            A.Not -> L.build_not) e' "tmp" builder
       | SCall ("print", [e]) ->
           let e' = expr builder e in
           ( match e with

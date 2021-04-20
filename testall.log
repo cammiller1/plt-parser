@@ -256,6 +256,22 @@ cc -o test-initialize-var.exe test-initialize-var.s
 diff -b test-initialize-var.out tests/test-initialize-var.out > test-initialize-var.diff
 ###### SUCCESS
 
+###### Testing test-not1
+./compyled.native tests/test-not1.cp > test-not1.ll
+llc -relocation-model=pic test-not1.ll > test-not1.s
+cc -o test-not1.exe test-not1.s
+./test-not1.exe
+diff -b test-not1.out tests/test-not1.out > test-not1.diff
+###### SUCCESS
+
+###### Testing test-not2
+./compyled.native tests/test-not2.cp > test-not2.ll
+llc -relocation-model=pic test-not2.ll > test-not2.s
+cc -o test-not2.exe test-not2.s
+./test-not2.exe
+diff -b test-not2.out tests/test-not2.out > test-not2.diff
+###### SUCCESS
+
 ###### Testing test-while1
 ./compyled.native tests/test-while1.cp > test-while1.ll
 llc -relocation-model=pic test-while1.ll > test-while1.s

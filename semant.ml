@@ -58,12 +58,6 @@ let check (globals, functions, statements) =
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
       | Noexpr     -> (Void, SNoexpr)
-      | Assign(var, e) as ex -> 
-          let lt = type_of_identifier var
-          and (rt, e') = expr e in
-          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
-            string_of_typ rt ^ " in " ^ string_of_expr ex
-          in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
           and (t2, e2') = expr e2 in
@@ -78,14 +72,24 @@ let check (globals, functions, statements) =
                      when same && (t1 = Int || t1 = Float) -> Boolean
           | And | Or when same && t1 = Boolean -> Boolean
           | _ -> raise (
-        Failure ("illegal binary operator ") )
+        Failure ("illegal binary operator " ^
+                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+                       string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
 
   in
   
-  let check_globals global= 
+  let check_globals global = 
 
     let return_checked_global (t, s, e) =
+      match e with 
+        | Noexpr     -> (t, s, expr e)
+        | _ ->
+          let lt = type_of_identifier s
+          and (rt, e') = expr e in
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr e
+          in check_assign lt rt err;
       (t, s, expr e)
 
     in return_checked_global global
@@ -214,8 +218,20 @@ let check (globals, functions, statements) =
 
   in
   
-  let return_checked_locals (t, s, e) =
-      (t, s, expr e)
+  
+  let check_locals local = 
+    let return_checked_locals (t, s, e) =
+      match e with 
+          | Noexpr     -> (t, s, expr e)
+          | _ ->
+            let lt = type_of_identifier s
+            and (rt, e') = expr e in
+            let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+              string_of_typ rt ^ " in " ^ string_of_expr e
+            in check_assign lt rt err;
+        (t, s, expr e)
+
+       in return_checked_locals local
 
   in
 
@@ -324,8 +340,8 @@ let check (globals, functions, statements) =
     in (* body of check_function *)
     { styp = func.typ;
       sfname = func.fname;
-      sformals = (List.map return_checked_locals func.formals);
-      slocals  = (List.map return_checked_locals func.locals);
+      sformals = (List.map check_locals func.formals);
+      slocals  = (List.map check_locals func.locals);
       sbody = match check_stmt (Block func.body) with
   SBlock(sl) -> sl
       | _ -> raise (Failure ("internal error: block didn't become a block?"))

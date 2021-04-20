@@ -299,23 +299,20 @@ diff -b fail-for1.err tests/fail-for1.err > fail-for1.diff
 diff -b fail-for2.err tests/fail-for2.err > fail-for2.diff
 ###### SUCCESS
 
+###### Testing fail-initialize-in-func
+./compyled.native < tests/fail-initialize-in-func.cp 2> fail-initialize-in-func.err >> testall.log
+diff -b fail-initialize-in-func.err tests/fail-initialize-in-func.err > fail-initialize-in-func.diff
+###### SUCCESS
+
 ###### Testing fail-initialize1
 ./compyled.native < tests/fail-initialize1.cp 2> fail-initialize1.err >> testall.log
-; ModuleID = 'complyed'
-source_filename = "complyed"
+diff -b fail-initialize1.err tests/fail-initialize1.err > fail-initialize1.diff
+###### SUCCESS
 
-@x = global i1 true
-@fmt = private unnamed_addr constant [4 x i8] c"%d\0A\00"
-@fmt.1 = private unnamed_addr constant [4 x i8] c"%f\0A\00"
-@fmt.2 = private unnamed_addr constant [4 x i8] c"%s\0A\00"
-
-declare i32 @printf(i8*, ...)
-
-define i32 @main(i8*, ...) {
-entry:
-  ret i32 0
-}
-###### FAILED
+###### Testing fail-initialize2
+./compyled.native < tests/fail-initialize2.cp 2> fail-initialize2.err >> testall.log
+diff -b fail-initialize2.err tests/fail-initialize2.err > fail-initialize2.diff
+###### SUCCESS
 
 ###### Testing fail-return1
 ./compyled.native < tests/fail-return1.cp 2> fail-return1.err >> testall.log

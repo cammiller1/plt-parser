@@ -28,8 +28,8 @@ type sbind = typ * string * sexpr
 type sfunc_decl = {
     styp : typ;
     sfname : string;
-    sformals : bind list;
-    slocals : bind list;
+    sformals : sbind list;
+    slocals : sbind list;
     sbody : sstmt list;
 }
 

@@ -121,21 +121,37 @@ let translate (globals, functions, statements) =
     and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder
     and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder in
 
+
+    (********* THIS EXPR BUILDER IS SOLELY FOR INITIALIZATION!!!! ******)
+    (* Construct code for an expression in the INITIALIZATION; return its value *)
+    let rec expr ((_, e) : sexpr) = match e with
+        SLiti i  -> L.const_int i32_t i
+      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l -> L.const_float float_t l
+      (* | SLits s -> L.build_global_stringptr s "str" builder *)
+      | SNoexpr     -> L.const_int i32_t 0
+      (* | SId s       -> L.build_load (lookup s) s builder *)
+      | SAssign (s, e) -> expr e
+
+  in
+
     (* Construct the function's "locals": formal arguments and locally
        declared variables.  Allocate each on the stack, initialize their
        value, if appropriate, and remember their values in the "locals" map *)
     let local_vars =
-      let add_formal m (t, n, e) p = 
+      let add_formal m (t, n, se) p = 
         L.set_value_name n p;
-  let local = L.build_alloca (ltype_of_typ t) n builder in
-        ignore (L.build_store p local builder);
-  StringMap.add n local m 
+      let local = L.build_alloca (ltype_of_typ t) n builder 
+          in ignore (L.build_store p local builder); 
+          StringMap.add n local m 
 
       (* Allocate space for any locally declared variables and add the
        * resulting registers to our map *)
-      and add_local m (t, n, e) =
-  let local_var = L.build_alloca (ltype_of_typ t) n builder
-  in StringMap.add n local_var m 
+      and add_local m (t, n, se) =
+        L.set_value_name n (expr se);
+        let local_var = L.build_alloca (ltype_of_typ t) n builder
+          in ignore (L.build_store (expr se) local_var builder);
+        StringMap.add n local_var m 
       in
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
@@ -149,6 +165,8 @@ let translate (globals, functions, statements) =
       let atype = t
       in StringMap.add n t m in
     List.fold_left local_var StringMap.empty fdecl.slocals in
+  
+
 
     (* Return the value for a variable or formal argument.
        Check local names first, then global names *)

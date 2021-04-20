@@ -26,7 +26,7 @@ rule tokenize = parse
 | "=="     { EQ }
 | "=<"     { LTE }
 | ">="     { GTE }
-| '!'	   { NOT }
+| "not"	   { NOT }
 | "!="     { NE }
 | "**"     { EXP }
 | "and"    { AND }

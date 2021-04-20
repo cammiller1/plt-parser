@@ -39,6 +39,7 @@ let trd (_,_,c) = c;;
 %left PLUS MINUS
 %left TIMES DIVIDE MOD EXP
 %left PP MM
+%right NOT
 
 %start program  /* the entry point */
 %type <Ast.program> program
@@ -144,6 +145,7 @@ expr:
   | ID ASSIGN expr     { Assign($1, $3) } 
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }
+  | NOT expr           { Uniop(Not, $2) }
 
 args_opt:
     /* nothing */ { [] }

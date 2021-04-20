@@ -76,6 +76,14 @@ let check (globals, functions, statements) =
                        string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
                        string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
+      | Uniop(op, e) as ex -> 
+          let (t, e') = expr e in
+          let ty = match op with
+            Not when t = Boolean -> Boolean
+          | _ -> raise (Failure ("illegal unary operator " ^ 
+                                 string_of_uop op ^ string_of_typ t ^
+                                 " in " ^ string_of_expr ex))
+          in (ty, SUniop(op, (t, e')))
 
   in
   
@@ -215,6 +223,14 @@ let check (globals, functions, statements) =
                        string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
                        string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
+      | Uniop(op, e) as ex -> 
+          let (t, e') = expr e in
+          let ty = match op with
+            Not when t = Boolean -> Boolean
+          | _ -> raise (Failure ("illegal unary operator " ^ 
+                                 string_of_uop op ^ string_of_typ t ^
+                                 " in " ^ string_of_expr ex))
+          in (ty, SUniop(op, (t, e')))
 
   in
   
@@ -292,6 +308,14 @@ let check (globals, functions, statements) =
                        string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
                        string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
+      | Uniop(op, e) as ex -> 
+          let (t, e') = expr e in
+          let ty = match op with
+            Not when t = Boolean -> Boolean
+          | _ -> raise (Failure ("illegal unary operator " ^ 
+                                 string_of_uop op ^ string_of_typ t ^
+                                 " in " ^ string_of_expr ex))
+          in (ty, SUniop(op, (t, e')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in
           let param_length = List.length fd.formals in
@@ -422,6 +446,14 @@ let check (globals, functions, statements) =
                        string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
                        string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
+      | Uniop(op, e) as ex -> 
+          let (t, e') = expr e in
+          let ty = match op with
+            Not when t = Boolean -> Boolean
+          | _ -> raise (Failure ("illegal unary operator " ^ 
+                                 string_of_uop op ^ string_of_typ t ^
+                                 " in " ^ string_of_expr ex))
+          in (ty, SUniop(op, (t, e')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in
           let param_length = List.length fd.formals in

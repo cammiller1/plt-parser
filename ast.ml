@@ -3,7 +3,7 @@
 type operator = Add | Sub | Mul | Div | Seq | Lt | Gt | Exp | Mod | Lte | Gte
 			| Eq | Ne | And | Or
 
-type unary_operator = Pp | Mm
+type unary_operator = Pp | Mm | Not
 
 type typ = Int | Float | Boolean | Void | String | Array
 
@@ -60,6 +60,7 @@ let string_of_op = function
 let string_of_uop = function
     Pp -> "++"
   | Mm -> "--"
+  | Not -> "not"
 
 let rec string_of_expr = function
     Liti(l) -> string_of_int l

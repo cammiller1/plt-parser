@@ -1,3 +1,5 @@
+open Printf
+
 type operator = Add | Sub | Mul | Div | Seq | Lt | Gt | Exp | Mod | Lte | Gte
 			| Eq | Ne | And | Or
 
@@ -60,9 +62,10 @@ let string_of_uop = function
 
 let rec string_of_expr = function
     Liti(l) -> string_of_int l
-  (* | Litf(l) -> l *)
+  | Litf(l) -> sprintf "%f" l
   | Litb(true) -> "true"
   | Litb(false) -> "false"
+  | Lits(l) -> l
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
@@ -90,6 +93,7 @@ let string_of_typ = function
   | Boolean -> "bool"
   | Float -> "float"
   | Void -> "void"
+  | String -> "string"
 
 let string_of_vdecl (t, id, e) = string_of_typ t ^ " " ^ id ^ ";\n"
 

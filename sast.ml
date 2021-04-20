@@ -1,6 +1,8 @@
 (* Semantically-checked Abstract Syntax Tree*)
 open Ast
 
+open Printf
+
 type sexpr = typ * sx
 and sx =
     SLiti of int
@@ -40,9 +42,10 @@ type sprogram = sbind list * sfunc_decl list * sstmt list
 let rec string_of_sexpr (t, e) =
   "(" ^ string_of_typ t ^ " : " ^ (match e with
     SLiti(l) -> string_of_int l
+  | SLitf(l) -> sprintf  "%f" l
   | SLitb(true) -> "true"
   | SLitb(false) -> "false"
-  (*| SLitf(l) -> l *)
+  | SLits(l) -> l
   | SId(s) -> s
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
@@ -76,6 +79,7 @@ let string_of_sfdecl fdecl =
   String.concat "" (List.map string_of_vdecl fdecl.slocals) ^
   String.concat "" (List.map string_of_sstmt fdecl.sbody) ^
   "}\n"
+
 
 let string_of_sprogram (vars, funcs, statements) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^

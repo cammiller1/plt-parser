@@ -170,7 +170,7 @@ if [ $# -ge 1 ]
 then
     files=$@
 else
-    files="tests/test-*.cp" # tests/fail-*.cp"
+    files="tests/test-*.cp tests/fail-*.cp"
 fi
 
 for file in $files

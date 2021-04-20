@@ -263,3 +263,9 @@ cc -o test-while1.exe test-while1.s
 ./test-while1.exe
 diff -b test-while1.out tests/test-while1.out > test-while1.diff
 ###### SUCCESS
+
+###### Testing fail-assign1
+./compyled.native < tests/fail-assign1.cp 2> fail-assign1.err >> testall.log
+diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
+FAILED fail-assign1.err differs from tests/fail-assign1.err
+###### FAILED

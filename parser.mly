@@ -22,7 +22,7 @@ let trd (_,_,c) = c;;
 %token LPAREN RPAREN RBRACE LBRACE COMMA
 
 %token <int> ILITERAL
-%token <float> FLITERAL
+%token <string> FLITERAL
 %token <string> ID
 %token <string> SLITERAL
 %token <bool> BLITERAL

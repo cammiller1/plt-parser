@@ -1,4 +1,4 @@
-open Printf
+(* open Printf *)
 
 type operator = Add | Sub | Mul | Div | Seq | Lt | Gt | Exp | Mod | Lte | Gte
 			| Eq | Ne | And | Or
@@ -9,7 +9,7 @@ type typ = Int | Float | Boolean | Void | String | Array
 
 type expr =
     Liti of int
-  | Litf of float
+  | Litf of string
   | Litb of bool
   | Lits of string
   | Id of string
@@ -63,7 +63,7 @@ let string_of_uop = function
 
 let rec string_of_expr = function
     Liti(l) -> string_of_int l
-  | Litf(l) -> sprintf "%f" l
+  | Litf(l) -> l (* sprintf "%f" l *)
   | Litb(true) -> "true"
   | Litb(false) -> "false"
   | Lits(l) -> l

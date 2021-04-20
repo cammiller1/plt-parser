@@ -1,12 +1,12 @@
 (* Semantically-checked Abstract Syntax Tree*)
 open Ast
 
-open Printf
+(* open Printf *)
 
 type sexpr = typ * sx
 and sx =
     SLiti of int
-  | SLitf of float
+  | SLitf of string
   | SLitb of bool
   | SLits of string
   | SId of string
@@ -43,7 +43,7 @@ type sprogram = sbind list * sfunc_decl list * sstmt list
 let rec string_of_sexpr (t, e) =
   "(" ^ string_of_typ t ^ " : " ^ (match e with
     SLiti(l) -> string_of_int l
-  | SLitf(l) -> sprintf  "%f" l
+  | SLitf(l) -> l
   | SLitb(true) -> "True"
   | SLitb(false) -> "False"
   | SLits(l) -> l

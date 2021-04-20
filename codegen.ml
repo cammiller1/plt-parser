@@ -46,7 +46,7 @@ let translate (globals, functions, statements) =
     let rec expr ((_, e) : sexpr) = match e with
         SLiti i  -> L.const_int i32_t i
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-      | SLitf l -> L.const_float float_t l
+      | SLitf l -> L.const_float_of_string float_t l
       (* | SLits s -> L.build_global_stringptr s "str" builder *)
       | SNoexpr     -> L.const_int i32_t 0
       (* | SId s       -> L.build_load (lookup s) s builder *)
@@ -127,7 +127,7 @@ let translate (globals, functions, statements) =
     let rec expr ((_, e) : sexpr) = match e with
         SLiti i  -> L.const_int i32_t i
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-      | SLitf l -> L.const_float float_t l
+      | SLitf l -> L.const_float_of_string float_t l
       (* | SLits s -> L.build_global_stringptr s "str" builder *)
       | SNoexpr     -> L.const_int i32_t 0
       (* | SId s       -> L.build_load (lookup s) s builder *)
@@ -185,7 +185,7 @@ let translate (globals, functions, statements) =
     let rec expr builder ((_, e) : sexpr) = match e with
         SLiti i  -> L.const_int i32_t i
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-      | SLitf l -> L.const_float float_t l
+      | SLitf l -> L.const_float_of_string float_t l
       | SLits s -> L.build_global_stringptr s "str" builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
@@ -367,7 +367,7 @@ let translate (globals, functions, statements) =
      let builder = L.builder_at_end context (L.entry_block the_function) in
  
      let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
-     and float_format_str = L.build_global_stringptr "%f\n" "fmt" builder
+     and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder
      and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
   in
 
@@ -389,7 +389,7 @@ let translate (globals, functions, statements) =
     let rec expr builder ((_, e) : sexpr) = match e with
         SLiti i  -> L.const_int i32_t i
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-      | SLitf l -> L.const_float float_t l
+      | SLitf l -> L.const_float_of_string float_t l
       | SLits s -> L.build_global_stringptr s "str" builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder

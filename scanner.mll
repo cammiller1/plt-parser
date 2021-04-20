@@ -55,7 +55,7 @@ rule tokenize = parse
 | "return" { RETURN }
 | string_literal as lxm { SLITERAL(remove_quotes lxm) }
 | digit+ as lxm { ILITERAL(int_of_string lxm) }
-| flt as lxm { FLITERAL(float_of_string lxm) }
+| flt as lxm { FLITERAL(lxm) }
 | letter['a'-'z' 'A'-'Z' '0'-'9' '_']*  as lxm { ID(lxm) }
 | eof     { EOF }
 | _ as char { raise (Failure("illegal character" ^ Char.escaped char)) } 

@@ -58,11 +58,6 @@ let check (globals, functions, statements) =
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
       | Noexpr     -> (Void, SNoexpr)
-      | Assign(var, e) as ex -> 
-          let lt = type_of_identifier var
-          and (rt, e') = expr e in
-          let err = "illegal assignment"
-          in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
           and (t2, e2') = expr e2 in
@@ -77,14 +72,24 @@ let check (globals, functions, statements) =
                      when same && (t1 = Int || t1 = Float) -> Boolean
           | And | Or when same && t1 = Boolean -> Boolean
           | _ -> raise (
-        Failure ("illegal binary operator ") )
+        Failure ("illegal binary operator " ^
+                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+                       string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
 
   in
   
-  let check_globals global= 
+  let check_globals global = 
 
     let return_checked_global (t, s, e) =
+      match e with 
+        | Noexpr     -> (t, s, expr e)
+        | _ ->
+          let lt = type_of_identifier s
+          and (rt, e') = expr e in
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr e
+          in check_assign lt rt err;
       (t, s, expr e)
 
     in return_checked_global global
@@ -189,7 +194,8 @@ let check (globals, functions, statements) =
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
-          let err = "illegal assignment"
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr ex
           in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
@@ -205,13 +211,27 @@ let check (globals, functions, statements) =
                      when same && (t1 = Int || t1 = Float) -> Boolean
           | And | Or when same && t1 = Boolean -> Boolean
           | _ -> raise (
-        Failure ("illegal binary operator ") )
+        Failure ("illegal binary operator " ^
+                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+                       string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
 
   in
   
-  let return_checked_locals (t, s, e) =
-      (t, s, expr e)
+  
+  let check_locals local = 
+    let return_checked_locals (t, s, e) =
+      match e with 
+          | Noexpr     -> (t, s, expr e)
+          | _ ->
+            let lt = type_of_identifier s
+            and (rt, e') = expr e in
+            let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+              string_of_typ rt ^ " in " ^ string_of_expr e
+            in check_assign lt rt err;
+        (t, s, expr e)
+
+       in return_checked_locals local
 
   in
 
@@ -223,6 +243,10 @@ let check (globals, functions, statements) =
     let check_assign lvaluet rvaluet err =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
     in   
+
+    let check_print lvaluet rvaluet err =
+       lvaluet
+    in
 
     (* Build local symbol table of variables for this function *)
     (* drop the expression "e" from being stored in the symbol table*)
@@ -247,7 +271,8 @@ let check (globals, functions, statements) =
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
-          let err = "illegal assignment"
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr ex
           in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
@@ -263,7 +288,9 @@ let check (globals, functions, statements) =
                      when same && (t1 = Int || t1 = Float) -> Boolean
           | And | Or when same && t1 = Boolean -> Boolean
           | _ -> raise (
-        Failure ("illegal binary operator ") )
+        Failure ("illegal binary operator " ^
+                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+                       string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in
@@ -273,7 +300,8 @@ let check (globals, functions, statements) =
           else let check_call (ft, _, _) e = 
             let (et, e') = expr e in 
             let err = "illegal argument found "
-            in (check_assign ft et err, e')
+            (* skip print function *)
+            in if fname = "print" then (check_print ft et err, e') else (check_assign ft et err, e')
           in 
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
@@ -282,7 +310,7 @@ let check (globals, functions, statements) =
 
     let check_bool_expr e = 
       let (t', e') = expr e
-      and err = "expected Boolean expression in ____"
+      and err = "expected Boolean expression in " ^ string_of_expr e
       in if t' != Boolean then raise (Failure err) else (t', e') 
     in
 
@@ -294,7 +322,9 @@ let check (globals, functions, statements) =
           SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)
       | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
       | Return e -> let (t, e') = expr e in
-          SReturn (t, e')
+          if t = func.typ then SReturn (t, e') 
+          else raise ( Failure ("return gives " ^ string_of_typ t ^ " expected " ^
+            string_of_typ func.typ ^ " in " ^ string_of_expr e))
       | Block sl -> 
           let rec check_stmt_list = function
               [Return _ as s] -> [check_stmt s]
@@ -310,8 +340,8 @@ let check (globals, functions, statements) =
     in (* body of check_function *)
     { styp = func.typ;
       sfname = func.fname;
-      sformals = (List.map return_checked_locals func.formals);
-      slocals  = (List.map return_checked_locals func.locals);
+      sformals = (List.map check_locals func.formals);
+      slocals  = (List.map check_locals func.locals);
       sbody = match check_stmt (Block func.body) with
   SBlock(sl) -> sl
       | _ -> raise (Failure ("internal error: block didn't become a block?"))
@@ -352,7 +382,11 @@ let check (globals, functions, statements) =
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
     let check_assign lvaluet rvaluet err =
-       if lvaluet = rvaluet then lvaluet else lvaluet (* raise (Failure err) *)
+       if lvaluet = rvaluet then lvaluet else raise (Failure err)
+    in
+
+    let check_print lvaluet rvaluet err =
+       lvaluet
     in
 
 
@@ -367,7 +401,8 @@ let check (globals, functions, statements) =
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
-          let err = "illegal assignment"
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr ex
           in (check_assign lt rt err, SAssign(var, (rt, e')))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
@@ -383,7 +418,9 @@ let check (globals, functions, statements) =
                      when same && (t1 = Int || t1 = Float) -> Boolean
           | And | Or when same && t1 = Boolean -> Boolean
           | _ -> raise (
-        Failure ("illegal binary operator ") )
+        Failure ("illegal binary operator " ^
+                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+                       string_of_typ t2 ^ " in " ^ string_of_expr e))
           in (ty, SBinop((t1, e1'), op, (t2, e2')))
       | Call(fname, args) as call -> 
           let fd = find_func fname in
@@ -393,7 +430,8 @@ let check (globals, functions, statements) =
           else let check_call (ft, _, _) e = 
             let (et, e') = expr e in 
             let err = "illegal argument found "
-            in (check_assign ft et err, e')
+            (* skip print function *)
+            in if fname = "print" then (check_print ft et err, e') else (check_assign ft et err, e')
           in 
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
@@ -402,8 +440,8 @@ let check (globals, functions, statements) =
 
     let check_bool_expr e = 
       let (t', e') = expr e
-      and err = "expected Boolean expression in ____"
-      in if t' != Boolean then raise (Failure err) else (t', e') 
+      and err = "expected Boolean expression in " ^ string_of_expr e
+      in if t' != Boolean then raise (Failure err) else (t', e')
     in
 
     (* Return a semantically-checked statement i.e. containing sexprs *)

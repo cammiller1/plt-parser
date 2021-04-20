@@ -263,3 +263,58 @@ cc -o test-while1.exe test-while1.s
 ./test-while1.exe
 diff -b test-while1.out tests/test-while1.out > test-while1.diff
 ###### SUCCESS
+
+###### Testing fail-assign1
+./compyled.native < tests/fail-assign1.cp 2> fail-assign1.err >> testall.log
+diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
+###### SUCCESS
+
+###### Testing fail-assign2
+./compyled.native < tests/fail-assign2.cp 2> fail-assign2.err >> testall.log
+diff -b fail-assign2.err tests/fail-assign2.err > fail-assign2.diff
+###### SUCCESS
+
+###### Testing fail-assign3
+./compyled.native < tests/fail-assign3.cp 2> fail-assign3.err >> testall.log
+diff -b fail-assign3.err tests/fail-assign3.err > fail-assign3.diff
+###### SUCCESS
+
+###### Testing fail-expr1
+./compyled.native < tests/fail-expr1.cp 2> fail-expr1.err >> testall.log
+diff -b fail-expr1.err tests/fail-expr1.err > fail-expr1.diff
+###### SUCCESS
+
+###### Testing fail-expr2
+./compyled.native < tests/fail-expr2.cp 2> fail-expr2.err >> testall.log
+diff -b fail-expr2.err tests/fail-expr2.err > fail-expr2.diff
+###### SUCCESS
+
+###### Testing fail-for1
+./compyled.native < tests/fail-for1.cp 2> fail-for1.err >> testall.log
+diff -b fail-for1.err tests/fail-for1.err > fail-for1.diff
+###### SUCCESS
+
+###### Testing fail-for2
+./compyled.native < tests/fail-for2.cp 2> fail-for2.err >> testall.log
+diff -b fail-for2.err tests/fail-for2.err > fail-for2.diff
+###### SUCCESS
+
+###### Testing fail-initialize-in-func
+./compyled.native < tests/fail-initialize-in-func.cp 2> fail-initialize-in-func.err >> testall.log
+diff -b fail-initialize-in-func.err tests/fail-initialize-in-func.err > fail-initialize-in-func.diff
+###### SUCCESS
+
+###### Testing fail-initialize1
+./compyled.native < tests/fail-initialize1.cp 2> fail-initialize1.err >> testall.log
+diff -b fail-initialize1.err tests/fail-initialize1.err > fail-initialize1.diff
+###### SUCCESS
+
+###### Testing fail-initialize2
+./compyled.native < tests/fail-initialize2.cp 2> fail-initialize2.err >> testall.log
+diff -b fail-initialize2.err tests/fail-initialize2.err > fail-initialize2.diff
+###### SUCCESS
+
+###### Testing fail-return1
+./compyled.native < tests/fail-return1.cp 2> fail-return1.err >> testall.log
+diff -b fail-return1.err tests/fail-return1.err > fail-return1.diff
+###### SUCCESS

@@ -1,5 +1,5 @@
-int i;
+bool i;
 
-i = 3.2;
+i = 1;
 
 print(i);

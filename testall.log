@@ -267,5 +267,57 @@ diff -b test-while1.out tests/test-while1.out > test-while1.diff
 ###### Testing fail-assign1
 ./compyled.native < tests/fail-assign1.cp 2> fail-assign1.err >> testall.log
 diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
-FAILED fail-assign1.err differs from tests/fail-assign1.err
+###### SUCCESS
+
+###### Testing fail-assign2
+./compyled.native < tests/fail-assign2.cp 2> fail-assign2.err >> testall.log
+diff -b fail-assign2.err tests/fail-assign2.err > fail-assign2.diff
+###### SUCCESS
+
+###### Testing fail-assign3
+./compyled.native < tests/fail-assign3.cp 2> fail-assign3.err >> testall.log
+diff -b fail-assign3.err tests/fail-assign3.err > fail-assign3.diff
+###### SUCCESS
+
+###### Testing fail-expr1
+./compyled.native < tests/fail-expr1.cp 2> fail-expr1.err >> testall.log
+diff -b fail-expr1.err tests/fail-expr1.err > fail-expr1.diff
+###### SUCCESS
+
+###### Testing fail-expr2
+./compyled.native < tests/fail-expr2.cp 2> fail-expr2.err >> testall.log
+diff -b fail-expr2.err tests/fail-expr2.err > fail-expr2.diff
+###### SUCCESS
+
+###### Testing fail-for1
+./compyled.native < tests/fail-for1.cp 2> fail-for1.err >> testall.log
+diff -b fail-for1.err tests/fail-for1.err > fail-for1.diff
+###### SUCCESS
+
+###### Testing fail-for2
+./compyled.native < tests/fail-for2.cp 2> fail-for2.err >> testall.log
+diff -b fail-for2.err tests/fail-for2.err > fail-for2.diff
+###### SUCCESS
+
+###### Testing fail-initialize1
+./compyled.native < tests/fail-initialize1.cp 2> fail-initialize1.err >> testall.log
+; ModuleID = 'complyed'
+source_filename = "complyed"
+
+@x = global i1 true
+@fmt = private unnamed_addr constant [4 x i8] c"%d\0A\00"
+@fmt.1 = private unnamed_addr constant [4 x i8] c"%f\0A\00"
+@fmt.2 = private unnamed_addr constant [4 x i8] c"%s\0A\00"
+
+declare i32 @printf(i8*, ...)
+
+define i32 @main(i8*, ...) {
+entry:
+  ret i32 0
+}
 ###### FAILED
+
+###### Testing fail-return1
+./compyled.native < tests/fail-return1.cp 2> fail-return1.err >> testall.log
+diff -b fail-return1.err tests/fail-return1.err > fail-return1.diff
+###### SUCCESS

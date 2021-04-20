@@ -40,6 +40,7 @@ type func_decl = {
 
 type program = bind list * func_decl list * stmt list
 
+
 (* Pretty-printing functions *)
 
 let string_of_op = function
@@ -90,7 +91,7 @@ let rec string_of_stmt = function
 
 let string_of_typ = function
     Int -> "int"
-  | Boolean -> "bool"
+  | Boolean -> "boolean"
   | Float -> "float"
   | Void -> "void"
   | String -> "string"

@@ -48,6 +48,7 @@ let translate (globals, functions, statements) =
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
       | SLitf l -> L.const_float_of_string float_t l
       (* | SLits s -> L.build_global_stringptr s "str" builder *)
+      (* | SLits s -> L.const_pointer_null s "str" builder *)
       | SNoexpr     -> L.const_int i32_t 0
       (* | SId s       -> L.build_load (lookup s) s builder *)
       | SAssign (s, e) -> expr e
@@ -128,7 +129,7 @@ let translate (globals, functions, statements) =
         SLiti i  -> L.const_int i32_t i
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
       | SLitf l -> L.const_float_of_string float_t l
-      (* | SLits s -> L.build_global_stringptr s "str" builder *)
+      | SLits s -> L.build_global_stringptr s "str" builder
       | SNoexpr     -> L.const_int i32_t 0
       (* | SId s       -> L.build_load (lookup s) s builder *)
       | SAssign (s, e) -> expr e

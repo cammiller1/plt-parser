@@ -24,7 +24,7 @@ let translate (globals, functions, statements) =
   (* Get types from the context *)
   (* llvm only supports primitive types *)
   let i32_t      = L.i32_type       context  (* 32-bit int type *)
-  and i8_t       = L.i8_type        context  (* caracters *)
+  and i8_t       = L.i8_type        context  (* characters *)
   and i1_t       = L.i1_type        context  (* boolean type *)
   and float_t    = L.double_type    context  (* double/float type *)
   and void_t     = L.void_type      context   (* void type *)
@@ -32,7 +32,7 @@ let translate (globals, functions, statements) =
   in
 
   (* Return the LLVM type for a complyed type *)
-  let ltype_of_typ = function
+  let rec ltype_of_typ = function
       A.Int   -> i32_t
     | A.Boolean  -> i1_t
     | A.Float -> float_t
@@ -65,6 +65,7 @@ let translate (globals, functions, statements) =
             | A.Int -> L.const_int (ltype_of_typ t) 0
             | A.Boolean -> L.const_int (ltype_of_typ t) 0
             | A.String -> L.const_pointer_null (ltype_of_typ t)
+            | A.Array(p) -> L.const_int (ltype_of_typ p) 0 (*const_int might be wrong*)
           )
         | _ -> expr se
       in StringMap.add n (L.define_global n init the_module) m in

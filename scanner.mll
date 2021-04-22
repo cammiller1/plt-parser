@@ -21,7 +21,6 @@ rule tokenize = parse
 | "bool"   { BOOL }
 | "void"   { VOID }
 | "string" { STRING }
-| "array"  { ARRAY }
 | ","      { COMMA }
 | "=="     { EQ }
 | "=<"     { LTE }
@@ -47,6 +46,8 @@ rule tokenize = parse
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
+| '['      { LSBRAC }
+| ']'      { RSBRAC }
 | "if"     { IF }
 | "else"   { ELSE }
 | "while"  { WHILE }

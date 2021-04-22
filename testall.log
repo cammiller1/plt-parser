@@ -88,6 +88,14 @@ cc -o test-assign2.exe test-assign2.s
 diff -b test-assign2.out tests/test-assign2.out > test-assign2.diff
 ###### SUCCESS
 
+###### Testing test-decl-arr1
+./compyled.native tests/test-decl-arr1.cp > test-decl-arr1.ll
+llc -relocation-model=pic test-decl-arr1.ll > test-decl-arr1.s
+cc -o test-decl-arr1.exe test-decl-arr1.s
+./test-decl-arr1.exe
+diff -b test-decl-arr1.out tests/test-decl-arr1.out > test-decl-arr1.diff
+###### SUCCESS
+
 ###### Testing test-decl1
 ./compyled.native tests/test-decl1.cp > test-decl1.ll
 llc -relocation-model=pic test-decl1.ll > test-decl1.s

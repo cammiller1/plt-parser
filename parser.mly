@@ -19,7 +19,7 @@ let trd (_,_,c) = c;;
 %token LT GT LTE GTE EQ NE AND OR MOD NOT IN
 
 %token IF ELSE WHILE FOR DEF RETURN
-%token LPAREN RPAREN RBRACE LBRACE COMMA
+%token LPAREN RPAREN RBRACE LBRACE LSBRAC RSBRAC COMMA
 
 %token <int> ILITERAL
 %token <string> FLITERAL
@@ -112,7 +112,7 @@ typ:
   | BOOL             { Boolean }
   | STRING           { String }
   | VOID             { Void }
-  | typ LBRACE RBRACE  { Array($1) } 
+  | typ LSBRAC RSBRAC  { Array($1) } 
 /* =================================== */
 
 

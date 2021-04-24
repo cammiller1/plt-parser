@@ -10,9 +10,9 @@ module StringMap = Map.Make(String)
 
 (* translate : Sast.program -> Llvm.module *)
 (* context = the thing we need to pass to certain LLVM functions 
-internally: some C++ class 
-REMINDER: L.pointer_type i8_t IS A CHAR POINTER. WILL NEED FOR STRINGS
+internally: some C++ class
 *)
+
 let translate (globals, functions, statements) =
   let context    = L.global_context () in
 
@@ -51,6 +51,7 @@ let translate (globals, functions, statements) =
       | SNoexpr     -> L.const_int i32_t 0
       (* | SId s       -> L.build_load (lookup s) s builder *)
       | SAssign (s, e) -> expr e
+      (* TODO: add binop and function calls *)
 
   in
 
@@ -128,7 +129,7 @@ let translate (globals, functions, statements) =
         SLiti i  -> L.const_int i32_t i
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
       | SLitf l -> L.const_float_of_string float_t l
-      (* | SLits s -> L.build_global_stringptr s "str" builder *)
+      | SLits s -> L.build_global_stringptr s "str" builder
       | SNoexpr     -> L.const_int i32_t 0
       (* | SId s       -> L.build_load (lookup s) s builder *)
       | SAssign (s, e) -> expr e
@@ -327,7 +328,7 @@ let translate (globals, functions, statements) =
       | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
     in
 
-    List.iter build_function_body functions;
+    (*List.iter build_function_body functions;*)
 
 
 
@@ -464,19 +465,6 @@ let translate (globals, functions, statements) =
               A.Void -> ""
              | _ -> f ^ "_result") in
            L.build_call fdef (Array.of_list llargs) result builder
-
-      (*
-      | SCall ("print", [e]) | SCall ("printb", [e]) ->
-          L.build_call printf_func [| int_format_str ; (expr builder e) |]
-            "printf" builder
-
-      | SCall ("prints", [e]) ->
-          L.build_call printf_func [| string_format_str ; (expr builder e) |]
-            "printf" builder
-      
-      | SCall ("printf", [e]) -> 
-          L.build_call printf_func [| float_format_str ; (expr builder e) |]
-          "printf" builder *)
     in
 
 
@@ -544,5 +532,5 @@ let translate (globals, functions, statements) =
     L.build_ret (L.const_int i32_t 0) builder
   in
 
-    build_statements statements;
+    (List.iter build_function_body functions, build_statements statements);
     the_module  (* return the LLVM module result *)

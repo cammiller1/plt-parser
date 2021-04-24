@@ -248,6 +248,14 @@ cc -o test-initialize-var-in-func2.exe test-initialize-var-in-func2.s
 diff -b test-initialize-var-in-func2.out tests/test-initialize-var-in-func2.out > test-initialize-var-in-func2.diff
 ###### SUCCESS
 
+###### Testing test-initialize-var-in-func3
+./compyled.native tests/test-initialize-var-in-func3.cp > test-initialize-var-in-func3.ll
+llc -relocation-model=pic test-initialize-var-in-func3.ll > test-initialize-var-in-func3.s
+cc -o test-initialize-var-in-func3.exe test-initialize-var-in-func3.s
+./test-initialize-var-in-func3.exe
+diff -b test-initialize-var-in-func3.out tests/test-initialize-var-in-func3.out > test-initialize-var-in-func3.diff
+###### SUCCESS
+
 ###### Testing test-initialize-var
 ./compyled.native tests/test-initialize-var.cp > test-initialize-var.ll
 llc -relocation-model=pic test-initialize-var.ll > test-initialize-var.s
@@ -255,6 +263,11 @@ cc -o test-initialize-var.exe test-initialize-var.s
 ./test-initialize-var.exe
 diff -b test-initialize-var.out tests/test-initialize-var.out > test-initialize-var.diff
 ###### SUCCESS
+
+###### Testing test-initialize-var2
+./compyled.native tests/test-initialize-var2.cp > test-initialize-var2.ll
+Fatal error: exception Match_failure("codegen.ml", 46, 36)
+###### FAILED
 
 ###### Testing test-not1
 ./compyled.native tests/test-not1.cp > test-not1.ll
@@ -318,6 +331,11 @@ diff -b fail-for2.err tests/fail-for2.err > fail-for2.diff
 ###### Testing fail-initialize-in-func
 ./compyled.native < tests/fail-initialize-in-func.cp 2> fail-initialize-in-func.err >> testall.log
 diff -b fail-initialize-in-func.err tests/fail-initialize-in-func.err > fail-initialize-in-func.diff
+###### SUCCESS
+
+###### Testing fail-initialize-var-in-func1
+./compyled.native < tests/fail-initialize-var-in-func1.cp 2> fail-initialize-var-in-func1.err >> testall.log
+diff -b fail-initialize-var-in-func1.err tests/fail-initialize-var-in-func1.err > fail-initialize-var-in-func1.diff
 ###### SUCCESS
 
 ###### Testing fail-initialize1

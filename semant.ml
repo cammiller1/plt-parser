@@ -67,6 +67,7 @@ let check (globals, functions, statements) =
           let ty = match op with
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div when same && t1 = Float -> Float
+          | Concat when same && t1 = String -> String
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -214,6 +215,7 @@ let check (globals, functions, statements) =
           let ty = match op with
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div when same && t1 = Float -> Float
+          | Concat when same && t1 = String -> String
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -299,6 +301,7 @@ let check (globals, functions, statements) =
           let ty = match op with
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div when same && t1 = Float -> Float
+          | Concat when same && t1 = String -> String
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -437,6 +440,7 @@ let check (globals, functions, statements) =
           let ty = match op with
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div when same && t1 = Float -> Float
+          | Concat when same && t1 = String -> String
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean

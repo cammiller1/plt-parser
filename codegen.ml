@@ -1,4 +1,8 @@
-(* Code generation: translate takes a semantically checked AST and
+
+
+
+(*
+Code generation: translate takes a semantically checked AST and
 produces LLVM IR
 *)
 
@@ -218,6 +222,7 @@ let translate (globals, functions, statements) =
             let e1' = expr builder e1
             and e2' = expr builder e2 in
             if op ==  A.Concat then L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
+            (* if op == A.Add then L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder *)
             else
             (match op with
               A.Add     -> L.build_add
@@ -428,6 +433,7 @@ let translate (globals, functions, statements) =
             let e1' = expr builder e1
             and e2' = expr builder e2 in
             if op ==  A.Concat then L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
+            (* if op ==  A.Add then L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder *)
             else
             (match op with
               A.Add     -> L.build_add
@@ -556,3 +562,5 @@ let translate (globals, functions, statements) =
 
     build_statements statements;
     the_module  (* return the LLVM module result *)
+
+

@@ -1,4 +1,4 @@
-/usr/bin/lli
+/usr/local/Cellar/llvm@11/11.1.0/bin/lli
 
 ###### Testing test-arithm-float-add
 ./compyled.native tests/test-arithm-float-add.cp > test-arithm-float-add.ll
@@ -270,6 +270,30 @@ llc -relocation-model=pic test-not2.ll > test-not2.s
 cc -o test-not2.exe test-not2.s
 ./test-not2.exe
 diff -b test-not2.out tests/test-not2.out > test-not2.diff
+###### SUCCESS
+
+###### Testing test-string-concat
+./compyled.native tests/test-string-concat.cp > test-string-concat.ll
+llc -relocation-model=pic test-string-concat.ll > test-string-concat.s
+cc -o test-string-concat.exe test-string-concat.s
+Undefined symbols for architecture x86_64:
+  "_string_concat", referenced from:
+      _main in test-string-concat-cfd67a.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+###### FAILED
+
+###### Testing test-string-global-init
+./compyled.native tests/test-string-global-init.cp > test-string-global-init.ll
+Fatal error: exception Match_failure("codegen.ml", 50, 36)
+###### FAILED
+
+###### Testing test-string-nonglobal-init
+./compyled.native tests/test-string-nonglobal-init.cp > test-string-nonglobal-init.ll
+llc -relocation-model=pic test-string-nonglobal-init.ll > test-string-nonglobal-init.s
+cc -o test-string-nonglobal-init.exe test-string-nonglobal-init.s
+./test-string-nonglobal-init.exe
+diff -b test-string-nonglobal-init.out tests/test-string-nonglobal-init.out > test-string-nonglobal-init.diff
 ###### SUCCESS
 
 ###### Testing test-while1

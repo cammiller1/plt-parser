@@ -20,7 +20,6 @@ let translate (globals, functions, statements) =
      we will generate code *)
   let the_module = L.create_module context "complyed" in
 
-
   (* Get types from the context *)
   (* llvm only supports primitive types *)
   let i32_t      = L.i32_type       context  (* 32-bit int type *)
@@ -33,15 +32,14 @@ let translate (globals, functions, statements) =
   in
 
   (* Return the LLVM type for a complyed type *)
-  let ltype_of_typ = function
+  let rec ltype_of_typ = function
       A.Int   -> i32_t
     | A.Boolean  -> i1_t
     | A.Float -> float_t
     | A.Void  -> void_t
     | A.String -> string_t
-    (* | A.Array -> array_t *)
+    | A.Array(t) -> L.pointer_type (ltype_of_typ t)
   in
-
 
   (* Declaring external functions *)
   (* create a link to the C library's "printf" *)
@@ -60,7 +58,6 @@ let translate (globals, functions, statements) =
   let main_func : L.llvalue = 
       L.declare_function "main" printf_t the_module in *)
 
-
   (* Define each function (arguments and return type) so we can 
       call it even before we've created its body *)
    (* define a main function to wrap out program in *)
@@ -72,8 +69,6 @@ let translate (globals, functions, statements) =
        in let ftype = L.function_type (ltype_of_typ fdecl.styp) formal_types in
        StringMap.add name (L.define_function name ftype the_module, fdecl) m in
      List.fold_left function_decl StringMap.empty functions in
-
-
 
   (* Generate a name for the main function *)    
 
@@ -92,12 +87,9 @@ let translate (globals, functions, statements) =
       if test_main_name name == name then name
       else generate_main_name (name ^ "0")
 
-
   in let main_name = generate_main_name main_name in
 
   let function_decls = StringMap.add main_name (L.define_function main_name main_t the_module, ({styp = Int; sfname = main_name; sformals = []; slocals = []; sbody = [] })) function_decls
-
-    
 
   in
 
@@ -106,8 +98,6 @@ let translate (globals, functions, statements) =
   (* Need to find the main function with the most zeros at the end *)
   let (the_function, _) = StringMap.find main_name function_decls in
   let builder = L.builder_at_end context (L.entry_block the_function) in
-
-
 
 (********* THIS EXPR BUILDER IS SOLELY FOR INITIALIZATION!!!! ******)
 (* Construct code for an expression in the INITIALIZATION; return its value *)
@@ -132,14 +122,15 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.Int -> L.const_int (ltype_of_typ t) 0
             | A.Boolean -> L.const_int (ltype_of_typ t) 0
             | A.String -> L.const_pointer_null (ltype_of_typ t)
-            (* arrays should never match here *)
+            | A.Array(p) -> L.const_pointer_null (ltype_of_typ p)
+            (* | A.Array(ty) -> L.build_array_alloca (ltype_of_typ ty) (L.const_int i32_t 0) n builder *)
           )
-        | (A.Array, _) -> (match snd se with
+        (* | (A.Array, _) -> (match snd se with
                     SArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n builder
-                  )
+                  ) *)
                     (* L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) n builder ) *)
         | _ -> expr se
-      in if t = A.Array then (StringMap.add n (init) m) else (StringMap.add n (L.define_global n init the_module) m)
+      in (StringMap.add n (L.define_global n init the_module) m)
       in
       (* StringMap.add n (L.define_global n init the_module) m in *)
     List.fold_left global_var StringMap.empty globals in
@@ -401,7 +392,7 @@ let rec expr ((_, e) : sexpr) = match e with
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
       | SLitf l -> L.const_float_of_string float_t l
       | SLits s -> L.build_global_stringptr s "str" builder
-      | SArray(t, size) -> L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) "arr" builder
+      (* | SArray(t) -> L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t 0) "arr" builder *)
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in

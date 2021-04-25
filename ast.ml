@@ -5,7 +5,9 @@ type operator = Add | Sub | Mul | Div | Seq | Lt | Gt | Exp | Mod | Lte | Gte
 
 type unary_operator = Pp | Mm | Not
 
-type typ = Int | Float | Boolean | Void | String | Array
+type typ = Int | Float | Boolean | Void | String | Array of typ
+(* type arr = Array of typ *)
+(* type typ = Prim of prim_typ | Array of prim_typ *)
 
 type expr =
     Liti of int
@@ -14,7 +16,7 @@ type expr =
   | Lits of string
   | Assign of string * expr
   | Id of string
-  | Array of typ * int
+  (* | Array of prim *)
   | Binop of expr * operator * expr
   | Uniop of unary_operator * expr
   | Call of string * expr list
@@ -29,7 +31,7 @@ type stmt =
   | For of expr * expr * expr * stmt
   | While of expr * stmt
 
-type bind = typ * string * expr
+type bind = typ * string * expr (*| arr * string * expr*)
 
 type func_decl = {
     typ : typ;
@@ -69,7 +71,7 @@ let rec string_of_expr = function
   | Litb(true) -> "true"
   | Litb(false) -> "false"
   | Lits(l) -> l
-  | Array(t, size) -> "an array"  (* TODO: make me better *)
+  (* | Array(t) -> "an array"  TODO: make me better *)
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
@@ -98,7 +100,7 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "string"
-  | Array -> "array"
+  | Array(_) -> "array"
 
 let string_of_vdecl (t, id, e) = string_of_typ t ^ " " ^ id ^ ";\n"
 

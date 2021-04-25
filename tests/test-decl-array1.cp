@@ -1,1 +1,1 @@
-array x [int 3];
+int[] x;

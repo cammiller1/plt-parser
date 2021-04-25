@@ -20,7 +20,7 @@ let trd (_,_,c) = c;;
 %token LT GT LTE GTE EQ NE AND OR MOD NOT IN
 
 %token IF ELSE WHILE FOR DEF RETURN
-%token LPAREN RPAREN RBRACE LBRACE COMMA
+%token LPAREN RPAREN RBRACE LBRACE COMMA LBRACKET RBRACKET
 
 %token <int> ILITERAL
 %token <string> FLITERAL
@@ -109,15 +109,19 @@ formal_list:
 
 /* type-relevant parsing */
 typ: 
+    prim_typ         { $1 }
+  | arr_typ          { Array($1) }
+
+prim_typ:
     INT              { Int }
   | FLOAT            { Float }
   | BOOL             { Boolean }
   | STRING           { String }
   | VOID             { Void }
-  | ARRAY            { Array }
-  /*| typ LBRACKET ILITERAL RBRACKET   { Array($1,$3) }*/
+  // | ARRAY            { Array }
 /* =================================== */
-
+arr_typ:
+  prim_typ LBRACKET RBRACKET   { $1 }
 
 
 /* expression-relevant parsing */
@@ -132,7 +136,7 @@ expr:
   | SLITERAL           { Lits($1) }
   | ID                 { Id($1) }
 
-  | LBRACKET typ ILITERAL RBRACKET { Array($2, $3) }  /* array decl for type and size */
+  // | typ LBRACKET RBRACKET { Array($1) }  /* array decl for type and size */
   /*| expr COMMA expr   { Binop($1, Add, $3) } */
 
   | expr PLUS   expr   { Binop($1, Add, $3) }

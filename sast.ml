@@ -11,7 +11,7 @@ and sx =
   | SLits of string
   | SAssign of string * sexpr
   | SId of string
-  | SArray of typ * int  (* this will be an interesting case *)
+  (* | SArray of typ   this will be an interesting case *)
   | SBinop of sexpr * operator * sexpr
   | SUniop of unary_operator * sexpr
   | SCall of string * sexpr list
@@ -48,7 +48,7 @@ let rec string_of_sexpr (t, e) =
   | SLitb(true) -> "True"
   | SLitb(false) -> "False"
   | SLits(l) -> l
-  | SArray(t, size) -> "an array"  (* TODO: make me better *)
+  (* | SArray(t) -> "an array"  TODO: make me better *)
   | SId(s) -> s
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2

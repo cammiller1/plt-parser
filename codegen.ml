@@ -29,6 +29,7 @@ let translate (globals, functions, statements) =
   and float_t    = L.double_type    context  (* double/float type *)
   and void_t     = L.void_type      context   (* void type *)
   and string_t   = L.pointer_type   (L.i8_type context)      (* pointer type to char *)
+  (* and array_t    = L.array_type     (L.i32_type context) *)
   in
 
   (* Return the LLVM type for a complyed type *)
@@ -38,6 +39,7 @@ let translate (globals, functions, statements) =
     | A.Float -> float_t
     | A.Void  -> void_t
     | A.String -> string_t
+    (* | A.Array -> array_t *)
   in
 
 
@@ -116,7 +118,7 @@ let rec expr ((_, e) : sexpr) = match e with
   | SLits s -> L.build_global_stringptr s "str" builder
   | SNoexpr     -> L.const_int i32_t 0
   | SAssign (s, e) -> expr e
-  | SArray(t, size) -> L.pointer_type (L.array_type t size)
+  (* | SArray(t, size) -> L.pointer_type (L.array_type t size) *)
 
   in
 
@@ -132,6 +134,12 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.String -> L.const_pointer_null (ltype_of_typ t)
             (* arrays should never match here *)
           )
+        | (A.Array, _) -> L.const_pointer_null (ltype_of_typ A.String)
+        (* give some bogus value here for now to get past arrays *)
+        
+        (*| (A.Array, _) -> (match snd se with
+                    SArray(t, size) -> L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) "arr" builder )
+        *)
         | _ -> expr se
       in StringMap.add n (L.define_global n init the_module) m in
     List.fold_left global_var StringMap.empty globals in
@@ -393,6 +401,7 @@ let rec expr ((_, e) : sexpr) = match e with
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
       | SLitf l -> L.const_float_of_string float_t l
       | SLits s -> L.build_global_stringptr s "str" builder
+      | SArray(t, size) -> L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) "arr" builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in

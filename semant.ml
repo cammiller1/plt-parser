@@ -403,6 +403,12 @@ in
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
+    (* Return a array type from our array symbol table *)
+    let type_of_array_identifier s =
+      try StringMap.find s array_symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
     (* Raise an exception if the given rvalue type cannot be assigned to
        the given lvalue type *)
     let check_assign lvaluet rvaluet err =
@@ -431,10 +437,12 @@ in
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
+          let rt = if rt = Array then let SArrayIndexAccess(var, idx) = e' in type_of_array_identifier var else rt
+          in
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
           in 
-          if rt = Array then (lt, SAssign(var, (rt, e'))) else (check_assign lt rt err, SAssign(var, (rt, e')))
+          (check_assign lt rt err, SAssign(var, (rt, e')))
       | ArrayIndexAssign(var, idx, e) ->
           let lt = type_of_identifier var
           and (rt, e') = expr e in

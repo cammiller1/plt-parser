@@ -49,6 +49,12 @@ let translate (globals, functions, statements) =
     (* below LLVM's connection to a built-in function *)
   let printf_func : L.llvalue = 
       L.declare_function "printf" printf_t the_module in
+    
+  let len_t : L.lltype =
+    L.function_type i32_t [ string_t ] in
+  
+  let len_func : L.llvalue = 
+    L.declare_function "len" len_t the module in
 
   (* create fake main function *)
   let main_t : L.lltype = 
@@ -57,7 +63,7 @@ let translate (globals, functions, statements) =
   (*  (* below LLVM's connection to a built-in function *)
   let main_func : L.llvalue = 
       L.declare_function "main" printf_t the_module in *)
-
+  
 
   (* Define each function (arguments and return type) so we can 
       call it even before we've created its body *)
@@ -140,9 +146,6 @@ let rec expr ((_, e) : sexpr) = match e with
       let atype = t
       in StringMap.add n t m in
     List.fold_left global_var StringMap.empty globals in
-
-
-
 
   (******** BUILD FUNCTIONS ************)
 
@@ -283,6 +286,19 @@ let rec expr ((_, e) : sexpr) = match e with
             | (_, SCall(f, args)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" f_builder
             | (_,_) ->  raise (Failure "invalid argument called on the print function")
           )
+      | SCall ("len", arg) -> 
+        
+        (* let get_type_from_sexpr = function
+          SLiti i  -> A.Int
+          | SLitb b -> A.Boolean
+          | SLitf l -> A.Float
+          | SLits s -> A.String
+          (*| SArray a -> A.Array*)
+        in
+        let type_of = get_type_from_sexpr (List.hd arg) in
+        let type_of = ltype_of_typ type_of in
+        let size_of = size_of type_of in
+        L.build_bitcast size_of i32_t "tmp" f_builder *)
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
            let llargs = List.rev (List.map (expr f_builder) (List.rev args)) in

@@ -39,6 +39,15 @@ let check (globals, functions, statements) =
                   StringMap.empty globals
     in
 
+    let global_arrays = List.find_all (fun (ty, name, e) -> ty = Array) globals
+
+  in
+    
+    let array_symbols = List.fold_left (fun m (ty, name, e) -> match e with
+         LitArray(t, size) -> StringMap.add name t m)
+                  StringMap.empty global_arrays
+    in
+
     (* Return a variable from our temp symbol table *)
     let type_of_identifier s =
       try StringMap.find s symbols
@@ -85,12 +94,7 @@ let check (globals, functions, statements) =
 
   in
 
-(*
-  let array_symbols = List.fold_left (fun m (ty, name, (t, s)) -> 
-        if ty = Array then StringMap.add name t m)
-                  StringMap.empty globals
-    in
-*)
+
   
 
  

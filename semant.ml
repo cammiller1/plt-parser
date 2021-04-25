@@ -30,10 +30,6 @@ let check (globals, functions, statements) =
   check_binds "global" globals;
 
 
-  (***** CHECK expressions of global variables ****)
-   (* Return a semantically-checked expression, i.e., with a type *)
-
-
     (* drop the expression "e" from being stored in the symbol table *)
     let symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
                   StringMap.empty globals
@@ -54,6 +50,8 @@ let check (globals, functions, statements) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
+    (* Raise an exception if the given rvalue type cannot be assigned to
+       the given lvalue type *)
     let check_assign lvaluet rvaluet err =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
     in   
@@ -93,12 +91,9 @@ let check (globals, functions, statements) =
           in (ty, SUniop(op, (t, e')))
 
   in
-
-
   
-
- 
-  
+  (***** CHECK expressions of global variables ****)
+   (* Return a semantically-checked expression, i.e., with a type *)
   let check_globals global = 
 
     let return_checked_global (t, s, e) =
@@ -127,10 +122,7 @@ let check (globals, functions, statements) =
       formals = [(ty, "x", Noexpr)];
       locals = [];
       body = [] } map 
-    in List.fold_left add_bind StringMap.empty [ ("print", Int);
-                               ("printb", Boolean);
-                               ("printf", Float); 
-                               ("prints", String) ]
+    in List.fold_left add_bind StringMap.empty [ ("print", Int) ]
   in
 
   (* Add function name to symbol table *)
@@ -188,102 +180,39 @@ let check (globals, functions, statements) =
     check_binds "local" func.locals;
 
 
-  (* FOR LOCAL VAR INIT and formal check*)
-   (* Build temp symbol table to check the types of the initializations *)
+  (* FOR LOCAL VAR INIT and formal check *)
+   (* Build local symbol table to check the types of the initializations *)
     (* drop the expression "e" from being stored in the symbol table*)
     let local_symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
                   StringMap.empty (globals @ func.formals @ func.locals)
     in
 
-    (* Return a variable from our temp symbol table *)
+    let local_arrays = List.find_all (fun (ty, name, e) -> ty = Array) func.locals
+
+    in
+    
+    let local_array_symbols = List.fold_left (fun m (ty, name, e) -> match e with
+         LitArray(t, size) -> StringMap.add name t m)
+                  StringMap.empty local_arrays
+    in
+
+    (* Return a variable from the local symbol table *)
     let type_of_identifier s =
       try StringMap.find s local_symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-    let check_assign lvaluet rvaluet err =
-       if lvaluet = rvaluet then lvaluet else raise (Failure err)
-    in   
-
-    let rec expr = function
-        Liti l -> (Int, SLiti l)
-      | Litf l -> (Float, SLitf l)
-      | Litb l  -> (Boolean, SLitb l)
-      | Lits l  -> (String, SLits l)
-      | Noexpr     -> (Void, SNoexpr)
-      | LitArray(t, size) -> (Array, SLitArray(t, size))
-      | Assign(var, e) as ex -> 
-          let lt = type_of_identifier var
-          and (rt, e') = expr e in
-          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
-            string_of_typ rt ^ " in " ^ string_of_expr ex
-          in (check_assign lt rt err, SAssign(var, (rt, e')))
-      | Binop(e1, op, e2) as e -> 
-          let (t1, e1') = expr e1 
-          and (t2, e2') = expr e2 in
-          (* All binary operators require operands of the same type *)
-          let same = t1 = t2 in
-          (* Determine expression type based on operator and operand types *)
-          let ty = match op with
-            Add | Sub | Mul | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div when same && t1 = Float -> Float
-          | Eq | Ne            when same               -> Boolean
-          | Lt | Lte | Gt | Gte
-                     when same && (t1 = Int || t1 = Float) -> Boolean
-          | And | Or when same && t1 = Boolean -> Boolean
-          | _ -> raise (
-        Failure ("illegal binary operator " ^
-                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-                       string_of_typ t2 ^ " in " ^ string_of_expr e))
-          in (ty, SBinop((t1, e1'), op, (t2, e2')))
-      | Uniop(op, e) as ex -> 
-          let (t, e') = expr e in
-          let ty = match op with
-            Not when t = Boolean -> Boolean
-          | _ -> raise (Failure ("illegal unary operator " ^ 
-                                 string_of_uop op ^ string_of_typ t ^
-                                 " in " ^ string_of_expr ex))
-          in (ty, SUniop(op, (t, e')))
-
-  in
-  
-  
-  let check_locals local = 
-    let return_checked_locals (t, s, e) =
-      match e with 
-          | Noexpr     -> (t, s, expr e)
-          | _ ->
-            let lt = type_of_identifier s
-            and (rt, e') = expr e in
-            let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
-              string_of_typ rt ^ " in " ^ string_of_expr e
-            in check_assign lt rt err;
-        (t, s, expr e)
-
-       in return_checked_locals local
-
-  in
-
-(*========= ^ FOR LOCAL VAR INIT =======*)
-
-
-  (* Raise an exception if the given rvalue type cannot be assigned to
-       the given lvalue type *)
-    let check_assign lvaluet rvaluet err =
-       if lvaluet = rvaluet then lvaluet else raise (Failure err)
-    in   
+    (* Return a array type from our array symbol table *)
+    let type_of_array_identifier s =
+      try StringMap.find s local_array_symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
 
     let check_print lvaluet rvaluet err =
        lvaluet
     in
 
-    (* Return a variable from our local symbol table *)
-    let type_of_identifier s =
-      try StringMap.find s local_symbols
-      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
-    in
-
-    (* Return a semantically-checked expression, i.e., with a type *)
+     (* Return a semantically-checked expression, i.e., with a type *)
     let rec expr = function
         Liti l -> (Int, SLiti l)
       | Litf l -> (Float, SLitf l)
@@ -295,9 +224,17 @@ let check (globals, functions, statements) =
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
+          let rt = if rt = Array then let SArrayIndexAccess(var, idx) = e' in type_of_array_identifier var else rt
+          in
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
-          in (check_assign lt rt err, SAssign(var, (rt, e')))
+          in 
+          (check_assign lt rt err, SAssign(var, (rt, e')))
+      | ArrayIndexAssign(var, idx, e) ->
+          let lt = type_of_identifier var
+          and (rt, e') = expr e in
+          (Array, SArrayIndexAssign(var, idx, (rt, e')))
+      | ArrayIndexAccess(var, idx) -> (Array, SArrayIndexAccess(var, idx))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
           and (t2, e2') = expr e2 in
@@ -338,7 +275,23 @@ let check (globals, functions, statements) =
           let args' = List.map2 check_call fd.formals args
           in (fd.typ, SCall(fname, args'))
     in
+  
+  
+  let check_locals local = 
+    let return_checked_locals (t, s, e) =
+      match e with 
+          | Noexpr     -> (t, s, expr e)
+          | _ ->
+            let lt = type_of_identifier s
+            and (rt, e') = expr e in
+            let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+              string_of_typ rt ^ " in " ^ string_of_expr e
+            in check_assign lt rt err;
+        (t, s, expr e)
 
+       in return_checked_locals local
+
+  in
 
     let check_bool_expr e = 
       let (t', e') = expr e
@@ -397,31 +350,20 @@ in
 
   let check_statement statements = 
 
-    (* Return a variable from our symbol table *)
+    (* Return a variable from the global symbol table *)
     let type_of_identifier s =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-    (* Return a array type from our array symbol table *)
+    (* Return a array type from the global array symbol table *)
     let type_of_array_identifier s =
       try StringMap.find s array_symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-    (* Raise an exception if the given rvalue type cannot be assigned to
-       the given lvalue type *)
-    let check_assign lvaluet rvaluet err =
-       if lvaluet = rvaluet then lvaluet else raise (Failure err)
-    in
-
     let check_print lvaluet rvaluet err =
        lvaluet
-    in
-
-    (* TODO: implement array type check *)
-    let check_array lvaluet rvaluet err =
-       rvaluet
     in
 
 

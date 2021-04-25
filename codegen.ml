@@ -214,12 +214,13 @@ let translate (globals, functions, statements) =
             | A.And | A.Or ->
                 raise (Failure "internal error: semant should have rejected and/or on float")
             ) e1' e2' "tmp" builder
-              | SBinop (e1, op, e2) ->
+      | SBinop (e1, op, e2) ->
             let e1' = expr builder e1
             and e2' = expr builder e2 in
+            if op ==  A.Concat then L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
+            else
             (match op with
               A.Add     -> L.build_add
-            | A.Concat  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
             | A.Sub     -> L.build_sub
             | A.Mul     -> L.build_mul
             | A.Div     -> L.build_sdiv
@@ -426,9 +427,10 @@ let translate (globals, functions, statements) =
       | SBinop (e1, op, e2) ->
             let e1' = expr builder e1
             and e2' = expr builder e2 in
+            if op ==  A.Concat then L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
+            else
             (match op with
               A.Add     -> L.build_add
-            | A.Concat  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
             | A.Sub     -> L.build_sub
             | A.Mul     -> L.build_mul
             | A.Div     -> L.build_sdiv

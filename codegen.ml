@@ -37,7 +37,7 @@ let translate (globals, functions, statements) =
     | A.Boolean  -> i1_t
     | A.Float -> float_t
     | A.Void  -> void_t
-    | A.String -> string_t (* added for our project *)
+    | A.String -> string_t
   in
 
 
@@ -116,6 +116,7 @@ let rec expr ((_, e) : sexpr) = match e with
   | SLits s -> L.build_global_stringptr s "str" builder
   | SNoexpr     -> L.const_int i32_t 0
   | SAssign (s, e) -> expr e
+  | SArray(t, size) -> L.pointer_type (L.array_type t size)
 
   in
 
@@ -129,6 +130,7 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.Int -> L.const_int (ltype_of_typ t) 0
             | A.Boolean -> L.const_int (ltype_of_typ t) 0
             | A.String -> L.const_pointer_null (ltype_of_typ t)
+            (* arrays should never match here *)
           )
         | _ -> expr se
       in StringMap.add n (L.define_global n init the_module) m in

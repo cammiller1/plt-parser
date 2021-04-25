@@ -88,6 +88,22 @@ cc -o test-assign2.exe test-assign2.s
 diff -b test-assign2.out tests/test-assign2.out > test-assign2.diff
 ###### SUCCESS
 
+###### Testing test-decl-array1
+./compyled.native tests/test-decl-array1.cp > test-decl-array1.ll
+llc -relocation-model=pic test-decl-array1.ll > test-decl-array1.s
+llc: test-decl-array1.ll:4:17: error: null must be a pointer type
+@x = global i32 null
+                ^
+###### FAILED
+
+###### Testing test-decl-string1
+./compyled.native tests/test-decl-string1.cp > test-decl-string1.ll
+llc -relocation-model=pic test-decl-string1.ll > test-decl-string1.s
+cc -o test-decl-string1.exe test-decl-string1.s
+./test-decl-string1.exe
+diff -b test-decl-string1.out tests/test-decl-string1.out > test-decl-string1.diff
+###### SUCCESS
+
 ###### Testing test-decl1
 ./compyled.native tests/test-decl1.cp > test-decl1.ll
 llc -relocation-model=pic test-decl1.ll > test-decl1.s

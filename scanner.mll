@@ -47,6 +47,8 @@ rule tokenize = parse
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
+| '['	   { LBRACKET }
+| ']'	   { RBRACKET }
 | "if"     { IF }
 | "else"   { ELSE }
 | "while"  { WHILE }

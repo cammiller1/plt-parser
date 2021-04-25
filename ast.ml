@@ -12,10 +12,11 @@ type expr =
   | Litf of string
   | Litb of bool
   | Lits of string
+  | Assign of string * expr
   | Id of string
+  | Array of typ * int
   | Binop of expr * operator * expr
   | Uniop of unary_operator * expr
-  | Assign of string * expr
   | Call of string * expr list
   | Noexpr
 
@@ -68,6 +69,7 @@ let rec string_of_expr = function
   | Litb(true) -> "true"
   | Litb(false) -> "false"
   | Lits(l) -> l
+  | Array(t, size) -> "an array"  (* TODO: make me better *)
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
@@ -96,6 +98,7 @@ let string_of_typ = function
   | Float -> "float"
   | Void -> "void"
   | String -> "string"
+  | Array -> "array"
 
 let string_of_vdecl (t, id, e) = string_of_typ t ^ " " ^ id ^ ";\n"
 

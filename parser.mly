@@ -15,6 +15,7 @@ let trd (_,_,c) = c;;
 /* operators */
 %token ASSIGN PLUS MINUS TIMES DIVIDE
 %token EXP SEMC PP MM
+%token LBRACKET RBRACKET
 /* comparators */
 %token LT GT LTE GTE EQ NE AND OR MOD NOT IN
 
@@ -76,11 +77,12 @@ stmt_list:
 
 
 vdecl:
-    typ ID vdecl_assign SEMC { ($1, $2, $3) } /* declaration with or w.o assignment */
+     typ ID vdecl_assign SEMC { ($1, $2, $3) } /* declaration with or w.o assignment */
 
 vdecl_assign:
-  { Noexpr }
-  | ASSIGN expr { $2 } 
+                { Noexpr }
+  | ASSIGN expr { $2 }
+  | expr  { $1 } 
 
 
 vdecl_list:
@@ -112,7 +114,8 @@ typ:
   | BOOL             { Boolean }
   | STRING           { String }
   | VOID             { Void }
-/*  | typ ARRAY        { Array($1) } */
+  | ARRAY            { Array }
+  /*| typ LBRACKET ILITERAL RBRACKET   { Array($1,$3) }*/
 /* =================================== */
 
 
@@ -127,7 +130,11 @@ expr:
   | FLITERAL           { Litf($1) }
   | BLITERAL           { Litb($1) }
   | SLITERAL           { Lits($1) }
-  | ID                 { Id($1) } 
+  | ID                 { Id($1) }
+
+  | LBRACKET typ ILITERAL RBRACKET { Array($2, $3) }  /* array decl for type and size */
+  /*| expr COMMA expr   { Binop($1, Add, $3) } */
+
   | expr PLUS   expr   { Binop($1, Add, $3) }
   | expr MINUS  expr   { Binop($1, Sub, $3) }
   | expr TIMES  expr   { Binop($1, Mul, $3) }

@@ -13,7 +13,7 @@ let trd (_,_,c) = c;;
 /* types */
 %token INT FLOAT BOOL STRING VOID ARRAY
 /* operators */
-%token ASSIGN PLUS MINUS TIMES DIVIDE
+%token ASSIGN PLUS MINUS TIMES DIVIDE CONCAT
 %token EXP SEMC PP MM
 /* comparators */
 %token LT GT LTE GTE EQ NE AND OR MOD NOT IN
@@ -33,6 +33,7 @@ let trd (_,_,c) = c;;
 %nonassoc ELSE
 %right UMINUS
 %right ASSIGN
+%left CONCAT
 %left AND OR
 %left EQ NE
 %left LT GT LTE GTE 
@@ -129,6 +130,7 @@ expr:
   | SLITERAL           { Lits($1) }
   | ID                 { Id($1) } 
   | expr PLUS   expr   { Binop($1, Add, $3) }
+  | expr CONCAT expr   { Binop($1, Concat, $3) }
   | expr MINUS  expr   { Binop($1, Sub, $3) }
   | expr TIMES  expr   { Binop($1, Mul, $3) }
   | expr DIVIDE expr   { Binop($1, Div, $3) }

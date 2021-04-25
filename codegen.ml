@@ -24,20 +24,20 @@ let translate (globals, functions, statements) =
   (* Get types from the context *)
   (* llvm only supports primitive types *)
   let i32_t      = L.i32_type       context  (* 32-bit int type *)
-  and i8_t       = L.i8_type        context  (* characters *)
+  and i8_t       = L.i8_type        context  (* chars *)
   and i1_t       = L.i1_type        context  (* boolean type *)
   and float_t    = L.double_type    context  (* double/float type *)
   and void_t     = L.void_type      context   (* void type *)
-  and string_t   = L.pointer_type   (L.i8_type context)      (* pointer type to char *)
+  and string_t   = L.pointer_type   (L.i8_type context)  (* pointer type to char *)
   in
 
   (* Return the LLVM type for a complyed type *)
   let ltype_of_typ = function
-      A.Int   -> i32_t
-    | A.Boolean  -> i1_t
-    | A.Float -> float_t
-    | A.Void  -> void_t
-    | A.String -> string_t (* added for our project *)
+      A.Int       -> i32_t
+    | A.Boolean   -> i1_t
+    | A.Float     -> float_t
+    | A.Void      -> void_t
+    | A.String    -> string_t (* added for our project *)
   in
 
 
@@ -46,10 +46,10 @@ let translate (globals, functions, statements) =
     let rec expr ((_, e) : sexpr) = match e with
         SLiti i  -> L.const_int i32_t i
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-      | SLitf l -> L.const_float_of_string float_t l
+      | SLitf l  -> L.const_float_of_string float_t l
       (* | SLits s -> L.build_global_stringptr s "str" builder *)
       (* | SLits s -> L.const_pointer_null s "str" builder *)
-      | SNoexpr     -> L.const_int i32_t 0
+      | SNoexpr  -> L.const_int i32_t 0
       (* | SId s       -> L.build_load (lookup s) s builder *)
       | SAssign (s, e) -> expr e
 
@@ -61,10 +61,10 @@ let translate (globals, functions, statements) =
       let init = match se with
         (A.Void, _) ->  (
             match t with
-              A.Float -> L.const_float (ltype_of_typ t) 0.0
-            | A.Int -> L.const_int (ltype_of_typ t) 0
+              A.Float   -> L.const_float (ltype_of_typ t) 0.0
+            | A.Int     -> L.const_int (ltype_of_typ t) 0
             | A.Boolean -> L.const_int (ltype_of_typ t) 0
-            | A.String -> L.const_pointer_null (ltype_of_typ t)
+            | A.String  -> L.const_pointer_null (ltype_of_typ t)
           )
         | _ -> expr se
       in StringMap.add n (L.define_global n init the_module) m in
@@ -85,6 +85,11 @@ let translate (globals, functions, statements) =
     (* below LLVM's connection to a built-in function *)
   let printf_func : L.llvalue = 
       L.declare_function "printf" printf_t the_module in
+
+  let string_concat_t : L.lltype =
+    L.function_type string_t [| string_t; string_t |] in
+  let string_concat_f : L.llvalue =
+    L.declare_function "string_concat" string_concat_t the_module in
 
   (* create fake main function *)
   let main_t : L.lltype = 
@@ -126,11 +131,11 @@ let translate (globals, functions, statements) =
     (********* THIS EXPR BUILDER IS SOLELY FOR INITIALIZATION!!!! ******)
     (* Construct code for an expression in the INITIALIZATION; return its value *)
     let rec expr ((_, e) : sexpr) = match e with
-        SLiti i  -> L.const_int i32_t i
-      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-      | SLitf l -> L.const_float_of_string float_t l
-      | SLits s -> L.build_global_stringptr s "str" builder
-      | SNoexpr     -> L.const_int i32_t 0
+        SLiti i   -> L.const_int i32_t i
+      | SLitb b   -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l   -> L.const_float_of_string float_t l
+      | SLits s   -> L.build_global_stringptr s "str" builder
+      | SNoexpr   -> L.const_int i32_t 0
       (* | SId s       -> L.build_load (lookup s) s builder *)
       | SAssign (s, e) -> expr e
 
@@ -184,13 +189,13 @@ let translate (globals, functions, statements) =
     (* An expression in LLVM always turns into code in a single basic block (not true for stmts) *)
     (* build instructions in the given builder that evaluate the expr; return the expr's value *)
     let rec expr builder ((_, e) : sexpr) = match e with
-        SLiti i  -> L.const_int i32_t i
-      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-      | SLitf l -> L.const_float_of_string float_t l
-      | SLits s -> L.build_global_stringptr s "str" builder
-      | SNoexpr     -> L.const_int i32_t 0
-      | SId s       -> L.build_load (lookup s) s builder
-      | SAssign (s, e) -> let e' = expr builder e in
+        SLiti i         -> L.const_int i32_t i
+      | SLitb b         -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l         -> L.const_float_of_string float_t l
+      | SLits s         -> L.build_global_stringptr s "str" builder
+      | SNoexpr         -> L.const_int i32_t 0
+      | SId s           -> L.build_load (lookup s) s builder
+      | SAssign (s, e)  -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
         let e1' = expr builder e1
@@ -198,13 +203,13 @@ let translate (globals, functions, statements) =
           (match op with 
               A.Add     -> L.build_fadd
             | A.Sub     -> L.build_fsub
-            | A.Mul    -> L.build_fmul
+            | A.Mul     -> L.build_fmul
             | A.Div     -> L.build_fdiv 
-            | A.Eq   -> L.build_fcmp L.Fcmp.Oeq
-            | A.Ne     -> L.build_fcmp L.Fcmp.One
-            | A.Lt    -> L.build_fcmp L.Fcmp.Olt
+            | A.Eq      -> L.build_fcmp L.Fcmp.Oeq
+            | A.Ne      -> L.build_fcmp L.Fcmp.One
+            | A.Lt      -> L.build_fcmp L.Fcmp.Olt
             | A.Lte     -> L.build_fcmp L.Fcmp.Ole
-            | A.Gt -> L.build_fcmp L.Fcmp.Ogt
+            | A.Gt      -> L.build_fcmp L.Fcmp.Ogt
             | A.Gte     -> L.build_fcmp L.Fcmp.Oge
             | A.And | A.Or ->
                 raise (Failure "internal error: semant should have rejected and/or on float")
@@ -214,16 +219,17 @@ let translate (globals, functions, statements) =
             and e2' = expr builder e2 in
             (match op with
               A.Add     -> L.build_add
+            | A.Concat  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
             | A.Sub     -> L.build_sub
-            | A.Mul    -> L.build_mul
+            | A.Mul     -> L.build_mul
             | A.Div     -> L.build_sdiv
             | A.And     -> L.build_and
             | A.Or      -> L.build_or
-            | A.Eq   -> L.build_icmp L.Icmp.Eq
-            | A.Ne     -> L.build_icmp L.Icmp.Ne
-            | A.Lt    -> L.build_icmp L.Icmp.Slt
+            | A.Eq      -> L.build_icmp L.Icmp.Eq
+            | A.Ne      -> L.build_icmp L.Icmp.Ne
+            | A.Lt      -> L.build_icmp L.Icmp.Slt
             | A.Lte     -> L.build_icmp L.Icmp.Sle
-            | A.Gt -> L.build_icmp L.Icmp.Sgt
+            | A.Gt      -> L.build_icmp L.Icmp.Sgt
             | A.Gte     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" builder
       | SUniop(op, ((t, _) as e)) ->
@@ -235,12 +241,12 @@ let translate (globals, functions, statements) =
           ( match e with
               (_, SLiti i)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
             | (_, SLitb b)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
-            | (_, SLitf l) -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
-            | (_, SLits s) -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
+            | (_, SLitf l)  -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+            | (_, SLits s)  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
             | (_, SId s) ->
                 ( match find_type s with
                       A.Int     -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
-                    | A.Boolean      -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                    | A.Boolean -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
                     | A.Float   -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
                     | A.String  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
                     | _ -> raise (Failure "invalid argument called on the print function")
@@ -274,8 +280,8 @@ let translate (globals, functions, statements) =
        the statement's successor (i.e., the next instruction will be built
        after the one generated by this call) *)
      let rec stmt builder = function
-        SBlock sl -> List.fold_left stmt builder sl
-        | SExpr e -> ignore(expr builder e); builder
+        SBlock sl   -> List.fold_left stmt builder sl
+        | SExpr e   -> ignore(expr builder e); builder
         | SReturn e -> ignore(match fdecl.styp with
                               (* Special "return nothing" instr *)
                               A.Void -> L.build_ret_void builder 
@@ -323,9 +329,9 @@ let translate (globals, functions, statements) =
 
     (* Add a return if the last block falls off the end *)
     add_terminal builder (match fdecl.styp with
-        A.Void -> L.build_ret_void
+        A.Void  -> L.build_ret_void
       | A.Float -> L.build_ret (L.const_float float_t 0.0)
-      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
+      | t       -> L.build_ret (L.const_int (ltype_of_typ t) 0))
     in
 
     List.iter build_function_body functions;
@@ -392,13 +398,13 @@ let translate (globals, functions, statements) =
     (* An expression in LLVM always turns into code in a single basic block (not true for stmts) *)
     (* build instructions in the given builder that evaluate the expr; return the expr's value *)
     let rec expr builder ((_, e) : sexpr) = match e with
-        SLiti i  -> L.const_int i32_t i
-      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-      | SLitf l -> L.const_float_of_string float_t l
-      | SLits s -> L.build_global_stringptr s "str" builder
-      | SNoexpr     -> L.const_int i32_t 0
-      | SId s       -> L.build_load (lookup s) s builder
-      | SAssign (s, e) -> let e' = expr builder e in
+        SLiti i         -> L.const_int i32_t i
+      | SLitb b         -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l         -> L.const_float_of_string float_t l
+      | SLits s         -> L.build_global_stringptr s "str" builder
+      | SNoexpr         -> L.const_int i32_t 0
+      | SId s           -> L.build_load (lookup s) s builder
+      | SAssign (s, e)  -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
         let e1' = expr builder e1
@@ -406,13 +412,13 @@ let translate (globals, functions, statements) =
           (match op with 
               A.Add     -> L.build_fadd
             | A.Sub     -> L.build_fsub
-            | A.Mul    -> L.build_fmul
+            | A.Mul     -> L.build_fmul
             | A.Div     -> L.build_fdiv 
-            | A.Eq   -> L.build_fcmp L.Fcmp.Oeq
-            | A.Ne     -> L.build_fcmp L.Fcmp.One
-            | A.Lt    -> L.build_fcmp L.Fcmp.Olt
+            | A.Eq      -> L.build_fcmp L.Fcmp.Oeq
+            | A.Ne      -> L.build_fcmp L.Fcmp.One
+            | A.Lt      -> L.build_fcmp L.Fcmp.Olt
             | A.Lte     -> L.build_fcmp L.Fcmp.Ole
-            | A.Gt -> L.build_fcmp L.Fcmp.Ogt
+            | A.Gt      -> L.build_fcmp L.Fcmp.Ogt
             | A.Gte     -> L.build_fcmp L.Fcmp.Oge
             | A.And | A.Or ->
                 raise (Failure "internal error: semant should have rejected and/or on float")
@@ -422,16 +428,17 @@ let translate (globals, functions, statements) =
             and e2' = expr builder e2 in
             (match op with
               A.Add     -> L.build_add
+            | A.Concat  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
             | A.Sub     -> L.build_sub
-            | A.Mul    -> L.build_mul
+            | A.Mul     -> L.build_mul
             | A.Div     -> L.build_sdiv
             | A.And     -> L.build_and
             | A.Or      -> L.build_or
-            | A.Eq   -> L.build_icmp L.Icmp.Eq
-            | A.Ne     -> L.build_icmp L.Icmp.Ne
-            | A.Lt    -> L.build_icmp L.Icmp.Slt
+            | A.Eq      -> L.build_icmp L.Icmp.Eq
+            | A.Ne      -> L.build_icmp L.Icmp.Ne
+            | A.Lt      -> L.build_icmp L.Icmp.Slt
             | A.Lte     -> L.build_icmp L.Icmp.Sle
-            | A.Gt -> L.build_icmp L.Icmp.Sgt
+            | A.Gt      -> L.build_icmp L.Icmp.Sgt
             | A.Gte     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" builder
       | SUniop(op, ((t, _) as e)) ->
@@ -443,12 +450,12 @@ let translate (globals, functions, statements) =
           ( match e with
               (_, SLiti i)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
             | (_, SLitb b)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
-            | (_, SLitf l) -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
-            | (_, SLits s) -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
+            | (_, SLitf l)  -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+            | (_, SLits s)  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
             | (_, SId s) ->
                 ( match find_type s with
                       A.Int     -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
-                    | A.Boolean      -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                    | A.Boolean -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
                     | A.Float   -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
                     | A.String  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
                     | _ -> raise (Failure "invalid argument called on the print function")

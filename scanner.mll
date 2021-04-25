@@ -38,6 +38,7 @@ rule tokenize = parse
 | '>'      { GT }
 | '<'      { LT }
 | '+'      { PLUS }
+| '&'      { CONCAT }
 | '-'      { MINUS }
 | '*'      { TIMES }
 | '/'      { DIVIDE }

@@ -115,6 +115,7 @@ let rec expr ((_, e) : sexpr) = match e with
   | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
   | SLitf l -> L.const_float_of_string float_t l
   | SLits s -> L.build_global_stringptr s "str" builder
+  | SArrayinit (p,len) -> L.build_array_alloca (ltype_of_typ p) (L.const_int i32_t len) "arr" builder
   | SNoexpr     -> L.const_int i32_t 0
   | SAssign (s, e) -> expr e
 
@@ -130,7 +131,8 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.Int -> L.const_int (ltype_of_typ t) 0
             | A.Boolean -> L.const_int (ltype_of_typ t) 0
             | A.String -> L.const_pointer_null (ltype_of_typ t)
-            | A.Array (p,len) -> L.build_array_alloca (ltype_of_typ p) (L.const_int i32_t len) "arr" builder
+            | A.Array (p,len) -> L.const_pointer_null (ltype_of_typ t)
+
           )
         | _ -> expr se
       in StringMap.add n (L.define_global n init the_module) m in

@@ -33,11 +33,8 @@ let check (globals, functions, statements) =
   (***** CHECK expressions of global variables ****)
    (* Return a semantically-checked expression, i.e., with a type *)
 
-   (* Raise an exception if the given rvalue type cannot be assigned to
-       the given lvalue type *)
 
-   (* Build temp symbol table to check the types of the initializations *)
-    (* drop the expression "e" from being stored in the symbol table*)
+    (* drop the expression "e" from being stored in the symbol table *)
     let symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
                   StringMap.empty globals
     in
@@ -58,7 +55,7 @@ let check (globals, functions, statements) =
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
       | Noexpr     -> (Void, SNoexpr)
-      | Array(t, size) -> (Array, SArray(t, size))
+      | LitArray(t, size) -> (Array, SLitArray(t, size))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
           and (t2, e2') = expr e2 in
@@ -87,6 +84,16 @@ let check (globals, functions, statements) =
           in (ty, SUniop(op, (t, e')))
 
   in
+
+(*
+  let array_symbols = List.fold_left (fun m (ty, name, (t, s)) -> 
+        if ty = Array then StringMap.add name t m)
+                  StringMap.empty globals
+    in
+*)
+  
+
+ 
   
   let check_globals global = 
 
@@ -103,7 +110,7 @@ let check (globals, functions, statements) =
 
     in return_checked_global global
 
-  in (globals, functions, statements);   
+  in
 
 
 
@@ -200,7 +207,7 @@ let check (globals, functions, statements) =
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
       | Noexpr     -> (Void, SNoexpr)
-      | Array(t, size) -> (Array, SArray(t, size))
+      | LitArray(t, size) -> (Array, SLitArray(t, size))
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
@@ -278,7 +285,7 @@ let check (globals, functions, statements) =
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
-      | Array(t, size) -> (Array, SArray(t, size))
+      | LitArray(t, size) -> (Array, SLitArray(t, size))
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex -> 
@@ -369,6 +376,12 @@ let check (globals, functions, statements) =
     }
 
 
+
+
+
+
+
+
 in
 
   (* Return a function from our built_in symbol table *)
@@ -408,7 +421,7 @@ in
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
-      | Array(t, size) -> (Array, SArray(t, size))
+      | LitArray(t, size) -> (Array, SLitArray(t, size))
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex -> 

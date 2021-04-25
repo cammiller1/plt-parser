@@ -132,7 +132,7 @@ expr:
   | SLITERAL           { Lits($1) }
   | ID                 { Id($1) }
 
-  | LBRACKET typ ILITERAL RBRACKET { Array($2, $3) }  /* array decl for type and size */
+  | LBRACKET typ ILITERAL RBRACKET { LitArray($2, $3) }  /* array decl for type and size */
   /*| expr COMMA expr   { Binop($1, Add, $3) } */
 
   | expr PLUS   expr   { Binop($1, Add, $3) }

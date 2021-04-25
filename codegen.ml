@@ -134,7 +134,7 @@ let rec expr ((_, e) : sexpr) = match e with
             (* arrays should never match here *)
           )
         | (A.Array, _) -> (match snd se with
-                    SArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n builder
+                    SLitArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n builder
                   )
                   (* L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) n builder ) *)
         | _ -> expr se
@@ -193,7 +193,7 @@ let rec expr ((_, e) : sexpr) = match e with
         let local_var = match se with 
             (A.Void, _) -> L.build_alloca (ltype_of_typ t) n f_builder
           | (A.Array, _) -> (match snd se with
-                    SArray(ty, size) -> L.build_array_alloca (ltype_of_typ ty) (L.const_int i32_t size) n f_builder
+                    SLitArray(ty, size) -> L.build_array_alloca (ltype_of_typ ty) (L.const_int i32_t size) n f_builder
                   )
           | _ -> L.build_alloca (ltype_of_typ t) n f_builder
         in if t <> A.Array then ignore (L.build_store (expr se) local_var f_builder);

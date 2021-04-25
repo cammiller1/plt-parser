@@ -136,6 +136,7 @@ let rec expr ((_, e) : sexpr) = match e with
         | (A.Array, _) -> (match snd se with
                     SArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n builder
                   )
+                  (* L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) n builder ) *)
         | _ -> expr se
       in if t = A.Array then (StringMap.add n (init) m) else (StringMap.add n (L.define_global n init the_module) m)
       in
@@ -407,6 +408,17 @@ let rec expr ((_, e) : sexpr) = match e with
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
+      (*TODO only for integers here. need to match type later*)
+      | SArrayIndexAssign (s, idx, e) -> 
+                          let e' = expr builder e
+                          in
+                          let element_ptr = L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder and
+                          e' = e'
+                        in
+                          ignore(L.build_store e' element_ptr builder); e'
+      | SArrayIndexAccess (s, idx) -> 
+                    let element_ptr = L.build_load(L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder) "" builder
+                    in element_ptr
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
         let e1' = expr builder e1
         and e2' = expr builder e2 in
@@ -460,6 +472,15 @@ let rec expr ((_, e) : sexpr) = match e with
                     | A.String  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
                     | _ -> raise (Failure "invalid argument called on the print function")
                 )
+            | (_, SArrayIndexAccess (s, i)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                (*
+                ( match find_type s with
+                      A.Int     -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                    | A.Boolean      -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                    | A.Float   -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+                    | A.String  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
+                    | _ -> raise (Failure "invalid argument called on the print function")
+                ) *)
             | (_, SBinop ((A.Float,_ ) as e1, op, e2)) ->  L.build_call printf_func [| float_format_str ; e' |] "printf" builder
             | (_, SBinop (e1, op, e2)) ->  L.build_call printf_func [| int_format_str ; e' |] "printf" builder
             | (_, SCall(f, args)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder

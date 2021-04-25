@@ -149,7 +149,11 @@ expr:
   | expr NE expr       { Binop($1, Ne, $3) }
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
-  | ID ASSIGN expr     { Assign($1, $3) } 
+  | ID ASSIGN expr     { Assign($1, $3) }
+  
+  | ID LBRACKET ILITERAL RBRACKET { ArrayIndexAccess($1, $3) }
+  | ID LBRACKET ILITERAL RBRACKET ASSIGN expr { ArrayIndexAssign($1, $3, $6) }  /* array index assign */
+
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }
   | NOT expr           { Uniop(Not, $2) }

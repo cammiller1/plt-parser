@@ -72,12 +72,28 @@ cc -o test-array-decl-in-func1.exe test-array-decl-in-func1.s
 diff -b test-array-decl-in-func1.out tests/test-array-decl-in-func1.out > test-array-decl-in-func1.diff
 ###### SUCCESS
 
+###### Testing test-array-index-assign1
+./compyled.native tests/test-array-index-assign1.cp > test-array-index-assign1.ll
+llc -relocation-model=pic test-array-index-assign1.ll > test-array-index-assign1.s
+cc -o test-array-index-assign1.exe test-array-index-assign1.s
+./test-array-index-assign1.exe
+diff -b test-array-index-assign1.out tests/test-array-index-assign1.out > test-array-index-assign1.diff
+###### SUCCESS
+
 ###### Testing test-assign-arithm-add
 ./compyled.native tests/test-assign-arithm-add.cp > test-assign-arithm-add.ll
 llc -relocation-model=pic test-assign-arithm-add.ll > test-assign-arithm-add.s
 cc -o test-assign-arithm-add.exe test-assign-arithm-add.s
 ./test-assign-arithm-add.exe
 diff -b test-assign-arithm-add.out tests/test-assign-arithm-add.out > test-assign-arithm-add.diff
+###### SUCCESS
+
+###### Testing test-assign-var-to-index-access
+./compyled.native tests/test-assign-var-to-index-access.cp > test-assign-var-to-index-access.ll
+llc -relocation-model=pic test-assign-var-to-index-access.ll > test-assign-var-to-index-access.s
+cc -o test-assign-var-to-index-access.exe test-assign-var-to-index-access.s
+./test-assign-var-to-index-access.exe
+diff -b test-assign-var-to-index-access.out tests/test-assign-var-to-index-access.out > test-assign-var-to-index-access.diff
 ###### SUCCESS
 
 ###### Testing test-assign1

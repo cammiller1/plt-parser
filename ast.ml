@@ -13,6 +13,8 @@ type expr =
   | Litb of bool
   | Lits of string
   | Assign of string * expr
+  | ArrayIndexAssign of string * int * expr
+  | ArrayIndexAccess of string * int
   | Id of string
   | Array of typ * int
   | Binop of expr * operator * expr
@@ -75,6 +77,8 @@ let rec string_of_expr = function
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Uniop(o, e) -> string_of_uop o ^ string_of_expr e
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+  | ArrayIndexAssign(s, i, e) -> "an array assignment"  (* TODO: make me better *)
+  | ArrayIndexAccess(s, i) -> "an array access"  (* TODO: make me better *)
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""

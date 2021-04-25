@@ -38,13 +38,13 @@ let check (globals, functions, statements) =
 
    (* Build temp symbol table to check the types of the initializations *)
     (* drop the expression "e" from being stored in the symbol table*)
-    let tmp_symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
+    let symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
                   StringMap.empty globals
     in
 
     (* Return a variable from our temp symbol table *)
     let type_of_identifier s =
-      try StringMap.find s tmp_symbols
+      try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
@@ -180,13 +180,13 @@ let check (globals, functions, statements) =
   (* FOR LOCAL VAR INIT and formal check*)
    (* Build temp symbol table to check the types of the initializations *)
     (* drop the expression "e" from being stored in the symbol table*)
-    let tmp_symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
-                  StringMap.empty func.locals
+    let local_symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
+                  StringMap.empty (globals @ func.formals @ func.locals)
     in
 
     (* Return a variable from our temp symbol table *)
     let type_of_identifier s =
-      try StringMap.find s tmp_symbols
+      try StringMap.find s local_symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
@@ -266,15 +266,9 @@ let check (globals, functions, statements) =
        lvaluet
     in
 
-    (* Build local symbol table of variables for this function *)
-    (* drop the expression "e" from being stored in the symbol table*)
-    let symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
-                  StringMap.empty (globals @ func.formals @ func.locals )
-    in
-
     (* Return a variable from our local symbol table *)
     let type_of_identifier s =
-      try StringMap.find s symbols
+      try StringMap.find s local_symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
@@ -375,16 +369,7 @@ let check (globals, functions, statements) =
     }
 
 
-  in (globals, functions, statements);
-
-
-
-
-
-
-  (**** Check Statements ***)
-
-
+in
 
   (* Return a function from our built_in symbol table *)
   let find_func s = 
@@ -395,12 +380,7 @@ let check (globals, functions, statements) =
 
   let check_statement statements = 
 
-    (* Build a symbol table for global variables *)
-    let symbols = List.fold_left (fun m (ty, name, e) -> StringMap.add name ty m)
-                  StringMap.empty (globals)
-    in
-
-    (* Return a variable from our local symbol table *)
+    (* Return a variable from our symbol table *)
     let type_of_identifier s =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
@@ -414,6 +394,11 @@ let check (globals, functions, statements) =
 
     let check_print lvaluet rvaluet err =
        lvaluet
+    in
+
+    (* TODO: implement array type check *)
+    let check_array lvaluet rvaluet err =
+       rvaluet
     in
 
 
@@ -431,7 +416,13 @@ let check (globals, functions, statements) =
           and (rt, e') = expr e in
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
-          in (check_assign lt rt err, SAssign(var, (rt, e')))
+          in 
+          if rt = Array then (lt, SAssign(var, (rt, e'))) else (check_assign lt rt err, SAssign(var, (rt, e')))
+      | ArrayIndexAssign(var, idx, e) ->
+          let lt = type_of_identifier var
+          and (rt, e') = expr e in
+          (Array, SArrayIndexAssign(var, idx, (rt, e')))
+      | ArrayIndexAccess(var, idx) -> (Array, SArrayIndexAccess(var, idx))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
           and (t2, e2') = expr e2 in

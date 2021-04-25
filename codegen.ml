@@ -134,14 +134,14 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.String -> L.const_pointer_null (ltype_of_typ t)
             (* arrays should never match here *)
           )
-        | (A.Array, _) -> L.const_pointer_null (ltype_of_typ A.String)
-        (* give some bogus value here for now to get past arrays *)
-        
-        (*| (A.Array, _) -> (match snd se with
-                    SArray(t, size) -> L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) "arr" builder )
-        *)
+        | (A.Array, _) -> (match snd se with
+                    SArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n builder
+                  )
+                    (* L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) n builder ) *)
         | _ -> expr se
-      in StringMap.add n (L.define_global n init the_module) m in
+      in if t = A.Array then (StringMap.add n (init) m) else (StringMap.add n (L.define_global n init the_module) m)
+      in
+      (* StringMap.add n (L.define_global n init the_module) m in *)
     List.fold_left global_var StringMap.empty globals in
 
   (* Create a map of global variables after creating each *)

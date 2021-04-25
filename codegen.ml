@@ -56,9 +56,6 @@ let translate (globals, functions, statements) =
   let main_t : L.lltype = 
       (* the [| and |] indicates an Ocaml array*)
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-  (*  (* below LLVM's connection to a built-in function *)
-  let main_func : L.llvalue = 
-      L.declare_function "main" printf_t the_module in *)
 
 
   (* Define each function (arguments and return type) so we can 

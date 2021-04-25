@@ -14,6 +14,7 @@ and sx =
   | SUniop of unary_operator * sexpr
   | SAssign of string * sexpr
   | SCall of string * sexpr list
+  | SArrayinit of typ * int 
   | SNoexpr
 
 

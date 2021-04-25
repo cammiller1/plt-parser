@@ -17,6 +17,7 @@ type expr =
   | Uniop of unary_operator * expr
   | Assign of string * expr
   | Call of string * expr list
+  | Arrayinit of typ * int
   | Noexpr
 
 

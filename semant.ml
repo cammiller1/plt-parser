@@ -57,6 +57,7 @@ let check (globals, functions, statements) =
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
+      | Arrayinit (l,len) -> (l,SArrayinit(l,len) )
       | Noexpr     -> (Void, SNoexpr)
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
@@ -198,6 +199,7 @@ let check (globals, functions, statements) =
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
+      | Arrayinit (l,len) -> (l,SArrayinit(l,len) ) 
       | Noexpr     -> (Void, SNoexpr)
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
@@ -282,6 +284,7 @@ let check (globals, functions, statements) =
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
+      | Arrayinit (l,len) -> (l,SArrayinit(l,len) )
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex -> 
@@ -420,6 +423,7 @@ let check (globals, functions, statements) =
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
+      | Arrayinit (l,len) -> (l,SArrayinit(l,len) )
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex -> 

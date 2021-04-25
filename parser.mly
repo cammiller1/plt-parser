@@ -127,6 +127,7 @@ expr:
   | FLITERAL           { Litf($1) }
   | BLITERAL           { Litb($1) }
   | SLITERAL           { Lits($1) }
+  | typ LSBRAC ILITERAL RSBRAC {Arrayinit($1,$3)}
   | ID                 { Id($1) } 
   | expr PLUS   expr   { Binop($1, Add, $3) }
   | expr MINUS  expr   { Binop($1, Sub, $3) }

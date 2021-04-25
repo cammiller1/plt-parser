@@ -38,7 +38,7 @@ let translate (globals, functions, statements) =
     | A.Float -> float_t
     | A.Void  -> void_t
     | A.String -> string_t (* added for our project *)
-    | A.Array (t,n) -> L.array_type (ltype_of_typ t) n 
+    | A.Array (t,_) -> L.pointer_type (ltype_of_typ t) 
   in
 
 
@@ -393,6 +393,7 @@ let rec expr ((_, e) : sexpr) = match e with
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
       | SLitf l -> L.const_float_of_string float_t l
       | SLits s -> L.build_global_stringptr s "str" builder
+      | SArrayinit (p,len) -> L.build_array_alloca (ltype_of_typ p) (L.const_int i32_t len) "arr" builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in

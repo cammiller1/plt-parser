@@ -176,6 +176,7 @@ let rec expr ((_, e) : sexpr) = match e with
       | SNoexpr     -> L.const_int i32_t 0
       (* | SId s       -> L.build_load (lookup s) s f_builder *)
       | SAssign (s, e) -> expr e
+      (* | SArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n f_builder *)
 
   in
 
@@ -191,12 +192,34 @@ let rec expr ((_, e) : sexpr) = match e with
 
       (* Allocate space for any locally declared variables and add the
        * resulting registers to our map *)
-      and add_local m (t, n, se) =
-        L.set_value_name n (expr se);
-        let local_var = L.build_alloca (ltype_of_typ t) n f_builder
-          in ignore (L.build_store (expr se) local_var f_builder);
+      and add_local m (t, n, se) = 
+        let local_var = match se with 
+            (A.Void, _) -> L.build_alloca (ltype_of_typ t) n f_builder
+          | (A.Array, _) -> (match snd se with
+                    SArray(ty, size) -> L.build_array_alloca (ltype_of_typ ty) (L.const_int i32_t size) n builder
+                  )
+          | _ -> L.build_alloca (ltype_of_typ t) n f_builder
+        (* in ignore (L.build_store (expr se) local_var f_builder) *)
+        in if t <> A.Array then ignore (L.build_store (expr se) local_var f_builder);
         StringMap.add n local_var m 
+          (*| _ -> L.build_alloca (ltype_of_typ t) n f_builder in ignore (L.build_store (expr se) local_var f_builder); StringMap.add n local_var m *)
+
       in
+        (*
+        let local_var = match se with
+           (A.Array, _) -> (match snd se with
+                    SArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n builder;
+                  )
+          | _ -> L.build_alloca (ltype_of_typ t) n f_builder in ignore (L.build_store (expr se) local_var f_builder);
+         (*
+         A.Array(ty, siz) -> (match snd se with
+                    SArray(t, size) -> let local_var = L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n builder
+                                       in StringMap.add n local_var m 
+                    )
+        | _ -> let local_var = L.build_alloca (ltype_of_typ t) n f_builder
+              in ignore (L.build_store (expr se) local_var f_builder);
+              StringMap.add n local_var m          *) 
+      in StringMap.add n local_var m; *)
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
           (Array.to_list (L.params the_function)) in
@@ -401,7 +424,6 @@ let rec expr ((_, e) : sexpr) = match e with
       | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
       | SLitf l -> L.const_float_of_string float_t l
       | SLits s -> L.build_global_stringptr s "str" builder
-      | SArray(t, size) -> L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) "arr" builder
       | SNoexpr     -> L.const_int i32_t 0
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in

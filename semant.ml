@@ -119,7 +119,8 @@ let check (globals, functions, statements) =
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
                                ("printb", Boolean);
                                ("printf", Float); 
-                               ("prints", String) ]
+                               ("prints", String);
+                               ("string_concat", String); ]
   in
 
   (* Add function name to symbol table *)

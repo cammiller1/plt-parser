@@ -66,10 +66,11 @@ diff -b test-arithm-int-sub.out tests/test-arithm-int-sub.out > test-arithm-int-
 
 ###### Testing test-array-decl-in-func1
 ./compyled.native tests/test-array-decl-in-func1.cp > test-array-decl-in-func1.ll
-Basic Block in function 'main' does not have terminator!
-label %entry
-LLVM ERROR: Broken module found, compilation aborted!
-###### FAILED
+llc -relocation-model=pic test-array-decl-in-func1.ll > test-array-decl-in-func1.s
+cc -o test-array-decl-in-func1.exe test-array-decl-in-func1.s
+./test-array-decl-in-func1.exe
+diff -b test-array-decl-in-func1.out tests/test-array-decl-in-func1.out > test-array-decl-in-func1.diff
+###### SUCCESS
 
 ###### Testing test-assign-arithm-add
 ./compyled.native tests/test-assign-arithm-add.cp > test-assign-arithm-add.ll

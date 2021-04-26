@@ -331,27 +331,41 @@ let rec expr builder ((_, e) : sexpr) = match e with
                     let element_ptr = L.build_load(L.build_gep (lookup s) [| indx |] "" f_builder) "" f_builder
                     in element_ptr
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
-        let e1' = expr f_builder e1
-        and e2' = expr f_builder e2 in
-          (match op with 
-              A.Add     -> L.build_fadd
-            | A.Sub     -> L.build_fsub
-            | A.Mul     -> L.build_fmul
-            | A.Div     -> L.build_fdiv 
-            | A.Mod   -> L.build_urem
-            | A.Eq   -> L.build_fcmp L.Fcmp.Oeq
-            | A.Ne     -> L.build_fcmp L.Fcmp.One
-            | A.Lt    -> L.build_fcmp L.Fcmp.Olt
-            | A.Lte     -> L.build_fcmp L.Fcmp.Ole
-            | A.Gt      -> L.build_fcmp L.Fcmp.Ogt
-            | A.Gte     -> L.build_fcmp L.Fcmp.Oge
-            | A.And | A.Or ->
-                raise (Failure "internal error: semant should have rejected and/or on float")
-            ) e1' e2' "tmp" f_builder
-              | SBinop (e1, op, e2) ->
-            let e1' = expr f_builder e1
-            and e2' = expr f_builder e2 in
-            ) e1' e2' "tmp" builder
+      let e1' = expr f_builder e1
+      and e2' = expr f_builder e2 in
+        (match op with 
+            A.Add     -> L.build_fadd
+          | A.Sub     -> L.build_fsub
+          | A.Mul    -> L.build_fmul
+          | A.Div     -> L.build_fdiv 
+          | A.Mod   -> L.build_urem
+          | A.Eq   -> L.build_fcmp L.Fcmp.Oeq
+          | A.Ne     -> L.build_fcmp L.Fcmp.One
+          | A.Lt    -> L.build_fcmp L.Fcmp.Olt
+          | A.Lte     -> L.build_fcmp L.Fcmp.Ole
+          | A.Gt -> L.build_fcmp L.Fcmp.Ogt
+          | A.Gte     -> L.build_fcmp L.Fcmp.Oge
+          | A.And | A.Or ->
+              raise (Failure "internal error: semant should have rejected and/or on float")
+          ) e1' e2' "tmp" f_builder
+            | SBinop (e1, op, e2) ->
+          let e1' = expr f_builder e1
+          and e2' = expr f_builder e2 in
+          (match op with
+            A.Add     -> L.build_add
+          | A.Sub     -> L.build_sub
+          | A.Mul    -> L.build_mul
+          | A.Div     -> L.build_sdiv
+          | A.Mod     -> L.build_urem
+          | A.And     -> L.build_and
+          | A.Or      -> L.build_or
+          | A.Eq   -> L.build_icmp L.Icmp.Eq
+          | A.Ne     -> L.build_icmp L.Icmp.Ne
+          | A.Lt    -> L.build_icmp L.Icmp.Slt
+          | A.Lte     -> L.build_icmp L.Icmp.Sle
+          | A.Gt -> L.build_icmp L.Icmp.Sgt
+          | A.Gte     -> L.build_icmp L.Icmp.Sge
+        ) e1' e2' "tmp" f_builder
       | SBinop ((A.String,_ ) as e1, op, e2) ->
         let e1' = expr builder e1
         and e2' = expr builder e2 in

@@ -150,7 +150,8 @@ let check (globals, functions, statements) =
       formals = [(ty, "x", Noexpr)];
       locals = [];
       body = [] } map 
-    in List.fold_left add_bind built_in_decls3 [ ("len", String); ]
+    in List.fold_left add_bind built_in_decls3 [ ("len", String); 
+                                                  ("len", Array)]
   in
 
   

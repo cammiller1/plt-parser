@@ -9,6 +9,7 @@ and sx =
   | SLitf of string
   | SLitb of bool
   | SLits of string
+  | SLitArray of typ * sexpr
   | SId of string
   | SBinop of sexpr * operator * sexpr
   | SUniop of unary_operator * sexpr

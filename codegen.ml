@@ -169,10 +169,10 @@ let rec expr builder ((_, e) : sexpr) = match e with
       let init = match se with
         (A.Void, _) ->  (
             match t with
-              A.Float -> L.build_alloca (ltype_of_typ t) n builder
-            | A.Int -> L.build_alloca (ltype_of_typ t) n builder
-            | A.Boolean -> L.build_alloca (ltype_of_typ t) n builder
-            | A.String -> L.build_alloca (ltype_of_typ t) n builder
+              A.Float -> L.build_alloca (ltype_of_typ t) n builder;
+            | A.Int -> L.build_alloca (ltype_of_typ t) n builder; 
+            | A.Boolean -> L.build_alloca (ltype_of_typ t) n builder;
+            | A.String -> L.build_alloca (ltype_of_typ t) n builder;
           )
         | (A.Array, _) -> (match snd se with
                     SLitArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (expr builder size) n builder
@@ -180,7 +180,10 @@ let rec expr builder ((_, e) : sexpr) = match e with
                   (* L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) n builder ) *)
         | _ -> L.build_alloca (ltype_of_typ t) n builder
       in let (ty, s) = se
-      in if t <> A.Array && (ty <> A.Void) then ignore (L.build_store (expr builder se) init builder);
+      in if t <> A.Array && ty <> A.Void then ignore (L.build_store (expr builder se) init builder) 
+        else if ty = A.Void && (t == A.Int || t = A.Boolean) then ignore (L.build_store (L.const_int (ltype_of_typ t) 0) init builder)
+        else if ty = A.Void && t == A.Float then ignore (L.build_store (L.const_float (ltype_of_typ t) 0.0) init builder)
+        else if ty = A.Void && t == A.String then ignore (L.build_store (L.const_pointer_null (ltype_of_typ t)) init builder);
       StringMap.add n init m
     in
 

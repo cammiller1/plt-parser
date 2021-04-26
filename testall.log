@@ -432,12 +432,28 @@ cc -o test-not2.exe test-not2.s
 diff -b test-not2.out tests/test-not2.out > test-not2.diff
 ###### SUCCESS
 
+###### Testing test-pass-func-as-arg
+./compyled.native tests/test-pass-func-as-arg.cp > test-pass-func-as-arg.ll
+llc -relocation-model=pic test-pass-func-as-arg.ll > test-pass-func-as-arg.s
+cc -o test-pass-func-as-arg.exe test-pass-func-as-arg.s
+./test-pass-func-as-arg.exe
+diff -b test-pass-func-as-arg.out tests/test-pass-func-as-arg.out > test-pass-func-as-arg.diff
+###### SUCCESS
+
 ###### Testing test-reverse-function-call-nesting
 ./compyled.native tests/test-reverse-function-call-nesting.cp > test-reverse-function-call-nesting.ll
 llc -relocation-model=pic test-reverse-function-call-nesting.ll > test-reverse-function-call-nesting.s
 cc -o test-reverse-function-call-nesting.exe test-reverse-function-call-nesting.s
 ./test-reverse-function-call-nesting.exe
 diff -b test-reverse-function-call-nesting.out tests/test-reverse-function-call-nesting.out > test-reverse-function-call-nesting.diff
+###### SUCCESS
+
+###### Testing test-string-mutation
+./compyled.native tests/test-string-mutation.cp > test-string-mutation.ll
+llc -relocation-model=pic test-string-mutation.ll > test-string-mutation.s
+cc -o test-string-mutation.exe test-string-mutation.s
+./test-string-mutation.exe
+diff -b test-string-mutation.out tests/test-string-mutation.out > test-string-mutation.diff
 ###### SUCCESS
 
 ###### Testing test-var-decl-in-func

@@ -80,6 +80,14 @@ cc -o test-array-dynamic-access.exe test-array-dynamic-access.s
 diff -b test-array-dynamic-access.out tests/test-array-dynamic-access.out > test-array-dynamic-access.diff
 ###### SUCCESS
 
+###### Testing test-array-for-loop-assign
+./compyled.native tests/test-array-for-loop-assign.cp > test-array-for-loop-assign.ll
+llc -relocation-model=pic test-array-for-loop-assign.ll > test-array-for-loop-assign.s
+cc -o test-array-for-loop-assign.exe test-array-for-loop-assign.s
+./test-array-for-loop-assign.exe
+diff -b test-array-for-loop-assign.out tests/test-array-for-loop-assign.out > test-array-for-loop-assign.diff
+###### SUCCESS
+
 ###### Testing test-array-for-loop
 ./compyled.native tests/test-array-for-loop.cp > test-array-for-loop.ll
 llc -relocation-model=pic test-array-for-loop.ll > test-array-for-loop.s

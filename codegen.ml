@@ -1,4 +1,8 @@
-(* Code generation: translate takes a semantically checked AST and
+
+
+
+(*
+Code generation: translate takes a semantically checked AST and
 produces LLVM IR
 *)
 
@@ -24,7 +28,7 @@ let translate (globals, functions, statements) =
   (* Get types from the context *)
   (* llvm only supports primitive types *)
   let i32_t      = L.i32_type       context  (* 32-bit int type *)
-  and i8_t       = L.i8_type        context  (* caracters *)
+  and i8_t       = L.i8_type        context  (* chars *)
   and i1_t       = L.i1_type        context  (* boolean type *)
   and float_t    = L.double_type    context  (* double/float type *)
   and void_t     = L.void_type      context   (* void type *)
@@ -51,6 +55,21 @@ let translate (globals, functions, statements) =
     (* below LLVM's connection to a built-in function *)
   let printf_func : L.llvalue = 
       L.declare_function "printf" printf_t the_module in
+
+  let string_concat_t : L.lltype =
+    L.function_type string_t [| string_t; string_t |] in
+  let string_concat_f : L.llvalue =
+    L.declare_function "string_concat" string_concat_t the_module in
+
+  let string_equality_t : L.lltype =
+    L.function_type string_t [| string_t; string_t |] in
+  let string_equality_f : L.llvalue =
+    L.declare_function "string_equality" string_equality_t the_module in
+
+  let len_t : L.lltype =
+    L.function_type i32_t [| string_t |] in
+  let len_f : L.llvalue =
+    L.declare_function "len" len_t the_module in
 
   (* create fake main function *)
   let main_t : L.lltype = 
@@ -252,14 +271,14 @@ let rec expr ((_, e) : sexpr) = match e with
           (match op with 
               A.Add     -> L.build_fadd
             | A.Sub     -> L.build_fsub
-            | A.Mul    -> L.build_fmul
+            | A.Mul     -> L.build_fmul
             | A.Div     -> L.build_fdiv 
             | A.Mod   -> L.build_urem
             | A.Eq   -> L.build_fcmp L.Fcmp.Oeq
             | A.Ne     -> L.build_fcmp L.Fcmp.One
             | A.Lt    -> L.build_fcmp L.Fcmp.Olt
             | A.Lte     -> L.build_fcmp L.Fcmp.Ole
-            | A.Gt -> L.build_fcmp L.Fcmp.Ogt
+            | A.Gt      -> L.build_fcmp L.Fcmp.Ogt
             | A.Gte     -> L.build_fcmp L.Fcmp.Oge
             | A.And | A.Or ->
                 raise (Failure "internal error: semant should have rejected and/or on float")
@@ -267,19 +286,34 @@ let rec expr ((_, e) : sexpr) = match e with
               | SBinop (e1, op, e2) ->
             let e1' = expr f_builder e1
             and e2' = expr f_builder e2 in
+            ) e1' e2' "tmp" builder
+      | SBinop ((A.String,_ ) as e1, op, e2) ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+        (match op with
+           A.Add  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
+         | A.Eq   -> L.build_call string_equality_f [| e1'; e2' |] "string_equality" builder)
+      (* | SBinop ((A.Boolean,_ ) as e1, op, e2) ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+        (match op with
+         | A.Eq   -> L.build_call string_equality_f [| e1'; e2' |] "string_equality" builder) *)
+      | SBinop (e1, op, e2) ->
+            let e1' = expr builder e1
+            and e2' = expr builder e2 in
             (match op with
               A.Add     -> L.build_add
             | A.Sub     -> L.build_sub
-            | A.Mul    -> L.build_mul
+            | A.Mul     -> L.build_mul
             | A.Div     -> L.build_sdiv
             | A.Mod     -> L.build_urem
             | A.And     -> L.build_and
             | A.Or      -> L.build_or
-            | A.Eq   -> L.build_icmp L.Icmp.Eq
-            | A.Ne     -> L.build_icmp L.Icmp.Ne
-            | A.Lt    -> L.build_icmp L.Icmp.Slt
+            | A.Eq      -> L.build_icmp L.Icmp.Eq
+            | A.Ne      -> L.build_icmp L.Icmp.Ne
+            | A.Lt      -> L.build_icmp L.Icmp.Slt
             | A.Lte     -> L.build_icmp L.Icmp.Sle
-            | A.Gt -> L.build_icmp L.Icmp.Sgt
+            | A.Gt      -> L.build_icmp L.Icmp.Sgt
             | A.Gte     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" f_builder
       | SUniop(op, ((t, _) as e)) ->
@@ -306,6 +340,9 @@ let rec expr ((_, e) : sexpr) = match e with
             | (_, SCall(f, args)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" f_builder
             | (_,_) ->  raise (Failure "invalid argument called on the print function")
           )
+      | SCall ("len", [e]) -> 
+        let e' = expr builder e in
+        L.build_call len_f  [| e' |] "len" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
            let llargs = List.rev (List.map (expr f_builder) (List.rev args)) in
@@ -381,7 +418,7 @@ let rec expr ((_, e) : sexpr) = match e with
     add_terminal f_builder (match fdecl.styp with
         A.Void -> L.build_ret_void
       | A.Float -> L.build_ret (L.const_float float_t 0.0)
-      | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
+      | t       -> L.build_ret (L.const_int (ltype_of_typ t) 0))
     in
 
 
@@ -416,13 +453,13 @@ let rec expr ((_, e) : sexpr) = match e with
     (* An expression in LLVM always turns into code in a single basic block (not true for stmts) *)
     (* build instructions in the given builder that evaluate the expr; return the expr's value *)
     let rec expr builder ((_, e) : sexpr) = match e with
-        SLiti i  -> L.const_int i32_t i
-      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-      | SLitf l -> L.const_float_of_string float_t l
-      | SLits s -> L.build_global_stringptr s "str" builder
-      | SNoexpr     -> L.const_int i32_t 0
-      | SId s       -> L.build_load (lookup s) s builder
-      | SAssign (s, e) -> let e' = expr builder e in
+        SLiti i         -> L.const_int i32_t i
+      | SLitb b         -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l         -> L.const_float_of_string float_t l
+      | SLits s         -> L.build_global_stringptr s "str" builder
+      | SNoexpr         -> L.const_int i32_t 0
+      | SId s           -> L.build_load (lookup s) s builder
+      | SAssign (s, e)  -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SArrayIndexAssign (s, idx, e) -> 
                           let e' = expr builder e and
@@ -442,34 +479,40 @@ let rec expr ((_, e) : sexpr) = match e with
           (match op with 
               A.Add     -> L.build_fadd
             | A.Sub     -> L.build_fsub
-            | A.Mul    -> L.build_fmul
+            | A.Mul     -> L.build_fmul
             | A.Div     -> L.build_fdiv 
             | A.Mod     -> L.build_urem
             | A.Eq   -> L.build_fcmp L.Fcmp.Oeq
             | A.Ne     -> L.build_fcmp L.Fcmp.One
             | A.Lt    -> L.build_fcmp L.Fcmp.Olt
             | A.Lte     -> L.build_fcmp L.Fcmp.Ole
-            | A.Gt -> L.build_fcmp L.Fcmp.Ogt
+            | A.Gt      -> L.build_fcmp L.Fcmp.Ogt
             | A.Gte     -> L.build_fcmp L.Fcmp.Oge
             | A.And | A.Or ->
                 raise (Failure "internal error: semant should have rejected and/or on float")
             ) e1' e2' "tmp" builder
+      | SBinop ((A.String,_ ) as e1, op, e2) ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+        (match op with
+           A.Add  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
+         | A.Eq   -> L.build_call string_equality_f [| e1'; e2' |] "string_equality" builder)
       | SBinop (e1, op, e2) ->
             let e1' = expr builder e1
             and e2' = expr builder e2 in
             (match op with
               A.Add     -> L.build_add
             | A.Sub     -> L.build_sub
-            | A.Mul    -> L.build_mul
+            | A.Mul     -> L.build_mul
             | A.Div     -> L.build_sdiv
             | A.Mod     -> L.build_urem
             | A.And     -> L.build_and
             | A.Or      -> L.build_or
-            | A.Eq   -> L.build_icmp L.Icmp.Eq
-            | A.Ne     -> L.build_icmp L.Icmp.Ne
-            | A.Lt    -> L.build_icmp L.Icmp.Slt
+            | A.Eq      -> L.build_icmp L.Icmp.Eq
+            | A.Ne      -> L.build_icmp L.Icmp.Ne
+            | A.Lt      -> L.build_icmp L.Icmp.Slt
             | A.Lte     -> L.build_icmp L.Icmp.Sle
-            | A.Gt -> L.build_icmp L.Icmp.Sgt
+            | A.Gt      -> L.build_icmp L.Icmp.Sgt
             | A.Gte     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" builder
       | SUniop(op, ((t, _) as e)) ->
@@ -481,12 +524,12 @@ let rec expr ((_, e) : sexpr) = match e with
           ( match e with
               (_, SLiti i)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
             | (_, SLitb b)  -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
-            | (_, SLitf l) -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
-            | (_, SLits s) -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
+            | (_, SLitf l)  -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+            | (_, SLits s)  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
             | (_, SId s) ->
                 ( match find_type s with
                       A.Int     -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
-                    | A.Boolean      -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+                    | A.Boolean -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
                     | A.Float   -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
                     | A.String  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
                     | _ -> raise (Failure "invalid argument called on the print function")
@@ -499,6 +542,9 @@ let rec expr ((_, e) : sexpr) = match e with
             | (_, SCall(f, args)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
             | (_,_) ->  raise (Failure "invalid argument called on the print function")
           )
+      | SCall ("len", [e]) -> 
+      let e' = expr builder e in
+      L.build_call len_f  [| e' |] "len" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
            let llargs = List.rev (List.map (expr builder) (List.rev args)) in

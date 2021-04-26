@@ -4,11 +4,10 @@ s1 = "hello";
 string s2;
 s2 = "hello";
 
-int result;
-result = (s1 == s2);
+int b = (s1 == s2);
 
-if (result == 1) {
+## if ((s1 == s2)) {
 	print("equal");
 } else {
 	print("unequal");
-}
+} ##

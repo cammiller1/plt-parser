@@ -6,7 +6,7 @@
 #  Compile and check the error of each expected-to-fail test
 
 # Path to the LLVM interpreter
-LLI="lli"
+LLI="/usr/local/Cellar/llvm@11/11.1.0/bin/lli"
 #LLI="/usr/local/opt/llvm/bin/lli"
 
 # Path to the LLVM compiler
@@ -94,7 +94,7 @@ Check() {
     generatedfiles="$generatedfiles ${basename}.ll ${basename}.s ${basename}.exe ${basename}.out" &&
     Run "$COMPYLED" "$1" ">" "${basename}.ll" &&
     Run "$LLC" "-relocation-model=pic" "${basename}.ll" ">" "${basename}.s" &&
-    Run "$CC" "-o" "${basename}.exe" "${basename}.s" &&
+    Run "$CC" "-o" "${basename}.exe" "${basename}.s" "concat.o" &&
     Run "./${basename}.exe" > "${basename}.out" &&
     Compare ${basename}.out ${reffile}.out ${basename}.diff
 

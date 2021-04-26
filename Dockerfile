@@ -15,7 +15,9 @@ RUN apt-get -yq update && \
     python2.7 \
     pkg-config \
     cmake \
-    opam
+    opam \
+    gcc \
+    clang
 
 RUN ln -s /usr/bin/lli-10.0 /usr/bin/lli
 RUN ln -s /usr/bin/llc-10.0 /usr/bin/llc

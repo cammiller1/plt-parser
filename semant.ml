@@ -55,8 +55,66 @@ let check (globals, functions, statements) =
        the given lvalue type *)
     let check_assign lvaluet rvaluet err =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
-    in   
+    in 
 
+
+    let rec expr = function
+        Liti l -> (Int, SLiti l)
+      | Litf l -> (Float, SLitf l)
+      | Litb l  -> (Boolean, SLitb l)
+      | Lits l  -> (String, SLits l)
+      | Noexpr     -> (Void, SNoexpr)
+      | LitArray(t, size) -> 
+          let sz = expr size in
+          (Array, SLitArray(t, sz))
+      | Binop(e1, op, e2) as e -> 
+          let (t1, e1') = expr e1 
+          and (t2, e2') = expr e2 in
+          (* All binary operators require operands of the same type *)
+          let same = t1 = t2 in
+          (* Determine expression type based on operator and operand types *)
+          let ty = match op with
+            Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div  when same && t1 = Float -> Float
+          | Eq | Ne            when same               -> Boolean
+          | Lt | Lte | Gt | Gte
+                     when same && (t1 = Int || t1 = Float) -> Boolean
+          | And | Or when same && t1 = Boolean -> Boolean
+          | _ -> raise (
+        Failure ("illegal binary operator " ^
+                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+                       string_of_typ t2 ^ " in " ^ string_of_expr e))
+          in (ty, SBinop((t1, e1'), op, (t2, e2')))
+      | Uniop(op, e) as ex -> 
+          let (t, e') = expr e in
+          let ty = match op with
+            Not when t = Boolean -> Boolean
+          | _ -> raise (Failure ("illegal unary operator " ^ 
+                                 string_of_uop op ^ string_of_typ t ^
+                                 " in " ^ string_of_expr ex))
+          in (ty, SUniop(op, (t, e')))
+      | _ -> raise (
+        Failure ("Only literals can be initialized with variables. Otherwise you must declare first") )
+
+  in
+     (***** CHECK expressions of global variables ****)
+   (* Return a semantically-checked expression, i.e., with a type *)
+  let check_globals global = 
+
+    let return_checked_global (t, s, e) =
+      match e with 
+        | Noexpr     -> (t, s, expr e)
+        | _ ->
+          let lt = type_of_identifier s
+          and (rt, e') = expr e in
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr e
+          in check_assign lt rt err;
+      (t, s, expr e)
+
+    in return_checked_global global  
+
+in
 
 (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls1 = 
@@ -575,26 +633,6 @@ in
             | s :: ss         -> check_stmt s :: check_stmt_list ss
             | []              -> []
           in SBlock(check_stmt_list sl)
-
-    in
-  
-  (***** CHECK expressions of global variables ****)
-   (* Return a semantically-checked expression, i.e., with a type *)
-  let check_globals global = 
-
-    let return_checked_global (t, s, e) =
-      match e with 
-        | Noexpr     -> (t, s, expr e)
-        | _ ->
-          let lt = type_of_identifier s
-          and (rt, e') = expr e in
-          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
-            string_of_typ rt ^ " in " ^ string_of_expr e
-          in check_assign lt rt err;
-      (t, s, expr e)
-
-    in return_checked_global global
-
 
 
   in (List.map check_globals globals, List.map check_function functions, check_statement statements)

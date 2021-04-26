@@ -21,7 +21,6 @@ compyled.native :
 	rm -f *.o
 	ocamlbuild -use-ocamlfind compyled.native
 	gcc -c builtins.c
-	clang -emit-llvm -o builtins.bc -c builtins.c -Wno-varargs
 
 # "make clean" removes all generated files
 

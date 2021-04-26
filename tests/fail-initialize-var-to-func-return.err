@@ -1,0 +1,1 @@
+Fatal error: exception Failure("Only literals can be initialized with variables. Otherwise you must declare first")

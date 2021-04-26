@@ -183,13 +183,6 @@ let rec expr builder ((_, e) : sexpr) = match e with
       | SCall ("len", [e]) -> 
         let e' = expr builder e in
         L.build_call len_f  [| e' |] "len" builder
-      | SCall (f, args) ->
-         let (fdef, fdecl) = StringMap.find f function_decls in
-           let llargs = List.rev (List.map (expr builder) (List.rev args)) in
-           let result = (match fdecl.styp with 
-              A.Void -> ""
-             | _ -> f ^ "_result") in
-           L.build_call fdef (Array.of_list llargs) result builder
     in
 
   (* Create a map of global variables after creating each *)

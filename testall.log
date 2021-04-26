@@ -272,6 +272,14 @@ cc -o test-func4.exe test-func4.s
 diff -b test-func4.out tests/test-func4.out > test-func4.diff
 ###### SUCCESS
 
+###### Testing test-function-call-nesting
+./compyled.native tests/test-function-call-nesting.cp > test-function-call-nesting.ll
+llc -relocation-model=pic test-function-call-nesting.ll > test-function-call-nesting.s
+cc -o test-function-call-nesting.exe test-function-call-nesting.s
+./test-function-call-nesting.exe
+diff -b test-function-call-nesting.out tests/test-function-call-nesting.out > test-function-call-nesting.diff
+###### SUCCESS
+
 ###### Testing test-hello-world
 ./compyled.native tests/test-hello-world.cp > test-hello-world.ll
 llc -relocation-model=pic test-hello-world.ll > test-hello-world.s
@@ -400,6 +408,30 @@ cc -o test-not2.exe test-not2.s
 diff -b test-not2.out tests/test-not2.out > test-not2.diff
 ###### SUCCESS
 
+###### Testing test-reverse-function-call-nesting
+./compyled.native tests/test-reverse-function-call-nesting.cp > test-reverse-function-call-nesting.ll
+llc -relocation-model=pic test-reverse-function-call-nesting.ll > test-reverse-function-call-nesting.s
+cc -o test-reverse-function-call-nesting.exe test-reverse-function-call-nesting.s
+./test-reverse-function-call-nesting.exe
+diff -b test-reverse-function-call-nesting.out tests/test-reverse-function-call-nesting.out > test-reverse-function-call-nesting.diff
+###### SUCCESS
+
+###### Testing test-var-decl-in-func
+./compyled.native tests/test-var-decl-in-func.cp > test-var-decl-in-func.ll
+llc -relocation-model=pic test-var-decl-in-func.ll > test-var-decl-in-func.s
+cc -o test-var-decl-in-func.exe test-var-decl-in-func.s
+./test-var-decl-in-func.exe
+diff -b test-var-decl-in-func.out tests/test-var-decl-in-func.out > test-var-decl-in-func.diff
+###### SUCCESS
+
+###### Testing test-var-decl-in-func2
+./compyled.native tests/test-var-decl-in-func2.cp > test-var-decl-in-func2.ll
+llc -relocation-model=pic test-var-decl-in-func2.ll > test-var-decl-in-func2.s
+cc -o test-var-decl-in-func2.exe test-var-decl-in-func2.s
+./test-var-decl-in-func2.exe
+diff -b test-var-decl-in-func2.out tests/test-var-decl-in-func2.out > test-var-decl-in-func2.diff
+###### SUCCESS
+
 ###### Testing test-while1
 ./compyled.native tests/test-while1.cp > test-while1.ll
 llc -relocation-model=pic test-while1.ll > test-while1.s
@@ -426,6 +458,26 @@ diff -b fail-assign2.err tests/fail-assign2.err > fail-assign2.diff
 ###### Testing fail-assign3
 ./compyled.native < tests/fail-assign3.cp 2> fail-assign3.err >> testall.log
 diff -b fail-assign3.err tests/fail-assign3.err > fail-assign3.diff
+###### SUCCESS
+
+###### Testing fail-assign4
+./compyled.native < tests/fail-assign4.cp 2> fail-assign4.err >> testall.log
+diff -b fail-assign4.err tests/fail-assign4.err > fail-assign4.diff
+###### SUCCESS
+
+###### Testing fail-divide-int-float
+./compyled.native < tests/fail-divide-int-float.cp 2> fail-divide-int-float.err >> testall.log
+diff -b fail-divide-int-float.err tests/fail-divide-int-float.err > fail-divide-int-float.diff
+###### SUCCESS
+
+###### Testing fail-duplicate-func-name
+./compyled.native < tests/fail-duplicate-func-name.cp 2> fail-duplicate-func-name.err >> testall.log
+diff -b fail-duplicate-func-name.err tests/fail-duplicate-func-name.err > fail-duplicate-func-name.diff
+###### SUCCESS
+
+###### Testing fail-duplicate-var-name
+./compyled.native < tests/fail-duplicate-var-name.cp 2> fail-duplicate-var-name.err >> testall.log
+diff -b fail-duplicate-var-name.err tests/fail-duplicate-var-name.err > fail-duplicate-var-name.diff
 ###### SUCCESS
 
 ###### Testing fail-expr1
@@ -466,6 +518,16 @@ diff -b fail-initialize1.err tests/fail-initialize1.err > fail-initialize1.diff
 ###### Testing fail-initialize2
 ./compyled.native < tests/fail-initialize2.cp 2> fail-initialize2.err >> testall.log
 diff -b fail-initialize2.err tests/fail-initialize2.err > fail-initialize2.diff
+###### SUCCESS
+
+###### Testing fail-return-no-func
+./compyled.native < tests/fail-return-no-func.cp 2> fail-return-no-func.err >> testall.log
+diff -b fail-return-no-func.err tests/fail-return-no-func.err > fail-return-no-func.diff
+###### SUCCESS
+
+###### Testing fail-return-wrong-func-type
+./compyled.native < tests/fail-return-wrong-func-type.cp 2> fail-return-wrong-func-type.err >> testall.log
+diff -b fail-return-wrong-func-type.err tests/fail-return-wrong-func-type.err > fail-return-wrong-func-type.diff
 ###### SUCCESS
 
 ###### Testing fail-return1

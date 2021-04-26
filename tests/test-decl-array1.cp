@@ -1,0 +1,1 @@
+array x [int 3];

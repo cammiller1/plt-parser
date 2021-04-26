@@ -9,10 +9,13 @@ and sx =
   | SLitf of string
   | SLitb of bool
   | SLits of string
+  | SLitArray of typ * int  (* this will be an interesting case *)
+  | SAssign of string * sexpr
+  | SArrayIndexAssign of string * int * sexpr
+  | SArrayIndexAccess of string * int
   | SId of string
   | SBinop of sexpr * operator * sexpr
   | SUniop of unary_operator * sexpr
-  | SAssign of string * sexpr
   | SCall of string * sexpr list
   | SNoexpr
 
@@ -47,11 +50,14 @@ let rec string_of_sexpr (t, e) =
   | SLitb(true) -> "True"
   | SLitb(false) -> "False"
   | SLits(l) -> l
+  | SLitArray(t, size) -> "an array"  (* TODO: make me better *)
   | SId(s) -> s
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUniop(o, e) -> string_of_uop o ^ string_of_sexpr e
   | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
+  | SArrayIndexAssign(s, i, e) -> "an array assignment"  (* TODO: make me better *)
+  | SArrayIndexAccess(s, i) -> "an array access"  (* TODO: make me better *)
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""

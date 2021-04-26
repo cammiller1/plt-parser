@@ -64,12 +64,54 @@ cc -o test-arithm-int-sub.exe test-arithm-int-sub.s
 diff -b test-arithm-int-sub.out tests/test-arithm-int-sub.out > test-arithm-int-sub.diff
 ###### SUCCESS
 
+###### Testing test-array-decl-in-func1
+./compyled.native tests/test-array-decl-in-func1.cp > test-array-decl-in-func1.ll
+llc -relocation-model=pic test-array-decl-in-func1.ll > test-array-decl-in-func1.s
+cc -o test-array-decl-in-func1.exe test-array-decl-in-func1.s
+./test-array-decl-in-func1.exe
+diff -b test-array-decl-in-func1.out tests/test-array-decl-in-func1.out > test-array-decl-in-func1.diff
+###### SUCCESS
+
+###### Testing test-array-index-assign1
+./compyled.native tests/test-array-index-assign1.cp > test-array-index-assign1.ll
+llc -relocation-model=pic test-array-index-assign1.ll > test-array-index-assign1.s
+cc -o test-array-index-assign1.exe test-array-index-assign1.s
+./test-array-index-assign1.exe
+diff -b test-array-index-assign1.out tests/test-array-index-assign1.out > test-array-index-assign1.diff
+###### SUCCESS
+
+###### Testing test-array-index-assign2
+./compyled.native tests/test-array-index-assign2.cp > test-array-index-assign2.ll
+llc -relocation-model=pic test-array-index-assign2.ll > test-array-index-assign2.s
+cc -o test-array-index-assign2.exe test-array-index-assign2.s
+./test-array-index-assign2.exe
+diff -b test-array-index-assign2.out tests/test-array-index-assign2.out > test-array-index-assign2.diff
+FAILED test-array-index-assign2.out differs from tests/test-array-index-assign2.out
+###### FAILED
+
+###### Testing test-array-index-assign3
+./compyled.native tests/test-array-index-assign3.cp > test-array-index-assign3.ll
+llc -relocation-model=pic test-array-index-assign3.ll > test-array-index-assign3.s
+cc -o test-array-index-assign3.exe test-array-index-assign3.s
+./test-array-index-assign3.exe
+diff -b test-array-index-assign3.out tests/test-array-index-assign3.out > test-array-index-assign3.diff
+FAILED test-array-index-assign3.out differs from tests/test-array-index-assign3.out
+###### FAILED
+
 ###### Testing test-assign-arithm-add
 ./compyled.native tests/test-assign-arithm-add.cp > test-assign-arithm-add.ll
 llc -relocation-model=pic test-assign-arithm-add.ll > test-assign-arithm-add.s
 cc -o test-assign-arithm-add.exe test-assign-arithm-add.s
 ./test-assign-arithm-add.exe
 diff -b test-assign-arithm-add.out tests/test-assign-arithm-add.out > test-assign-arithm-add.diff
+###### SUCCESS
+
+###### Testing test-assign-var-to-index-access
+./compyled.native tests/test-assign-var-to-index-access.cp > test-assign-var-to-index-access.ll
+llc -relocation-model=pic test-assign-var-to-index-access.ll > test-assign-var-to-index-access.s
+cc -o test-assign-var-to-index-access.exe test-assign-var-to-index-access.s
+./test-assign-var-to-index-access.exe
+diff -b test-assign-var-to-index-access.out tests/test-assign-var-to-index-access.out > test-assign-var-to-index-access.diff
 ###### SUCCESS
 
 ###### Testing test-assign1
@@ -86,6 +128,22 @@ llc -relocation-model=pic test-assign2.ll > test-assign2.s
 cc -o test-assign2.exe test-assign2.s
 ./test-assign2.exe
 diff -b test-assign2.out tests/test-assign2.out > test-assign2.diff
+###### SUCCESS
+
+###### Testing test-decl-array1
+./compyled.native tests/test-decl-array1.cp > test-decl-array1.ll
+llc -relocation-model=pic test-decl-array1.ll > test-decl-array1.s
+cc -o test-decl-array1.exe test-decl-array1.s
+./test-decl-array1.exe
+diff -b test-decl-array1.out tests/test-decl-array1.out > test-decl-array1.diff
+###### SUCCESS
+
+###### Testing test-decl-string1
+./compyled.native tests/test-decl-string1.cp > test-decl-string1.ll
+llc -relocation-model=pic test-decl-string1.ll > test-decl-string1.s
+cc -o test-decl-string1.exe test-decl-string1.s
+./test-decl-string1.exe
+diff -b test-decl-string1.out tests/test-decl-string1.out > test-decl-string1.diff
 ###### SUCCESS
 
 ###### Testing test-decl1
@@ -294,6 +352,11 @@ llc -relocation-model=pic test-while1.ll > test-while1.s
 cc -o test-while1.exe test-while1.s
 ./test-while1.exe
 diff -b test-while1.out tests/test-while1.out > test-while1.diff
+###### SUCCESS
+
+###### Testing fail-assign-array-index1
+./compyled.native < tests/fail-assign-array-index1.cp 2> fail-assign-array-index1.err >> testall.log
+diff -b fail-assign-array-index1.err tests/fail-assign-array-index1.err > fail-assign-array-index1.diff
 ###### SUCCESS
 
 ###### Testing fail-assign1

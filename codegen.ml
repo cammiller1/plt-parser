@@ -29,6 +29,7 @@ let translate (globals, functions, statements) =
   and float_t    = L.double_type    context  (* double/float type *)
   and void_t     = L.void_type      context   (* void type *)
   and string_t   = L.pointer_type   (L.i8_type context)      (* pointer type to char *)
+  (* and array_t    = L.array_type     (L.i32_type context) *)
   in
 
   (* Return the LLVM type for a complyed type *)
@@ -37,7 +38,8 @@ let translate (globals, functions, statements) =
     | A.Boolean  -> i1_t
     | A.Float -> float_t
     | A.Void  -> void_t
-    | A.String -> string_t (* added for our project *)
+    | A.String -> string_t
+    (* | A.Array -> array_t *)
   in
 
 
@@ -54,9 +56,6 @@ let translate (globals, functions, statements) =
   let main_t : L.lltype = 
       (* the [| and |] indicates an Ocaml array*)
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
-  (*  (* below LLVM's connection to a built-in function *)
-  let main_func : L.llvalue = 
-      L.declare_function "main" printf_t the_module in *)
 
 
   (* Define each function (arguments and return type) so we can 
@@ -129,9 +128,16 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.Int -> L.const_int (ltype_of_typ t) 0
             | A.Boolean -> L.const_int (ltype_of_typ t) 0
             | A.String -> L.const_pointer_null (ltype_of_typ t)
+            (* arrays should never match here *)
           )
+        | (A.Array, _) -> (match snd se with
+                    SLitArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n builder
+                  )
+                  (* L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) n builder ) *)
         | _ -> expr se
-      in StringMap.add n (L.define_global n init the_module) m in
+      in if t = A.Array then (StringMap.add n (init) m) else (StringMap.add n (L.define_global n init the_module) m)
+      in
+      (* StringMap.add n (L.define_global n init the_module) m in *)
     List.fold_left global_var StringMap.empty globals in
 
   (* Create a map of global variables after creating each *)
@@ -140,8 +146,6 @@ let rec expr ((_, e) : sexpr) = match e with
       let atype = t
       in StringMap.add n t m in
     List.fold_left global_var StringMap.empty globals in
-
-
 
 
   (******** BUILD FUNCTIONS ************)
@@ -164,7 +168,6 @@ let rec expr ((_, e) : sexpr) = match e with
       | SLitf l -> L.const_float_of_string float_t l
       | SLits s -> L.build_global_stringptr s "str" f_builder
       | SNoexpr     -> L.const_int i32_t 0
-      (* | SId s       -> L.build_load (lookup s) s f_builder *)
       | SAssign (s, e) -> expr e
 
   in
@@ -181,11 +184,16 @@ let rec expr ((_, e) : sexpr) = match e with
 
       (* Allocate space for any locally declared variables and add the
        * resulting registers to our map *)
-      and add_local m (t, n, se) =
-        L.set_value_name n (expr se);
-        let local_var = L.build_alloca (ltype_of_typ t) n f_builder
-          in ignore (L.build_store (expr se) local_var f_builder);
+      and add_local m (t, n, se) = 
+        let local_var = match se with 
+            (A.Void, _) -> L.build_alloca (ltype_of_typ t) n f_builder
+          | (A.Array, _) -> (match snd se with
+                    SLitArray(ty, size) -> L.build_array_alloca (ltype_of_typ ty) (L.const_int i32_t size) n f_builder
+                  )
+          | _ -> L.build_alloca (ltype_of_typ t) n f_builder
+        in if t <> A.Array then ignore (L.build_store (expr se) local_var f_builder);
         StringMap.add n local_var m 
+
       in
 
       let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
@@ -225,6 +233,16 @@ let rec expr ((_, e) : sexpr) = match e with
       | SId s       -> L.build_load (lookup s) s f_builder
       | SAssign (s, e) -> let e' = expr f_builder e in
                           ignore(L.build_store e' (lookup s) f_builder); e'
+      | SArrayIndexAssign (s, idx, e) -> 
+                          let e' = expr builder e
+                          in
+                          let element_ptr = L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder and
+                          e' = e'
+                        in
+                          ignore(L.build_store e' element_ptr builder); e'
+      | SArrayIndexAccess (s, idx) -> 
+                    let element_ptr = L.build_load(L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder) "" builder
+                    in element_ptr
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
         let e1' = expr f_builder e1
         and e2' = expr f_builder e2 in
@@ -395,6 +413,16 @@ let rec expr ((_, e) : sexpr) = match e with
       | SId s       -> L.build_load (lookup s) s builder
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
+      | SArrayIndexAssign (s, idx, e) -> 
+                          let e' = expr builder e
+                          in
+                          let element_ptr = L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder and
+                          e' = e'
+                        in
+                          ignore(L.build_store e' element_ptr builder); e'
+      | SArrayIndexAccess (s, idx) -> 
+                    let element_ptr = L.build_load(L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder) "" builder
+                    in element_ptr
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
         let e1' = expr builder e1
         and e2' = expr builder e2 in
@@ -448,6 +476,9 @@ let rec expr ((_, e) : sexpr) = match e with
                     | A.String  -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
                     | _ -> raise (Failure "invalid argument called on the print function")
                 )
+            | (A.Int, SArrayIndexAccess (s, i)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
+            | (A.Float, SArrayIndexAccess (s, i)) -> L.build_call printf_func [| float_format_str ; e' |] "printf" builder
+            | (A.String, SArrayIndexAccess (s, i)) -> L.build_call printf_func [| string_format_str ; e' |] "printf" builder
             | (_, SBinop ((A.Float,_ ) as e1, op, e2)) ->  L.build_call printf_func [| float_format_str ; e' |] "printf" builder
             | (_, SBinop (e1, op, e2)) ->  L.build_call printf_func [| int_format_str ; e' |] "printf" builder
             | (_, SCall(f, args)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder

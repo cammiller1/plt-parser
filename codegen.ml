@@ -518,12 +518,7 @@ let rec expr ((_, e) : sexpr) = match e with
      let rec stmt builder = function
         SBlock sl -> List.fold_left stmt builder sl
         | SExpr e -> ignore(expr builder e); builder
-        (* | SReturn e -> ignore(match fdecl.styp with
-                              (* Special "return nothing" instr *)
-                              A.Void -> L.build_ret_void builder 
-                              (* Build return statement *)
-                            | _ -> L.build_ret (expr builder e) builder );
-                     builder *)
+        | SReturn e -> raise (Failure "Return should not be specified without a function defintion")
         | SIf (predicate, then_stmt, else_stmt) ->
          let bool_val = expr builder predicate in
          let merge_bb = L.append_block context "merge" the_function in

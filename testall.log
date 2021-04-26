@@ -428,6 +428,16 @@ diff -b fail-assign2.err tests/fail-assign2.err > fail-assign2.diff
 diff -b fail-assign3.err tests/fail-assign3.err > fail-assign3.diff
 ###### SUCCESS
 
+###### Testing fail-assign4
+./compyled.native < tests/fail-assign4.cp 2> fail-assign4.err >> testall.log
+diff -b fail-assign4.err tests/fail-assign4.err > fail-assign4.diff
+###### SUCCESS
+
+###### Testing fail-divide-int-float
+./compyled.native < tests/fail-divide-int-float.cp 2> fail-divide-int-float.err >> testall.log
+diff -b fail-divide-int-float.err tests/fail-divide-int-float.err > fail-divide-int-float.diff
+###### SUCCESS
+
 ###### Testing fail-expr1
 ./compyled.native < tests/fail-expr1.cp 2> fail-expr1.err >> testall.log
 diff -b fail-expr1.err tests/fail-expr1.err > fail-expr1.diff
@@ -466,6 +476,11 @@ diff -b fail-initialize1.err tests/fail-initialize1.err > fail-initialize1.diff
 ###### Testing fail-initialize2
 ./compyled.native < tests/fail-initialize2.cp 2> fail-initialize2.err >> testall.log
 diff -b fail-initialize2.err tests/fail-initialize2.err > fail-initialize2.diff
+###### SUCCESS
+
+###### Testing fail-return-no-func
+./compyled.native < tests/fail-return-no-func.cp 2> fail-return-no-func.err >> testall.log
+diff -b fail-return-no-func.err tests/fail-return-no-func.err > fail-return-no-func.diff
 ###### SUCCESS
 
 ###### Testing fail-return1

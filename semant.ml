@@ -133,7 +133,7 @@ let check (globals, functions, statements) =
     in List.fold_left add_bind built_in_decls1 [ ("string_concat", String); ]
   in
 
-  let built_in_decls3 = 
+  (* let built_in_decls3 = 
     let add_bind map (name, ty) = StringMap.add name {
       typ = Boolean;
       fname = name; 
@@ -141,7 +141,7 @@ let check (globals, functions, statements) =
       locals = [];
       body = [] } map 
     in List.fold_left add_bind built_in_decls2 [ ("string_equality", String) ]
-  in
+  in *)
 
   let built_in_decls = 
     let add_bind map (name, ty) = StringMap.add name {
@@ -150,7 +150,7 @@ let check (globals, functions, statements) =
       formals = [(ty, "x", Noexpr)];
       locals = [];
       body = [] } map 
-    in List.fold_left add_bind built_in_decls3 [ ("len", String); ]
+    in List.fold_left add_bind built_in_decls2 [ ("len", String); ]
   in
 
   

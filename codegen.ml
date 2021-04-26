@@ -127,15 +127,60 @@ let translate (globals, functions, statements) =
 
 
 (********* THIS EXPR BUILDER IS SOLELY FOR VARIABLE INITIALIZATION!!!! ******)
-let rec expr ((_, e) : sexpr) = match e with
-    SLiti i  -> L.const_int i32_t i
-  | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
-  | SLitf l -> L.const_float_of_string float_t l
-  | SLits s -> L.build_global_stringptr s "str" builder
-  | SNoexpr     -> L.const_int i32_t 0
-  | SAssign (s, e) -> expr e
-
-  in
+let rec expr builder ((_, e) : sexpr) = match e with
+        SLiti i  -> L.const_int i32_t i
+      | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
+      | SLitf l -> L.const_float_of_string float_t l
+      | SLits s -> L.build_global_stringptr s "str" builder
+      | SNoexpr     -> L.const_int i32_t 0
+      | SBinop ((A.Float,_ ) as e1, op, e2) ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+          (match op with 
+              A.Add     -> L.build_fadd
+            | A.Sub     -> L.build_fsub
+            | A.Mul    -> L.build_fmul
+            | A.Div     -> L.build_fdiv 
+            | A.Mod     -> L.build_urem
+            | A.Eq   -> L.build_fcmp L.Fcmp.Oeq
+            | A.Ne     -> L.build_fcmp L.Fcmp.One
+            | A.Lt    -> L.build_fcmp L.Fcmp.Olt
+            | A.Lte     -> L.build_fcmp L.Fcmp.Ole
+            | A.Gt -> L.build_fcmp L.Fcmp.Ogt
+            | A.Gte     -> L.build_fcmp L.Fcmp.Oge
+            | A.And | A.Or ->
+                raise (Failure "internal error: semant should have rejected and/or on float")
+            ) e1' e2' "tmp" builder
+      | SBinop (e1, op, e2) ->
+            let e1' = expr builder e1
+            and e2' = expr builder e2 in
+            (match op with
+              A.Add     -> L.build_add
+            | A.Sub     -> L.build_sub
+            | A.Mul    -> L.build_mul
+            | A.Div     -> L.build_sdiv
+            | A.Mod     -> L.build_urem
+            | A.And     -> L.build_and
+            | A.Or      -> L.build_or
+            | A.Eq   -> L.build_icmp L.Icmp.Eq
+            | A.Ne     -> L.build_icmp L.Icmp.Ne
+            | A.Lt    -> L.build_icmp L.Icmp.Slt
+            | A.Lte     -> L.build_icmp L.Icmp.Sle
+            | A.Gt -> L.build_icmp L.Icmp.Sgt
+            | A.Gte     -> L.build_icmp L.Icmp.Sge
+          ) e1' e2' "tmp" builder
+      | SUniop(op, ((t, _) as e)) ->
+          let e' = expr builder e in
+        (match op with
+            A.Not -> L.build_not) e' "tmp" builder
+      | SCall (f, args) ->
+         let (fdef, fdecl) = StringMap.find f function_decls in
+           let llargs = List.rev (List.map (expr builder) (List.rev args)) in
+           let result = (match fdecl.styp with 
+              A.Void -> ""
+             | _ -> f ^ "_result") in
+           L.build_call fdef (Array.of_list llargs) result builder
+    in
 
   (* Create a map of global variables after creating each *)
   let global_vars : L.llvalue StringMap.t =
@@ -143,26 +188,46 @@ let rec expr ((_, e) : sexpr) = match e with
       let init = match se with
         (A.Void, _) ->  (
             match t with
-              A.Float -> L.const_float (ltype_of_typ t) 0.0
-            | A.Int -> L.const_int (ltype_of_typ t) 0
-            | A.Boolean -> L.const_int (ltype_of_typ t) 0
-            | A.String -> L.const_pointer_null (ltype_of_typ t)
+              A.Float -> L.build_alloca (ltype_of_typ t) n builder;
+            | A.Int -> L.build_alloca (ltype_of_typ t) n builder; 
+            | A.Boolean -> L.build_alloca (ltype_of_typ t) n builder;
+            | A.String -> L.build_alloca (ltype_of_typ t) n builder;
           )
         | (A.Array, _) -> (match snd se with
-                    SLitArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (expr size) n builder
+                    SLitArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (expr builder size) n builder
                   )
                   (* L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) n builder ) *)
-        | _ -> expr se
-      in if t = A.Array then (StringMap.add n (init) m) else (StringMap.add n (L.define_global n init the_module) m)
-      in
+        | _ -> L.build_alloca (ltype_of_typ t) n builder
+      in let (ty, s) = se
+      in if t <> A.Array && ty <> A.Void then ignore (L.build_store (expr builder se) init builder) 
+        else if ty = A.Void && (t == A.Int || t = A.Boolean) then ignore (L.build_store (L.const_int (ltype_of_typ t) 0) init builder)
+        else if ty = A.Void && t == A.Float then ignore (L.build_store (L.const_float (ltype_of_typ t) 0.0) init builder)
+        else if ty = A.Void && t == A.String then ignore (L.build_store (L.const_pointer_null (ltype_of_typ t)) init builder);
+      StringMap.add n init m
+    in
+
     List.fold_left global_var StringMap.empty globals in
 
+
+
+
+  (* in ignore(L.build_store (expr builder se) init builder); StringMap.add n (init) m *)
   (* Create a map of global variables after creating each *)
   let global_var_types : A.typ StringMap.t =
     let global_var m (t, n, se) = 
       let atype = t
       in StringMap.add n t m in
     List.fold_left global_var StringMap.empty globals in
+
+
+  let global_arrays = List.find_all (fun (ty, name, e) -> ty = A.Array) globals
+
+  in
+    
+    let array_symbols = List.fold_left (fun m (ty, name, e) -> match e with
+         (_, SLitArray(t, size)) -> StringMap.add name t m)
+                  StringMap.empty global_arrays
+    in
 
 
 
@@ -444,6 +509,11 @@ let rec expr ((_, e) : sexpr) = match e with
                    with Not_found -> raise (Failure "global variable not found")
     in
 
+    let find_array_type n = try StringMap.find n array_symbols
+                   with Not_found -> raise (Failure "array type not found")
+    in
+    
+
     let find_type n = try StringMap.find n global_var_types
                    with Not_found -> raise (Failure "global variable type not found")
     in
@@ -461,14 +531,19 @@ let rec expr ((_, e) : sexpr) = match e with
       | SId s           -> L.build_load (lookup s) s builder
       | SAssign (s, e)  -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
+      | SAssign (s, (ty, SArrayIndexAssign (nam, idx, e))) -> 
+                          let e' = expr builder e and
+                          indx = expr builder idx in
+                          let element_ptr = L.build_gep (lookup nam) [| indx |] "" builder
+                          in
+                          ignore(L.build_store e' element_ptr builder); e'
       | SArrayIndexAssign (s, idx, e) -> 
                           let e' = expr builder e and
                           indx = expr builder idx
                           in
                           let element_ptr = L.build_gep (lookup s) [| indx |] "" builder and
                           e' = e'
-                        in
-                          ignore(L.build_store e' element_ptr builder); e'
+                        in  ignore(L.build_store e' element_ptr builder); e'
       | SArrayIndexAccess (s, idx) -> 
                     let indx = expr builder idx in
                     let element_ptr = L.build_load(L.build_gep (lookup s) [| indx |] "" builder) "" builder

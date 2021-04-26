@@ -14,7 +14,7 @@ let trd (_,_,c) = c;;
 %token INT FLOAT BOOL STRING VOID ARRAY
 /* operators */
 %token ASSIGN PLUS MINUS TIMES DIVIDE
-%token EXP SEMC PP MM
+%token SEMC
 %token LBRACKET RBRACKET
 /* comparators */
 %token LT GT LTE GTE EQ NE AND OR MOD NOT IN
@@ -38,8 +38,7 @@ let trd (_,_,c) = c;;
 %left EQ NE
 %left LT GT LTE GTE 
 %left PLUS MINUS
-%left TIMES DIVIDE MOD EXP
-%left PP MM
+%left TIMES DIVIDE MOD
 %right NOT
 
 %start program  /* the entry point */
@@ -138,7 +137,6 @@ expr:
   | expr DIVIDE expr   { Binop($1, Div, $3) }
   | expr LT expr       { Binop($1, Lt, $3) }
   | expr GT expr       { Binop($1, Gt, $3) }
-  | expr EXP expr      { Binop($1, Exp, $3) }
   | expr MOD expr      { Binop($1, Mod, $3) }
   | expr LTE expr      { Binop($1, Lte, $3) }
   | expr GTE expr      { Binop($1, Gte, $3) }

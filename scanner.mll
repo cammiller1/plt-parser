@@ -28,12 +28,9 @@ rule tokenize = parse
 | ">="     { GTE }
 | "not"	   { NOT }
 | "!="     { NE }
-| "**"     { EXP }
 | "and"    { AND }
 | "or"     { OR }
 | "in"	   { IN }
-| "++"     { PP }
-| "--"     { MM }
 | '%'      { MOD }
 | '>'      { GT }
 | '<'      { LT }

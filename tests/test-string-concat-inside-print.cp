@@ -6,4 +6,4 @@ s1 = "hello ";
 string s2;
 s2 = " world!";
 
-print(s1 & s2);
+print(s1 + s2);

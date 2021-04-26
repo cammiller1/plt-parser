@@ -1,7 +1,7 @@
 (* open Printf *)
 
 type operator = Add | Sub | Mul | Div | Seq | Lt | Gt | Exp | Mod | Lte | Gte
-			| Eq | Ne | And | Or | Concat
+			| Eq | Ne | And | Or
 
 type unary_operator = Pp | Mm | Not
 
@@ -45,7 +45,6 @@ type program = bind list * func_decl list * stmt list
 
 let string_of_op = function
     Add -> "+"
-  | Concat -> "&"
   | Sub -> "-"
   | Mul -> "*"
   | Div -> "/"

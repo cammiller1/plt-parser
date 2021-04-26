@@ -7,6 +7,6 @@ string s2;
 s2 = " world!";
 
 string s3;
-s3 = s1 & s2;
+s3 = s1 + s2;
 
 print(s3);

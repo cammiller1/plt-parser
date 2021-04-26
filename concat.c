@@ -15,3 +15,7 @@ char *string_concat(const char *s1, const char *s2)
     strcat(result, s2);
     return result;
 }
+
+int len(const char *s) {
+    return strlen(s);
+}

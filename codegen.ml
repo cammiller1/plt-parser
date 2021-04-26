@@ -1,3 +1,4 @@
+
 (* Code generation: translate takes a semantically checked AST and
 produces LLVM IR
 *)
@@ -51,6 +52,25 @@ let translate (globals, functions, statements) =
     (* below LLVM's connection to a built-in function *)
   let printf_func : L.llvalue = 
       L.declare_function "printf" printf_t the_module in
+
+  (* BUILTIN BEGIN *)
+
+  let string_concat_t : L.lltype =
+    L.function_type string_t [| string_t; string_t |] in
+  let string_concat_f : L.llvalue =
+    L.declare_function "string_concat" string_concat_t the_module in
+
+  (* let string_equality_t : L.lltype =
+    L.function_type string_t [| string_t; string_t |] in
+  let string_equality_f : L.llvalue =
+    L.declare_function "string_equality" string_equality_t the_module in *)
+
+  let len_t : L.lltype =
+    L.function_type i32_t [| string_t |] in
+  let len_f : L.llvalue =
+    L.declare_function "len" len_t the_module in
+
+  (* BUILTIN END *)
 
   (* create fake main function *)
   let main_t : L.lltype = 
@@ -132,6 +152,12 @@ let rec expr builder ((_, e) : sexpr) = match e with
             | A.And | A.Or ->
                 raise (Failure "internal error: semant should have rejected and/or on float")
             ) e1' e2' "tmp" builder
+      | SBinop ((A.String,_ ) as e1, op, e2) ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+        (match op with
+           A.Add  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder)
+         (* | A.Eq   -> L.build_call string_equality_f [| e1'; e2' |] "string_equality" builder) *)
       | SBinop (e1, op, e2) ->
             let e1' = expr builder e1
             and e2' = expr builder e2 in
@@ -154,6 +180,9 @@ let rec expr builder ((_, e) : sexpr) = match e with
           let e' = expr builder e in
         (match op with
             A.Not -> L.build_not) e' "tmp" builder
+      | SCall ("len", [e]) -> 
+        let e' = expr builder e in
+        L.build_call len_f  [| e' |] "len" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
            let llargs = List.rev (List.map (expr builder) (List.rev args)) in
@@ -347,6 +376,12 @@ let rec expr builder ((_, e) : sexpr) = match e with
             | A.Gt -> L.build_icmp L.Icmp.Sgt
             | A.Gte     -> L.build_icmp L.Icmp.Sge
           ) e1' e2' "tmp" f_builder
+      | SBinop ((A.String,_ ) as e1, op, e2) ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+        (match op with
+           A.Add  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder)
+         (* | A.Eq   -> L.build_call string_equality_f [| e1'; e2' |] "string_equality" builder) *)
       | SUniop(op, ((t, _) as e)) ->
           let e' = expr f_builder e in
         (match op with
@@ -371,6 +406,9 @@ let rec expr builder ((_, e) : sexpr) = match e with
             | (_, SCall(f, args)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" f_builder
             | (_,_) ->  raise (Failure "invalid argument called on the print function")
           )
+      | SCall ("len", [e]) -> 
+        let e' = expr builder e in
+        L.build_call len_f  [| e' |] "len" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
            let llargs = List.rev (List.map (expr f_builder) (List.rev args)) in
@@ -529,6 +567,12 @@ let rec expr builder ((_, e) : sexpr) = match e with
             | A.And | A.Or ->
                 raise (Failure "internal error: semant should have rejected and/or on float")
             ) e1' e2' "tmp" builder
+      | SBinop ((A.String,_ ) as e1, op, e2) ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+        (match op with
+           A.Add  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder)
+         (* | A.Eq   -> L.build_call string_equality_f [| e1'; e2' |] "string_equality" builder) *)
       | SBinop (e1, op, e2) ->
             let e1' = expr builder e1
             and e2' = expr builder e2 in
@@ -574,6 +618,9 @@ let rec expr builder ((_, e) : sexpr) = match e with
             | (_, SCall(f, args)) -> L.build_call printf_func [| int_format_str ; e' |] "printf" builder
             | (_,_) ->  raise (Failure "invalid argument called on the print function")
           )
+      | SCall ("len", [e]) -> 
+        let e' = expr builder e in
+        L.build_call len_f  [| e' |] "len" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
            let llargs = List.rev (List.map (expr builder) (List.rev args)) in
@@ -645,3 +692,4 @@ let rec expr builder ((_, e) : sexpr) = match e with
 
     (List.iter build_function_body functions, build_statements statements);
     the_module  (* return the LLVM module result *)
+    

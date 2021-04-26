@@ -1,0 +1,576 @@
+/usr/bin/lli
+
+###### Testing test-arithm-float-add
+./compyled.native tests/test-arithm-float-add.cp > test-arithm-float-add.ll
+llc -relocation-model=pic test-arithm-float-add.ll > test-arithm-float-add.s
+cc -o test-arithm-float-add.exe test-arithm-float-add.s
+./test-arithm-float-add.exe
+diff -b test-arithm-float-add.out tests/test-arithm-float-add.out > test-arithm-float-add.diff
+###### SUCCESS
+
+###### Testing test-arithm-float-divide
+./compyled.native tests/test-arithm-float-divide.cp > test-arithm-float-divide.ll
+llc -relocation-model=pic test-arithm-float-divide.ll > test-arithm-float-divide.s
+cc -o test-arithm-float-divide.exe test-arithm-float-divide.s
+./test-arithm-float-divide.exe
+diff -b test-arithm-float-divide.out tests/test-arithm-float-divide.out > test-arithm-float-divide.diff
+###### SUCCESS
+
+###### Testing test-arithm-float-multiply
+./compyled.native tests/test-arithm-float-multiply.cp > test-arithm-float-multiply.ll
+llc -relocation-model=pic test-arithm-float-multiply.ll > test-arithm-float-multiply.s
+cc -o test-arithm-float-multiply.exe test-arithm-float-multiply.s
+./test-arithm-float-multiply.exe
+diff -b test-arithm-float-multiply.out tests/test-arithm-float-multiply.out > test-arithm-float-multiply.diff
+###### SUCCESS
+
+###### Testing test-arithm-float-sub
+./compyled.native tests/test-arithm-float-sub.cp > test-arithm-float-sub.ll
+llc -relocation-model=pic test-arithm-float-sub.ll > test-arithm-float-sub.s
+cc -o test-arithm-float-sub.exe test-arithm-float-sub.s
+./test-arithm-float-sub.exe
+diff -b test-arithm-float-sub.out tests/test-arithm-float-sub.out > test-arithm-float-sub.diff
+###### SUCCESS
+
+###### Testing test-arithm-int-add
+./compyled.native tests/test-arithm-int-add.cp > test-arithm-int-add.ll
+llc -relocation-model=pic test-arithm-int-add.ll > test-arithm-int-add.s
+cc -o test-arithm-int-add.exe test-arithm-int-add.s
+./test-arithm-int-add.exe
+diff -b test-arithm-int-add.out tests/test-arithm-int-add.out > test-arithm-int-add.diff
+###### SUCCESS
+
+###### Testing test-arithm-int-divide
+./compyled.native tests/test-arithm-int-divide.cp > test-arithm-int-divide.ll
+llc -relocation-model=pic test-arithm-int-divide.ll > test-arithm-int-divide.s
+cc -o test-arithm-int-divide.exe test-arithm-int-divide.s
+./test-arithm-int-divide.exe
+diff -b test-arithm-int-divide.out tests/test-arithm-int-divide.out > test-arithm-int-divide.diff
+###### SUCCESS
+
+###### Testing test-arithm-int-multiply
+./compyled.native tests/test-arithm-int-multiply.cp > test-arithm-int-multiply.ll
+llc -relocation-model=pic test-arithm-int-multiply.ll > test-arithm-int-multiply.s
+cc -o test-arithm-int-multiply.exe test-arithm-int-multiply.s
+./test-arithm-int-multiply.exe
+diff -b test-arithm-int-multiply.out tests/test-arithm-int-multiply.out > test-arithm-int-multiply.diff
+###### SUCCESS
+
+###### Testing test-arithm-int-sub
+./compyled.native tests/test-arithm-int-sub.cp > test-arithm-int-sub.ll
+llc -relocation-model=pic test-arithm-int-sub.ll > test-arithm-int-sub.s
+cc -o test-arithm-int-sub.exe test-arithm-int-sub.s
+./test-arithm-int-sub.exe
+diff -b test-arithm-int-sub.out tests/test-arithm-int-sub.out > test-arithm-int-sub.diff
+###### SUCCESS
+
+###### Testing test-array-decl-in-func1
+./compyled.native tests/test-array-decl-in-func1.cp > test-array-decl-in-func1.ll
+llc -relocation-model=pic test-array-decl-in-func1.ll > test-array-decl-in-func1.s
+cc -o test-array-decl-in-func1.exe test-array-decl-in-func1.s
+./test-array-decl-in-func1.exe
+diff -b test-array-decl-in-func1.out tests/test-array-decl-in-func1.out > test-array-decl-in-func1.diff
+###### SUCCESS
+
+###### Testing test-array-dynamic-access
+./compyled.native tests/test-array-dynamic-access.cp > test-array-dynamic-access.ll
+llc -relocation-model=pic test-array-dynamic-access.ll > test-array-dynamic-access.s
+cc -o test-array-dynamic-access.exe test-array-dynamic-access.s
+./test-array-dynamic-access.exe
+diff -b test-array-dynamic-access.out tests/test-array-dynamic-access.out > test-array-dynamic-access.diff
+###### SUCCESS
+
+###### Testing test-array-for-loop-assign
+./compyled.native tests/test-array-for-loop-assign.cp > test-array-for-loop-assign.ll
+llc -relocation-model=pic test-array-for-loop-assign.ll > test-array-for-loop-assign.s
+cc -o test-array-for-loop-assign.exe test-array-for-loop-assign.s
+./test-array-for-loop-assign.exe
+diff -b test-array-for-loop-assign.out tests/test-array-for-loop-assign.out > test-array-for-loop-assign.diff
+###### SUCCESS
+
+###### Testing test-array-for-loop
+./compyled.native tests/test-array-for-loop.cp > test-array-for-loop.ll
+llc -relocation-model=pic test-array-for-loop.ll > test-array-for-loop.s
+cc -o test-array-for-loop.exe test-array-for-loop.s
+./test-array-for-loop.exe
+diff -b test-array-for-loop.out tests/test-array-for-loop.out > test-array-for-loop.diff
+###### SUCCESS
+
+###### Testing test-array-index-assign1
+./compyled.native tests/test-array-index-assign1.cp > test-array-index-assign1.ll
+llc -relocation-model=pic test-array-index-assign1.ll > test-array-index-assign1.s
+cc -o test-array-index-assign1.exe test-array-index-assign1.s
+./test-array-index-assign1.exe
+diff -b test-array-index-assign1.out tests/test-array-index-assign1.out > test-array-index-assign1.diff
+###### SUCCESS
+
+###### Testing test-array-index-assign2
+./compyled.native tests/test-array-index-assign2.cp > test-array-index-assign2.ll
+llc -relocation-model=pic test-array-index-assign2.ll > test-array-index-assign2.s
+cc -o test-array-index-assign2.exe test-array-index-assign2.s
+./test-array-index-assign2.exe
+diff -b test-array-index-assign2.out tests/test-array-index-assign2.out > test-array-index-assign2.diff
+###### SUCCESS
+
+###### Testing test-array-index-assign3
+./compyled.native tests/test-array-index-assign3.cp > test-array-index-assign3.ll
+llc -relocation-model=pic test-array-index-assign3.ll > test-array-index-assign3.s
+cc -o test-array-index-assign3.exe test-array-index-assign3.s
+./test-array-index-assign3.exe
+diff -b test-array-index-assign3.out tests/test-array-index-assign3.out > test-array-index-assign3.diff
+###### SUCCESS
+
+###### Testing test-assign-arithm-add
+./compyled.native tests/test-assign-arithm-add.cp > test-assign-arithm-add.ll
+llc -relocation-model=pic test-assign-arithm-add.ll > test-assign-arithm-add.s
+cc -o test-assign-arithm-add.exe test-assign-arithm-add.s
+./test-assign-arithm-add.exe
+diff -b test-assign-arithm-add.out tests/test-assign-arithm-add.out > test-assign-arithm-add.diff
+###### SUCCESS
+
+###### Testing test-assign-var-to-index-access
+./compyled.native tests/test-assign-var-to-index-access.cp > test-assign-var-to-index-access.ll
+llc -relocation-model=pic test-assign-var-to-index-access.ll > test-assign-var-to-index-access.s
+cc -o test-assign-var-to-index-access.exe test-assign-var-to-index-access.s
+./test-assign-var-to-index-access.exe
+diff -b test-assign-var-to-index-access.out tests/test-assign-var-to-index-access.out > test-assign-var-to-index-access.diff
+###### SUCCESS
+
+###### Testing test-assign-var-to-var
+./compyled.native tests/test-assign-var-to-var.cp > test-assign-var-to-var.ll
+llc -relocation-model=pic test-assign-var-to-var.ll > test-assign-var-to-var.s
+cc -o test-assign-var-to-var.exe test-assign-var-to-var.s
+./test-assign-var-to-var.exe
+diff -b test-assign-var-to-var.out tests/test-assign-var-to-var.out > test-assign-var-to-var.diff
+###### SUCCESS
+
+###### Testing test-assign1
+./compyled.native tests/test-assign1.cp > test-assign1.ll
+llc -relocation-model=pic test-assign1.ll > test-assign1.s
+cc -o test-assign1.exe test-assign1.s
+./test-assign1.exe
+diff -b test-assign1.out tests/test-assign1.out > test-assign1.diff
+###### SUCCESS
+
+###### Testing test-assign2
+./compyled.native tests/test-assign2.cp > test-assign2.ll
+llc -relocation-model=pic test-assign2.ll > test-assign2.s
+cc -o test-assign2.exe test-assign2.s
+./test-assign2.exe
+diff -b test-assign2.out tests/test-assign2.out > test-assign2.diff
+###### SUCCESS
+
+###### Testing test-decl-array1
+./compyled.native tests/test-decl-array1.cp > test-decl-array1.ll
+llc -relocation-model=pic test-decl-array1.ll > test-decl-array1.s
+cc -o test-decl-array1.exe test-decl-array1.s
+./test-decl-array1.exe
+diff -b test-decl-array1.out tests/test-decl-array1.out > test-decl-array1.diff
+###### SUCCESS
+
+###### Testing test-decl-string1
+./compyled.native tests/test-decl-string1.cp > test-decl-string1.ll
+llc -relocation-model=pic test-decl-string1.ll > test-decl-string1.s
+cc -o test-decl-string1.exe test-decl-string1.s
+./test-decl-string1.exe
+diff -b test-decl-string1.out tests/test-decl-string1.out > test-decl-string1.diff
+###### SUCCESS
+
+###### Testing test-decl1
+./compyled.native tests/test-decl1.cp > test-decl1.ll
+llc -relocation-model=pic test-decl1.ll > test-decl1.s
+cc -o test-decl1.exe test-decl1.s
+./test-decl1.exe
+diff -b test-decl1.out tests/test-decl1.out > test-decl1.diff
+###### SUCCESS
+
+###### Testing test-elif1
+./compyled.native tests/test-elif1.cp > test-elif1.ll
+llc -relocation-model=pic test-elif1.ll > test-elif1.s
+cc -o test-elif1.exe test-elif1.s
+./test-elif1.exe
+diff -b test-elif1.out tests/test-elif1.out > test-elif1.diff
+###### SUCCESS
+
+###### Testing test-elif2
+./compyled.native tests/test-elif2.cp > test-elif2.ll
+llc -relocation-model=pic test-elif2.ll > test-elif2.s
+cc -o test-elif2.exe test-elif2.s
+./test-elif2.exe
+diff -b test-elif2.out tests/test-elif2.out > test-elif2.diff
+###### SUCCESS
+
+###### Testing test-elif3
+./compyled.native tests/test-elif3.cp > test-elif3.ll
+llc -relocation-model=pic test-elif3.ll > test-elif3.s
+cc -o test-elif3.exe test-elif3.s
+./test-elif3.exe
+diff -b test-elif3.out tests/test-elif3.out > test-elif3.diff
+###### SUCCESS
+
+###### Testing test-elif4
+./compyled.native tests/test-elif4.cp > test-elif4.ll
+llc -relocation-model=pic test-elif4.ll > test-elif4.s
+cc -o test-elif4.exe test-elif4.s
+./test-elif4.exe
+diff -b test-elif4.out tests/test-elif4.out > test-elif4.diff
+###### SUCCESS
+
+###### Testing test-float1
+./compyled.native tests/test-float1.cp > test-float1.ll
+llc -relocation-model=pic test-float1.ll > test-float1.s
+cc -o test-float1.exe test-float1.s
+./test-float1.exe
+diff -b test-float1.out tests/test-float1.out > test-float1.diff
+###### SUCCESS
+
+###### Testing test-for1
+./compyled.native tests/test-for1.cp > test-for1.ll
+llc -relocation-model=pic test-for1.ll > test-for1.s
+cc -o test-for1.exe test-for1.s
+./test-for1.exe
+diff -b test-for1.out tests/test-for1.out > test-for1.diff
+###### SUCCESS
+
+###### Testing test-func-with-main
+./compyled.native tests/test-func-with-main.cp > test-func-with-main.ll
+llc -relocation-model=pic test-func-with-main.ll > test-func-with-main.s
+cc -o test-func-with-main.exe test-func-with-main.s
+./test-func-with-main.exe
+diff -b test-func-with-main.out tests/test-func-with-main.out > test-func-with-main.diff
+###### SUCCESS
+
+###### Testing test-func1
+./compyled.native tests/test-func1.cp > test-func1.ll
+llc -relocation-model=pic test-func1.ll > test-func1.s
+cc -o test-func1.exe test-func1.s
+./test-func1.exe
+diff -b test-func1.out tests/test-func1.out > test-func1.diff
+###### SUCCESS
+
+###### Testing test-func2
+./compyled.native tests/test-func2.cp > test-func2.ll
+llc -relocation-model=pic test-func2.ll > test-func2.s
+cc -o test-func2.exe test-func2.s
+./test-func2.exe
+diff -b test-func2.out tests/test-func2.out > test-func2.diff
+###### SUCCESS
+
+###### Testing test-func3
+./compyled.native tests/test-func3.cp > test-func3.ll
+llc -relocation-model=pic test-func3.ll > test-func3.s
+cc -o test-func3.exe test-func3.s
+./test-func3.exe
+diff -b test-func3.out tests/test-func3.out > test-func3.diff
+###### SUCCESS
+
+###### Testing test-func4
+./compyled.native tests/test-func4.cp > test-func4.ll
+llc -relocation-model=pic test-func4.ll > test-func4.s
+cc -o test-func4.exe test-func4.s
+./test-func4.exe
+diff -b test-func4.out tests/test-func4.out > test-func4.diff
+###### SUCCESS
+
+###### Testing test-function-call-nesting
+./compyled.native tests/test-function-call-nesting.cp > test-function-call-nesting.ll
+llc -relocation-model=pic test-function-call-nesting.ll > test-function-call-nesting.s
+cc -o test-function-call-nesting.exe test-function-call-nesting.s
+./test-function-call-nesting.exe
+diff -b test-function-call-nesting.out tests/test-function-call-nesting.out > test-function-call-nesting.diff
+###### SUCCESS
+
+###### Testing test-hello-world
+./compyled.native tests/test-hello-world.cp > test-hello-world.ll
+llc -relocation-model=pic test-hello-world.ll > test-hello-world.s
+cc -o test-hello-world.exe test-hello-world.s
+./test-hello-world.exe
+diff -b test-hello-world.out tests/test-hello-world.out > test-hello-world.diff
+###### SUCCESS
+
+###### Testing test-hoisting1
+./compyled.native tests/test-hoisting1.cp > test-hoisting1.ll
+llc -relocation-model=pic test-hoisting1.ll > test-hoisting1.s
+cc -o test-hoisting1.exe test-hoisting1.s
+./test-hoisting1.exe
+diff -b test-hoisting1.out tests/test-hoisting1.out > test-hoisting1.diff
+###### SUCCESS
+
+###### Testing test-hoisting2
+./compyled.native tests/test-hoisting2.cp > test-hoisting2.ll
+llc -relocation-model=pic test-hoisting2.ll > test-hoisting2.s
+cc -o test-hoisting2.exe test-hoisting2.s
+./test-hoisting2.exe
+diff -b test-hoisting2.out tests/test-hoisting2.out > test-hoisting2.diff
+###### SUCCESS
+
+###### Testing test-if-else1
+./compyled.native tests/test-if-else1.cp > test-if-else1.ll
+llc -relocation-model=pic test-if-else1.ll > test-if-else1.s
+cc -o test-if-else1.exe test-if-else1.s
+./test-if-else1.exe
+diff -b test-if-else1.out tests/test-if-else1.out > test-if-else1.diff
+###### SUCCESS
+
+###### Testing test-if-else2
+./compyled.native tests/test-if-else2.cp > test-if-else2.ll
+llc -relocation-model=pic test-if-else2.ll > test-if-else2.s
+cc -o test-if-else2.exe test-if-else2.s
+./test-if-else2.exe
+diff -b test-if-else2.out tests/test-if-else2.out > test-if-else2.diff
+###### SUCCESS
+
+###### Testing test-if-else3
+./compyled.native tests/test-if-else3.cp > test-if-else3.ll
+llc -relocation-model=pic test-if-else3.ll > test-if-else3.s
+cc -o test-if-else3.exe test-if-else3.s
+./test-if-else3.exe
+diff -b test-if-else3.out tests/test-if-else3.out > test-if-else3.diff
+###### SUCCESS
+
+###### Testing test-if-else4
+./compyled.native tests/test-if-else4.cp > test-if-else4.ll
+llc -relocation-model=pic test-if-else4.ll > test-if-else4.s
+cc -o test-if-else4.exe test-if-else4.s
+./test-if-else4.exe
+diff -b test-if-else4.out tests/test-if-else4.out > test-if-else4.diff
+###### SUCCESS
+
+###### Testing test-if-no-else1
+./compyled.native tests/test-if-no-else1.cp > test-if-no-else1.ll
+llc -relocation-model=pic test-if-no-else1.ll > test-if-no-else1.s
+cc -o test-if-no-else1.exe test-if-no-else1.s
+./test-if-no-else1.exe
+diff -b test-if-no-else1.out tests/test-if-no-else1.out > test-if-no-else1.diff
+###### SUCCESS
+
+###### Testing test-initialize-var-in-func1
+./compyled.native tests/test-initialize-var-in-func1.cp > test-initialize-var-in-func1.ll
+llc -relocation-model=pic test-initialize-var-in-func1.ll > test-initialize-var-in-func1.s
+cc -o test-initialize-var-in-func1.exe test-initialize-var-in-func1.s
+./test-initialize-var-in-func1.exe
+diff -b test-initialize-var-in-func1.out tests/test-initialize-var-in-func1.out > test-initialize-var-in-func1.diff
+###### SUCCESS
+
+###### Testing test-initialize-var-in-func2
+./compyled.native tests/test-initialize-var-in-func2.cp > test-initialize-var-in-func2.ll
+llc -relocation-model=pic test-initialize-var-in-func2.ll > test-initialize-var-in-func2.s
+cc -o test-initialize-var-in-func2.exe test-initialize-var-in-func2.s
+./test-initialize-var-in-func2.exe
+diff -b test-initialize-var-in-func2.out tests/test-initialize-var-in-func2.out > test-initialize-var-in-func2.diff
+###### SUCCESS
+
+###### Testing test-initialize-var-in-func3
+./compyled.native tests/test-initialize-var-in-func3.cp > test-initialize-var-in-func3.ll
+llc -relocation-model=pic test-initialize-var-in-func3.ll > test-initialize-var-in-func3.s
+cc -o test-initialize-var-in-func3.exe test-initialize-var-in-func3.s
+./test-initialize-var-in-func3.exe
+diff -b test-initialize-var-in-func3.out tests/test-initialize-var-in-func3.out > test-initialize-var-in-func3.diff
+###### SUCCESS
+
+###### Testing test-initialize-var-to-func-return
+./compyled.native tests/test-initialize-var-to-func-return.cp > test-initialize-var-to-func-return.ll
+llc -relocation-model=pic test-initialize-var-to-func-return.ll > test-initialize-var-to-func-return.s
+cc -o test-initialize-var-to-func-return.exe test-initialize-var-to-func-return.s
+./test-initialize-var-to-func-return.exe
+diff -b test-initialize-var-to-func-return.out tests/test-initialize-var-to-func-return.out > test-initialize-var-to-func-return.diff
+###### SUCCESS
+
+###### Testing test-initialize-var
+./compyled.native tests/test-initialize-var.cp > test-initialize-var.ll
+llc -relocation-model=pic test-initialize-var.ll > test-initialize-var.s
+cc -o test-initialize-var.exe test-initialize-var.s
+./test-initialize-var.exe
+diff -b test-initialize-var.out tests/test-initialize-var.out > test-initialize-var.diff
+###### SUCCESS
+
+###### Testing test-initialize-var2
+./compyled.native tests/test-initialize-var2.cp > test-initialize-var2.ll
+llc -relocation-model=pic test-initialize-var2.ll > test-initialize-var2.s
+cc -o test-initialize-var2.exe test-initialize-var2.s
+./test-initialize-var2.exe
+diff -b test-initialize-var2.out tests/test-initialize-var2.out > test-initialize-var2.diff
+###### SUCCESS
+
+###### Testing test-mod1
+./compyled.native tests/test-mod1.cp > test-mod1.ll
+llc -relocation-model=pic test-mod1.ll > test-mod1.s
+cc -o test-mod1.exe test-mod1.s
+./test-mod1.exe
+diff -b test-mod1.out tests/test-mod1.out > test-mod1.diff
+###### SUCCESS
+
+###### Testing test-mod2
+./compyled.native tests/test-mod2.cp > test-mod2.ll
+llc -relocation-model=pic test-mod2.ll > test-mod2.s
+cc -o test-mod2.exe test-mod2.s
+./test-mod2.exe
+diff -b test-mod2.out tests/test-mod2.out > test-mod2.diff
+###### SUCCESS
+
+###### Testing test-mod3
+./compyled.native tests/test-mod3.cp > test-mod3.ll
+llc -relocation-model=pic test-mod3.ll > test-mod3.s
+cc -o test-mod3.exe test-mod3.s
+./test-mod3.exe
+diff -b test-mod3.out tests/test-mod3.out > test-mod3.diff
+###### SUCCESS
+
+###### Testing test-not1
+./compyled.native tests/test-not1.cp > test-not1.ll
+llc -relocation-model=pic test-not1.ll > test-not1.s
+cc -o test-not1.exe test-not1.s
+./test-not1.exe
+diff -b test-not1.out tests/test-not1.out > test-not1.diff
+###### SUCCESS
+
+###### Testing test-not2
+./compyled.native tests/test-not2.cp > test-not2.ll
+llc -relocation-model=pic test-not2.ll > test-not2.s
+cc -o test-not2.exe test-not2.s
+./test-not2.exe
+diff -b test-not2.out tests/test-not2.out > test-not2.diff
+###### SUCCESS
+
+###### Testing test-pass-func-as-arg
+./compyled.native tests/test-pass-func-as-arg.cp > test-pass-func-as-arg.ll
+llc -relocation-model=pic test-pass-func-as-arg.ll > test-pass-func-as-arg.s
+cc -o test-pass-func-as-arg.exe test-pass-func-as-arg.s
+./test-pass-func-as-arg.exe
+diff -b test-pass-func-as-arg.out tests/test-pass-func-as-arg.out > test-pass-func-as-arg.diff
+###### SUCCESS
+
+###### Testing test-reverse-function-call-nesting
+./compyled.native tests/test-reverse-function-call-nesting.cp > test-reverse-function-call-nesting.ll
+llc -relocation-model=pic test-reverse-function-call-nesting.ll > test-reverse-function-call-nesting.s
+cc -o test-reverse-function-call-nesting.exe test-reverse-function-call-nesting.s
+./test-reverse-function-call-nesting.exe
+diff -b test-reverse-function-call-nesting.out tests/test-reverse-function-call-nesting.out > test-reverse-function-call-nesting.diff
+###### SUCCESS
+
+###### Testing test-string-mutation
+./compyled.native tests/test-string-mutation.cp > test-string-mutation.ll
+llc -relocation-model=pic test-string-mutation.ll > test-string-mutation.s
+cc -o test-string-mutation.exe test-string-mutation.s
+./test-string-mutation.exe
+diff -b test-string-mutation.out tests/test-string-mutation.out > test-string-mutation.diff
+###### SUCCESS
+
+###### Testing test-var-decl-in-func
+./compyled.native tests/test-var-decl-in-func.cp > test-var-decl-in-func.ll
+llc -relocation-model=pic test-var-decl-in-func.ll > test-var-decl-in-func.s
+cc -o test-var-decl-in-func.exe test-var-decl-in-func.s
+./test-var-decl-in-func.exe
+diff -b test-var-decl-in-func.out tests/test-var-decl-in-func.out > test-var-decl-in-func.diff
+###### SUCCESS
+
+###### Testing test-var-decl-in-func2
+./compyled.native tests/test-var-decl-in-func2.cp > test-var-decl-in-func2.ll
+llc -relocation-model=pic test-var-decl-in-func2.ll > test-var-decl-in-func2.s
+cc -o test-var-decl-in-func2.exe test-var-decl-in-func2.s
+./test-var-decl-in-func2.exe
+diff -b test-var-decl-in-func2.out tests/test-var-decl-in-func2.out > test-var-decl-in-func2.diff
+###### SUCCESS
+
+###### Testing test-while1
+./compyled.native tests/test-while1.cp > test-while1.ll
+llc -relocation-model=pic test-while1.ll > test-while1.s
+cc -o test-while1.exe test-while1.s
+./test-while1.exe
+diff -b test-while1.out tests/test-while1.out > test-while1.diff
+###### SUCCESS
+
+###### Testing fail-assign-array-index1
+./compyled.native < tests/fail-assign-array-index1.cp 2> fail-assign-array-index1.err >> testall.log
+diff -b fail-assign-array-index1.err tests/fail-assign-array-index1.err > fail-assign-array-index1.diff
+###### SUCCESS
+
+###### Testing fail-assign1
+./compyled.native < tests/fail-assign1.cp 2> fail-assign1.err >> testall.log
+diff -b fail-assign1.err tests/fail-assign1.err > fail-assign1.diff
+###### SUCCESS
+
+###### Testing fail-assign2
+./compyled.native < tests/fail-assign2.cp 2> fail-assign2.err >> testall.log
+diff -b fail-assign2.err tests/fail-assign2.err > fail-assign2.diff
+###### SUCCESS
+
+###### Testing fail-assign3
+./compyled.native < tests/fail-assign3.cp 2> fail-assign3.err >> testall.log
+diff -b fail-assign3.err tests/fail-assign3.err > fail-assign3.diff
+###### SUCCESS
+
+###### Testing fail-assign4
+./compyled.native < tests/fail-assign4.cp 2> fail-assign4.err >> testall.log
+diff -b fail-assign4.err tests/fail-assign4.err > fail-assign4.diff
+###### SUCCESS
+
+###### Testing fail-divide-int-float
+./compyled.native < tests/fail-divide-int-float.cp 2> fail-divide-int-float.err >> testall.log
+diff -b fail-divide-int-float.err tests/fail-divide-int-float.err > fail-divide-int-float.diff
+###### SUCCESS
+
+###### Testing fail-duplicate-func-name
+./compyled.native < tests/fail-duplicate-func-name.cp 2> fail-duplicate-func-name.err >> testall.log
+diff -b fail-duplicate-func-name.err tests/fail-duplicate-func-name.err > fail-duplicate-func-name.diff
+###### SUCCESS
+
+###### Testing fail-duplicate-var-name
+./compyled.native < tests/fail-duplicate-var-name.cp 2> fail-duplicate-var-name.err >> testall.log
+diff -b fail-duplicate-var-name.err tests/fail-duplicate-var-name.err > fail-duplicate-var-name.diff
+###### SUCCESS
+
+###### Testing fail-expr1
+./compyled.native < tests/fail-expr1.cp 2> fail-expr1.err >> testall.log
+diff -b fail-expr1.err tests/fail-expr1.err > fail-expr1.diff
+###### SUCCESS
+
+###### Testing fail-expr2
+./compyled.native < tests/fail-expr2.cp 2> fail-expr2.err >> testall.log
+diff -b fail-expr2.err tests/fail-expr2.err > fail-expr2.diff
+###### SUCCESS
+
+###### Testing fail-for1
+./compyled.native < tests/fail-for1.cp 2> fail-for1.err >> testall.log
+diff -b fail-for1.err tests/fail-for1.err > fail-for1.diff
+###### SUCCESS
+
+###### Testing fail-for2
+./compyled.native < tests/fail-for2.cp 2> fail-for2.err >> testall.log
+diff -b fail-for2.err tests/fail-for2.err > fail-for2.diff
+###### SUCCESS
+
+###### Testing fail-initialize-in-func
+./compyled.native < tests/fail-initialize-in-func.cp 2> fail-initialize-in-func.err >> testall.log
+diff -b fail-initialize-in-func.err tests/fail-initialize-in-func.err > fail-initialize-in-func.diff
+###### SUCCESS
+
+###### Testing fail-initialize-var-in-func1
+./compyled.native < tests/fail-initialize-var-in-func1.cp 2> fail-initialize-var-in-func1.err >> testall.log
+diff -b fail-initialize-var-in-func1.err tests/fail-initialize-var-in-func1.err > fail-initialize-var-in-func1.diff
+###### SUCCESS
+
+###### Testing fail-initialize1
+./compyled.native < tests/fail-initialize1.cp 2> fail-initialize1.err >> testall.log
+diff -b fail-initialize1.err tests/fail-initialize1.err > fail-initialize1.diff
+###### SUCCESS
+
+###### Testing fail-initialize2
+./compyled.native < tests/fail-initialize2.cp 2> fail-initialize2.err >> testall.log
+diff -b fail-initialize2.err tests/fail-initialize2.err > fail-initialize2.diff
+###### SUCCESS
+
+###### Testing fail-return-no-func
+./compyled.native < tests/fail-return-no-func.cp 2> fail-return-no-func.err >> testall.log
+diff -b fail-return-no-func.err tests/fail-return-no-func.err > fail-return-no-func.diff
+###### SUCCESS
+
+###### Testing fail-return-wrong-func-type
+./compyled.native < tests/fail-return-wrong-func-type.cp 2> fail-return-wrong-func-type.err >> testall.log
+diff -b fail-return-wrong-func-type.err tests/fail-return-wrong-func-type.err > fail-return-wrong-func-type.diff
+###### SUCCESS
+
+###### Testing fail-return1
+./compyled.native < tests/fail-return1.cp 2> fail-return1.err >> testall.log
+diff -b fail-return1.err tests/fail-return1.err > fail-return1.diff
+###### SUCCESS

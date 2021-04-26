@@ -7,7 +7,7 @@ test : all testall.sh
 # "make all" builds the executable
 
 .PHONY : all
-all : compyled.native concat.o
+all : compyled.native
 
 # "make compyled.native" compiles the compiler
 #
@@ -18,22 +18,12 @@ all : compyled.native concat.o
 
 compyled.native :
 	opam config exec -- \
-	rm -f *.o
 	ocamlbuild -use-ocamlfind compyled.native
-	gcc -c concat.c
-	clang -emit-llvm -o concat.bc -c concat.c -Wno-varargs
 
 # "make clean" removes all generated files
 
 .PHONY : clean
 clean :
 	ocamlbuild -clean
-	rm -rf ocamlllvm
+	rm -rf ocamlllvm *.diff
 	rm -rf _build
-	rm -rf testall.log *.diff *.ll
-
-
-# Testing the "concat" example
-
-printbig : concat.c
-	cc -o concat -DBUILD_TEST concat.c

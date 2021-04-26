@@ -57,75 +57,9 @@ let check (globals, functions, statements) =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
     in   
 
-<<<<<<< HEAD
-    let rec expr = function
-        Liti l -> (Int, SLiti l)
-      | Litf l -> (Float, SLitf l)
-      | Litb l  -> (Boolean, SLitb l)
-      | Lits l  -> (String, SLits l)
-      | Noexpr     -> (Void, SNoexpr)
-      | LitArray(t, size) -> 
-          let sz = expr size in
-          (Array, SLitArray(t, sz))
-      | Binop(e1, op, e2) as e -> 
-          let (t1, e1') = expr e1 
-          and (t2, e2') = expr e2 in
-          (* All binary operators require operands of the same type *)
-          let same = t1 = t2 in
-          (* Determine expression type based on operator and operand types *)
-          let ty = match op with
-            Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div  when same && t1 = Float -> Float
-            Add | Sub | Mul | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div when same && t1 = Float -> Float
-          | Add when same && t1 = String -> String
-          (* | Eq  when same && t1 = String -> Boolean *)
-          | Eq | Ne            when same               -> Boolean
-          | Lt | Lte | Gt | Gte
-                     when same && (t1 = Int || t1 = Float) -> Boolean
-          | And | Or when same && t1 = Boolean -> Boolean
-          | _ -> raise (
-        Failure ("illegal binary operator " ^
-                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-                       string_of_typ t2 ^ " in " ^ string_of_expr e))
-          in (ty, SBinop((t1, e1'), op, (t2, e2')))
-      | Uniop(op, e) as ex -> 
-          let (t, e') = expr e in
-          let ty = match op with
-            Not when t = Boolean -> Boolean
-          | _ -> raise (Failure ("illegal unary operator " ^ 
-                                 string_of_uop op ^ string_of_typ t ^
-                                 " in " ^ string_of_expr ex))
-          in (ty, SUniop(op, (t, e')))
-
-  in
-  
-  (***** CHECK expressions of global variables ****)
-   (* Return a semantically-checked expression, i.e., with a type *)
-  let check_globals global = 
-
-    let return_checked_global (t, s, e) =
-      match e with 
-        | Noexpr     -> (t, s, expr e)
-        | _ ->
-          let lt = type_of_identifier s
-          and (rt, e') = expr e in
-          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
-            string_of_typ rt ^ " in " ^ string_of_expr e
-          in check_assign lt rt err;
-      (t, s, expr e)
-
-    in return_checked_global global
-
-  in
-
-
-
-=======
->>>>>>> 69caa2c9a32a7c496a9c88abab3ed9f7642329ef
 
   (* Collect function declarations for built-in functions: no bodies *)
-  let built_in_decls1 = 
+  let built_in_decls = 
     let add_bind map (name, ty) = StringMap.add name {
       typ = Void;
       fname = name; 
@@ -135,44 +69,8 @@ let check (globals, functions, statements) =
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
                                ("printb", Boolean);
                                ("printf", Float); 
-<<<<<<< HEAD
-                               ("prints", String);]
-=======
                                ("prints", String) ]
->>>>>>> 69caa2c9a32a7c496a9c88abab3ed9f7642329ef
   in
-
-  let built_in_decls2 = 
-    let add_bind map (name, ty) = StringMap.add name {
-      typ = String;
-      fname = name; 
-      formals = [(ty, "x", Noexpr)];
-      locals = [];
-      body = [] } map 
-    in List.fold_left add_bind built_in_decls1 [ ("string_concat", String); ]
-  in
-
-  let built_in_decls3 = 
-    let add_bind map (name, ty) = StringMap.add name {
-      typ = Boolean;
-      fname = name; 
-      formals = [(ty, "x", Noexpr)];
-      locals = [];
-      body = [] } map 
-    in List.fold_left add_bind built_in_decls2 [ ("string_equality", String) ]
-  in
-
-  let built_in_decls = 
-    let add_bind map (name, ty) = StringMap.add name {
-      typ = Int;
-      fname = name; 
-      formals = [(ty, "x", Noexpr)];
-      locals = [];
-      body = [] } map 
-    in List.fold_left add_bind built_in_decls3 [ ("len", String); ]
-  in
-
-  
 
   (* Add function name to symbol table *)
   let add_func map fd = 
@@ -251,78 +149,11 @@ let check (globals, functions, statements) =
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
     in
 
-    let check_assign lvaluet rvaluet err =
-       if lvaluet = rvaluet then lvaluet else raise (Failure err)
-    in   
-
-    let rec expr = function
-        Liti l -> (Int, SLiti l)
-      | Litf l -> (Float, SLitf l)
-      | Litb l  -> (Boolean, SLitb l)
-      | Lits l  -> (String, SLits l)
-      | Noexpr     -> (Void, SNoexpr)
-      | Assign(var, e) as ex -> 
-          let lt = type_of_identifier var
-          and (rt, e') = expr e in
-          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
-            string_of_typ rt ^ " in " ^ string_of_expr ex
-          in (check_assign lt rt err, SAssign(var, (rt, e')))
-      | Binop(e1, op, e2) as e -> 
-          let (t1, e1') = expr e1 
-          and (t2, e2') = expr e2 in
-          (* All binary operators require operands of the same type *)
-          let same = t1 = t2 in
-          (* Determine expression type based on operator and operand types *)
-          let ty = match op with
-            Add | Sub | Mul | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div when same && t1 = Float -> Float
-          | Add when same && t1 = String -> String
-          (* | Eq  when same && t1 = String -> Boolean *)
-          | Eq | Ne            when same               -> Boolean
-          | Lt | Lte | Gt | Gte
-                     when same && (t1 = Int || t1 = Float) -> Boolean
-          | And | Or when same && t1 = Boolean -> Boolean
-          | _ -> raise (
-        Failure ("illegal binary operator " ^
-                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-                       string_of_typ t2 ^ " in " ^ string_of_expr e))
-          in (ty, SBinop((t1, e1'), op, (t2, e2')))
-      | Uniop(op, e) as ex -> 
-          let (t, e') = expr e in
-          let ty = match op with
-            Not when t = Boolean -> Boolean
-          | _ -> raise (Failure ("illegal unary operator " ^ 
-                                 string_of_uop op ^ string_of_typ t ^
-                                 " in " ^ string_of_expr ex))
-          in (ty, SUniop(op, (t, e')))
-
-  in
-  
-  
-  let check_locals local = 
-    let return_checked_locals (t, s, e) =
-      match e with 
-          | Noexpr     -> (t, s, expr e)
-          | _ ->
-            let lt = type_of_identifier s
-            and (rt, e') = expr e in
-            let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
-              string_of_typ rt ^ " in " ^ string_of_expr e
-            in check_assign lt rt err;
-        (t, s, expr e)
-
-       in return_checked_locals local
-
-  in
-
-(*========= ^ FOR LOCAL VAR INIT =======*)
-
-
-  (* Raise an exception if the given rvalue type cannot be assigned to
-       the given lvalue type *)
-    let check_assign lvaluet rvaluet err =
-       if lvaluet = rvaluet then lvaluet else raise (Failure err)
-    in   
+    (* Return a array type from our array symbol table *)
+    let type_of_array_identifier s =
+      try StringMap.find s local_array_symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
 
     let check_print lvaluet rvaluet err =
        lvaluet
@@ -366,10 +197,8 @@ let check (globals, functions, statements) =
           let same = t1 = t2 in
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
-            Add | Sub | Mul | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div when same && t1 = Float -> Float
-          | Add when same && t1 = String -> String
-          (* | Eq  when same && t1 = String -> Boolean *)
+            Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div  when same && t1 = Float -> Float
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -531,10 +360,8 @@ in
           let same = t1 = t2 in
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
-            Add | Sub | Mul | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div when same && t1 = Float -> Float
-          | Add when same && t1 = String -> String
-          (* | Eq  when same && t1 = String -> Boolean *)
+            Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div  when same && t1 = Float -> Float
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean

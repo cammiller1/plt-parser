@@ -525,6 +525,11 @@ diff -b fail-initialize2.err tests/fail-initialize2.err > fail-initialize2.diff
 diff -b fail-return-no-func.err tests/fail-return-no-func.err > fail-return-no-func.diff
 ###### SUCCESS
 
+###### Testing fail-return-wrong-func-type
+./compyled.native < tests/fail-return-wrong-func-type.cp 2> fail-return-wrong-func-type.err >> testall.log
+diff -b fail-return-wrong-func-type.err tests/fail-return-wrong-func-type.err > fail-return-wrong-func-type.diff
+###### SUCCESS
+
 ###### Testing fail-return1
 ./compyled.native < tests/fail-return1.cp 2> fail-return1.err >> testall.log
 diff -b fail-return1.err tests/fail-return1.err > fail-return1.diff

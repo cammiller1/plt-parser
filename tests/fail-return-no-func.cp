@@ -1,4 +1,4 @@
-## ensure user cannot return from a statement without a function ##
+## ensure user cannot return from a statement outside of a function definition ##
 
 int x;
 x = 3;

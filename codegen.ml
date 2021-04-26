@@ -60,7 +60,6 @@ let translate (globals, functions, statements) =
 
   (* Define each function (arguments and return type) so we can 
       call it even before we've created its body *)
-   (* define a main function to wrap out program in *)
    let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
      let function_decl m fdecl =
        let name = fdecl.sfname
@@ -72,7 +71,9 @@ let translate (globals, functions, statements) =
 
 
 
-  (* Generate a name for the main function *)    
+  (* Generate a name for a simulated main function. Recursively give it a new name in 
+     case the user names one of their functions as "main".
+  *)    
 
      let main_name = "main" in
 
@@ -98,7 +99,7 @@ let translate (globals, functions, statements) =
 
   in
 
-  (* creating a fake main funcion to wrap the entire script in *)
+  (* create a main function builder hidden from the user to wrap the entire script in *)
   (* Needs to occur outside of the build_statement function *)
   (* Need to find the main function with the most zeros at the end *)
   let (the_function, _) = StringMap.find main_name function_decls in
@@ -106,8 +107,7 @@ let translate (globals, functions, statements) =
 
 
 
-(********* THIS EXPR BUILDER IS SOLELY FOR INITIALIZATION!!!! ******)
-(* Construct code for an expression in the INITIALIZATION; return its value *)
+(********* THIS EXPR BUILDER IS SOLELY FOR VARIABLE INITIALIZATION!!!! ******)
 let rec expr ((_, e) : sexpr) = match e with
     SLiti i  -> L.const_int i32_t i
   | SLitb b  -> L.const_int i1_t (if b then 1 else 0)
@@ -128,7 +128,6 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.Int -> L.const_int (ltype_of_typ t) 0
             | A.Boolean -> L.const_int (ltype_of_typ t) 0
             | A.String -> L.const_pointer_null (ltype_of_typ t)
-            (* arrays should never match here *)
           )
         | (A.Array, _) -> (match snd se with
                     SLitArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (expr size) n builder
@@ -137,7 +136,6 @@ let rec expr ((_, e) : sexpr) = match e with
         | _ -> expr se
       in if t = A.Array then (StringMap.add n (init) m) else (StringMap.add n (L.define_global n init the_module) m)
       in
-      (* StringMap.add n (L.define_global n init the_module) m in *)
     List.fold_left global_var StringMap.empty globals in
 
   (* Create a map of global variables after creating each *)
@@ -146,6 +144,8 @@ let rec expr ((_, e) : sexpr) = match e with
       let atype = t
       in StringMap.add n t m in
     List.fold_left global_var StringMap.empty globals in
+
+
 
 
   (******** BUILD FUNCTIONS ************)
@@ -191,7 +191,8 @@ let rec expr ((_, e) : sexpr) = match e with
                     SLitArray(ty, size) -> L.build_array_alloca (ltype_of_typ ty) (expr size) n f_builder
                   )
           | _ -> L.build_alloca (ltype_of_typ t) n f_builder
-        in if t <> A.Array then ignore (L.build_store (expr se) local_var f_builder);
+        in let (ty, s) = se in
+        if t <> A.Array && (ty <> A.Void) then ignore (L.build_store (expr se) local_var f_builder);
         StringMap.add n local_var m 
 
       in
@@ -384,7 +385,13 @@ let rec expr ((_, e) : sexpr) = match e with
     in
 
 
-  (****** build statements *********)
+  
+
+
+
+
+
+  (****** BUILD STATEMENTS THAT EXIST OUTSIDE OF FUNCTION DEFINITONS *********)
 
   let build_statements statements =
  
@@ -554,7 +561,7 @@ let rec expr ((_, e) : sexpr) = match e with
 
     in
 
-     (* Build the code for each statement *)
+     (* Build the code for each statement that exist outside of files *)
     let builder = stmt builder (SBlock statements) in
 
     (* Add a return for the simulated main function *)

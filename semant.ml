@@ -58,8 +58,8 @@ let check (globals, functions, statements) =
     in   
 
 
-  (* Collect function declarations for built-in functions: no bodies *)
-  let built_in_decls = 
+(* Collect function declarations for built-in functions: no bodies *)
+  let built_in_decls1 = 
     let add_bind map (name, ty) = StringMap.add name {
       typ = Void;
       fname = name; 
@@ -69,7 +69,37 @@ let check (globals, functions, statements) =
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
                                ("printb", Boolean);
                                ("printf", Float); 
-                               ("prints", String) ]
+                               ("prints", String);]
+  in
+
+  let built_in_decls2 = 
+    let add_bind map (name, ty) = StringMap.add name {
+      typ = String;
+      fname = name; 
+      formals = [(ty, "x", Noexpr)];
+      locals = [];
+      body = [] } map 
+    in List.fold_left add_bind built_in_decls1 [ ("string_concat", String); ]
+  in
+
+  (* let built_in_decls3 = 
+    let add_bind map (name, ty) = StringMap.add name {
+      typ = Boolean;
+      fname = name; 
+      formals = [(ty, "x", Noexpr)];
+      locals = [];
+      body = [] } map 
+    in List.fold_left add_bind built_in_decls2 [ ("string_equality", String) ]
+  in *)
+
+  let built_in_decls = 
+    let add_bind map (name, ty) = StringMap.add name {
+      typ = Int;
+      fname = name; 
+      formals = [(ty, "x", Noexpr)];
+      locals = [];
+      body = [] } map 
+    in List.fold_left add_bind built_in_decls2 [ ("len", String); ]
   in
 
   (* Add function name to symbol table *)
@@ -199,6 +229,7 @@ let check (globals, functions, statements) =
           let ty = match op with
             Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div  when same && t1 = Float -> Float
+          | Add when same && t1 = String -> String
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -362,6 +393,7 @@ in
           let ty = match op with
             Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div  when same && t1 = Float -> Float
+          | Add when same && t1 = String -> String
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -486,6 +518,7 @@ in
           let ty = match op with
             Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div  when same && t1 = Float -> Float
+          | Add when same && t1 = String -> String
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean

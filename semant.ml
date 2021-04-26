@@ -44,7 +44,8 @@ let check (globals, functions, statements) =
                   StringMap.empty global_arrays
     in
 
-    (* Return a variable from our temp symbol table *)
+
+  (* Return a variable from our temp symbol table *)
     let type_of_identifier s =
       try StringMap.find s symbols
       with Not_found -> raise (Failure ("undeclared identifier " ^ s))
@@ -56,65 +57,6 @@ let check (globals, functions, statements) =
        if lvaluet = rvaluet then lvaluet else raise (Failure err)
     in   
 
-    let rec expr = function
-        Liti l -> (Int, SLiti l)
-      | Litf l -> (Float, SLitf l)
-      | Litb l  -> (Boolean, SLitb l)
-      | Lits l  -> (String, SLits l)
-      | Noexpr     -> (Void, SNoexpr)
-      | LitArray(t, size) -> 
-          let sz = expr size in
-          (Array, SLitArray(t, sz))
-      | Binop(e1, op, e2) as e -> 
-          let (t1, e1') = expr e1 
-          and (t2, e2') = expr e2 in
-          (* All binary operators require operands of the same type *)
-          let same = t1 = t2 in
-          (* Determine expression type based on operator and operand types *)
-          let ty = match op with
-            Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div  when same && t1 = Float -> Float
-          | Eq | Ne            when same               -> Boolean
-          | Lt | Lte | Gt | Gte
-                     when same && (t1 = Int || t1 = Float) -> Boolean
-          | And | Or when same && t1 = Boolean -> Boolean
-          | _ -> raise (
-        Failure ("illegal binary operator " ^
-                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
-                       string_of_typ t2 ^ " in " ^ string_of_expr e))
-          in (ty, SBinop((t1, e1'), op, (t2, e2')))
-      | Uniop(op, e) as ex -> 
-          let (t, e') = expr e in
-          let ty = match op with
-            Not when t = Boolean -> Boolean
-          | _ -> raise (Failure ("illegal unary operator " ^ 
-                                 string_of_uop op ^ string_of_typ t ^
-                                 " in " ^ string_of_expr ex))
-          in (ty, SUniop(op, (t, e')))
-
-  in
-  
-  (***** CHECK expressions of global variables ****)
-   (* Return a semantically-checked expression, i.e., with a type *)
-  let check_globals global = 
-
-    let return_checked_global (t, s, e) =
-      match e with 
-        | Noexpr     -> (t, s, expr e)
-        | _ ->
-          let lt = type_of_identifier s
-          and (rt, e') = expr e in
-          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
-            string_of_typ rt ^ " in " ^ string_of_expr e
-          in check_assign lt rt err;
-      (t, s, expr e)
-
-    in return_checked_global global
-
-  in
-
-
-
 
   (* Collect function declarations for built-in functions: no bodies *)
   let built_in_decls = 
@@ -124,7 +66,10 @@ let check (globals, functions, statements) =
       formals = [(ty, "x", Noexpr)];
       locals = [];
       body = [] } map 
-    in List.fold_left add_bind StringMap.empty [ ("print", Int) ]
+    in List.fold_left add_bind StringMap.empty [ ("print", Int);
+                               ("printb", Boolean);
+                               ("printf", Float); 
+                               ("prints", String) ]
   in
 
   (* Add function name to symbol table *)
@@ -479,7 +424,144 @@ in
     match check_stmt (Block statements) with
         SBlock(sl) -> sl
       | _ -> raise (Failure ("internal error: block didn't become a block?"))
+
+
+    in
+
+
+  (* Return a variable from the global symbol table *)
+    let type_of_identifier s =
+      try StringMap.find s symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
+    (* Return a array type from the global array symbol table *)
+    let type_of_array_identifier s =
+      try StringMap.find s array_symbols
+      with Not_found -> raise (Failure ("undeclared identifier " ^ s))
+    in
+
+    let check_print lvaluet rvaluet err =
+       lvaluet
+    in
+
+
+     (* Return a semantically-checked expression, i.e., with a type *)
+    let rec expr = function
+        Liti l -> (Int, SLiti l)
+      | Litf l -> (Float, SLitf l)
+      | Litb l  -> (Boolean, SLitb l)
+      | Lits l  -> (String, SLits l)
+      | LitArray(t, size) -> 
+          let sz = expr size in
+          (Array, SLitArray(t, sz))
+      | Noexpr     -> (Void, SNoexpr)
+      | Id s       -> (type_of_identifier s, SId s)
+      | Assign(var, e) as ex -> 
+          let lt = type_of_identifier var
+          and (rt, e') = expr e in
+          let rt = if rt = Array then let SArrayIndexAccess(var, (rt_i, idx)) = e' in type_of_array_identifier var else rt
+          in
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr ex
+          in 
+          (check_assign lt rt err, SAssign(var, (rt, e')))
+      | ArrayIndexAssign(var, idx, e) as ex ->
+          let lt = type_of_array_identifier var
+          and (rt, e') = expr e 
+          and (rt_i, indx) = expr idx 
+          in
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr ex
+          in
+          (check_assign lt rt err, SArrayIndexAssign(var, (rt_i, indx), (rt, e')))
+      | ArrayIndexAccess(var, idx) -> let (rt_i, indx) = expr idx in
+          (type_of_array_identifier var, SArrayIndexAccess(var, (rt_i, indx)))
+      | Binop(e1, op, e2) as e -> 
+          let (t1, e1') = expr e1 
+          and (t2, e2') = expr e2 in
+          (* All binary operators require operands of the same type *)
+          let same = t1 = t2 in
+          (* Determine expression type based on operator and operand types *)
+          let ty = match op with
+            Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div  when same && t1 = Float -> Float
+          | Eq | Ne            when same               -> Boolean
+          | Lt | Lte | Gt | Gte
+                     when same && (t1 = Int || t1 = Float) -> Boolean
+          | And | Or when same && t1 = Boolean -> Boolean
+          | _ -> raise (
+        Failure ("illegal binary operator " ^
+                       string_of_typ t1 ^ " " ^ string_of_op op ^ " " ^
+                       string_of_typ t2 ^ " in " ^ string_of_expr e))
+          in (ty, SBinop((t1, e1'), op, (t2, e2')))
+      | Uniop(op, e) as ex -> 
+          let (t, e') = expr e in
+          let ty = match op with
+            Not when t = Boolean -> Boolean
+          | _ -> raise (Failure ("illegal unary operator " ^ 
+                                 string_of_uop op ^ string_of_typ t ^
+                                 " in " ^ string_of_expr ex))
+          in (ty, SUniop(op, (t, e')))
+      | Call(fname, args) as call -> 
+          let fd = find_func fname in
+          let param_length = List.length fd.formals in
+          if List.length args != param_length then
+            raise (Failure ("wrong number of args "))
+          else let check_call (ft, _, _) e = 
+            let (et, e') = expr e in 
+            let err = "illegal argument found "
+            (* skip print function *)
+            in if fname = "print" then (check_print ft et err, e') else (check_assign ft et err, e')
+          in 
+          let args' = List.map2 check_call fd.formals args
+          in (fd.typ, SCall(fname, args'))
+    in
+
+
+    let check_bool_expr e = 
+      let (t', e') = expr e
+      and err = "expected Boolean expression in " ^ string_of_expr e
+      in if t' != Boolean then raise (Failure err) else (t', e')
+    in
+
+    (* Return a semantically-checked statement i.e. containing sexprs *)
+    let rec check_stmt = function
+        Expr e -> SExpr (expr e)
+      | If(p, b1, b2) -> SIf(check_bool_expr p, check_stmt b1, check_stmt b2)
+      | For(e1, e2, e3, st) ->
+          SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)
+      | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
+      | Return e -> let (t, e') = expr e in
+          SReturn (t, e')
+      | Block sl -> 
+          let rec check_stmt_list = function
+              [Return _ as s] -> [check_stmt s]
+            | Return _ :: _   -> raise (Failure "nothing may follow a return")
+            | Block sl :: ss  -> check_stmt_list (sl @ ss) (* Flatten blocks *)
+            | s :: ss         -> check_stmt s :: check_stmt_list ss
+            | []              -> []
+          in SBlock(check_stmt_list sl)
+
+    in
   
+  (***** CHECK expressions of global variables ****)
+   (* Return a semantically-checked expression, i.e., with a type *)
+  let check_globals global = 
+
+    let return_checked_global (t, s, e) =
+      match e with 
+        | Noexpr     -> (t, s, expr e)
+        | _ ->
+          let lt = type_of_identifier s
+          and (rt, e') = expr e in
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr e
+          in check_assign lt rt err;
+      (t, s, expr e)
+
+    in return_checked_global global
+
 
 
   in (List.map check_globals globals, List.map check_function functions, check_statement statements)

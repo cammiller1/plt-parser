@@ -25,6 +25,14 @@ int len(const char *s) {
     return strlen(s);
 }
 
+int len (int *arr) {
+    int len = 0;
+    while (*arr != '\0') {
+        arr++;
+        len++;
+    }
+    return len;
+}
 
 /*
  * String comparison

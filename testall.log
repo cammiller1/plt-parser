@@ -330,6 +330,30 @@ cc -o test-initialize-var2.exe test-initialize-var2.s
 diff -b test-initialize-var2.out tests/test-initialize-var2.out > test-initialize-var2.diff
 ###### SUCCESS
 
+###### Testing test-mod1
+./compyled.native tests/test-mod1.cp > test-mod1.ll
+llc -relocation-model=pic test-mod1.ll > test-mod1.s
+cc -o test-mod1.exe test-mod1.s
+./test-mod1.exe
+diff -b test-mod1.out tests/test-mod1.out > test-mod1.diff
+###### SUCCESS
+
+###### Testing test-mod2
+./compyled.native tests/test-mod2.cp > test-mod2.ll
+llc -relocation-model=pic test-mod2.ll > test-mod2.s
+cc -o test-mod2.exe test-mod2.s
+./test-mod2.exe
+diff -b test-mod2.out tests/test-mod2.out > test-mod2.diff
+###### SUCCESS
+
+###### Testing test-mod3
+./compyled.native tests/test-mod3.cp > test-mod3.ll
+llc -relocation-model=pic test-mod3.ll > test-mod3.s
+cc -o test-mod3.exe test-mod3.s
+./test-mod3.exe
+diff -b test-mod3.out tests/test-mod3.out > test-mod3.diff
+###### SUCCESS
+
 ###### Testing test-not1
 ./compyled.native tests/test-not1.cp > test-not1.ll
 llc -relocation-model=pic test-not1.ll > test-not1.s

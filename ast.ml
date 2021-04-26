@@ -59,6 +59,7 @@ let string_of_op = function
   | Gte -> ">="
   | And -> "&&"
   | Or -> "||"
+  | Mod -> "%"
 
 let string_of_uop = function
     Pp -> "++"

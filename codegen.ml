@@ -251,6 +251,7 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.Sub     -> L.build_fsub
             | A.Mul    -> L.build_fmul
             | A.Div     -> L.build_fdiv 
+            | A.Mod   -> L.build_urem
             | A.Eq   -> L.build_fcmp L.Fcmp.Oeq
             | A.Ne     -> L.build_fcmp L.Fcmp.One
             | A.Lt    -> L.build_fcmp L.Fcmp.Olt
@@ -268,6 +269,7 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.Sub     -> L.build_sub
             | A.Mul    -> L.build_mul
             | A.Div     -> L.build_sdiv
+            | A.Mod     -> L.build_urem
             | A.And     -> L.build_and
             | A.Or      -> L.build_or
             | A.Eq   -> L.build_icmp L.Icmp.Eq
@@ -431,6 +433,7 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.Sub     -> L.build_fsub
             | A.Mul    -> L.build_fmul
             | A.Div     -> L.build_fdiv 
+            | A.Mod     -> L.build_urem
             | A.Eq   -> L.build_fcmp L.Fcmp.Oeq
             | A.Ne     -> L.build_fcmp L.Fcmp.One
             | A.Lt    -> L.build_fcmp L.Fcmp.Olt
@@ -448,6 +451,7 @@ let rec expr ((_, e) : sexpr) = match e with
             | A.Sub     -> L.build_sub
             | A.Mul    -> L.build_mul
             | A.Div     -> L.build_sdiv
+            | A.Mod     -> L.build_urem
             | A.And     -> L.build_and
             | A.Or      -> L.build_or
             | A.Eq   -> L.build_icmp L.Icmp.Eq

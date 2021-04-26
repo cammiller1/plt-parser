@@ -70,8 +70,8 @@ let check (globals, functions, statements) =
           let same = t1 = t2 in
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
-            Add | Sub | Mul | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div when same && t1 = Float -> Float
+            Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div  when same && t1 = Float -> Float
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -242,8 +242,8 @@ let check (globals, functions, statements) =
           let same = t1 = t2 in
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
-            Add | Sub | Mul | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div when same && t1 = Float -> Float
+            Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div  when same && t1 = Float -> Float
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -400,8 +400,8 @@ in
           let same = t1 = t2 in
           (* Determine expression type based on operator and operand types *)
           let ty = match op with
-            Add | Sub | Mul | Div when same && t1 = Int   -> Int
-          | Add | Sub | Mul | Div when same && t1 = Float -> Float
+            Add | Sub | Mul | Div | Mod when same && t1 = Int   -> Int
+          | Add | Sub | Mul | Div  when same && t1 = Float -> Float
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean

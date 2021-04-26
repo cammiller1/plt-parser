@@ -130,7 +130,8 @@ expr:
   | BLITERAL           { Litb($1) }
   | SLITERAL           { Lits($1) }
   | ID                 { Id($1) }
-  | LBRACKET typ ILITERAL RBRACKET { LitArray($2, $3) }  /* array decl for type and size */
+  | ID LBRACKET expr RBRACKET { ArrayIndexAccess($1, $3) }
+  | LBRACKET typ expr RBRACKET { LitArray($2, $3) }  /* array decl for type and size */
   | expr PLUS   expr   { Binop($1, Add, $3) }
   | expr MINUS  expr   { Binop($1, Sub, $3) }
   | expr TIMES  expr   { Binop($1, Mul, $3) }
@@ -146,8 +147,7 @@ expr:
   | expr AND expr      { Binop($1, And, $3) }
   | expr OR expr       { Binop($1, Or, $3) }
   | ID ASSIGN expr     { Assign($1, $3) }
-  | ID LBRACKET ILITERAL RBRACKET { ArrayIndexAccess($1, $3) }
-  | ID LBRACKET ILITERAL RBRACKET ASSIGN expr { ArrayIndexAssign($1, $3, $6) }  /* array index assign */
+  | ID LBRACKET expr RBRACKET ASSIGN expr { ArrayIndexAssign($1, $3, $6) }  /* array index assign */
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }  /* function call */
   | LPAREN expr RPAREN { $2 }
   | NOT expr           { Uniop(Not, $2) }

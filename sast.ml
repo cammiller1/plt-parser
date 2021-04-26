@@ -9,10 +9,10 @@ and sx =
   | SLitf of string
   | SLitb of bool
   | SLits of string
-  | SLitArray of typ * int  (* this will be an interesting case *)
+  | SLitArray of typ * sexpr
   | SAssign of string * sexpr
-  | SArrayIndexAssign of string * int * sexpr
-  | SArrayIndexAccess of string * int
+  | SArrayIndexAssign of string * sexpr * sexpr
+  | SArrayIndexAccess of string * sexpr
   | SId of string
   | SBinop of sexpr * operator * sexpr
   | SUniop of unary_operator * sexpr

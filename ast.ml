@@ -12,10 +12,10 @@ type expr =
   | Litf of string
   | Litb of bool
   | Lits of string
-  | LitArray of typ * int
+  | LitArray of typ * expr
   | Assign of string * expr
-  | ArrayIndexAssign of string * int * expr
-  | ArrayIndexAccess of string * int
+  | ArrayIndexAssign of string * expr * expr
+  | ArrayIndexAccess of string * expr
   | Id of string
   | Binop of expr * operator * expr
   | Uniop of unary_operator * expr

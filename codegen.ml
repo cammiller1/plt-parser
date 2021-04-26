@@ -131,7 +131,7 @@ let rec expr ((_, e) : sexpr) = match e with
             (* arrays should never match here *)
           )
         | (A.Array, _) -> (match snd se with
-                    SLitArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (L.const_int i32_t size) n builder
+                    SLitArray(t, size) -> L.build_array_alloca (ltype_of_typ t) (expr size) n builder
                   )
                   (* L.build_array_malloc (ltype_of_typ t) (L.const_int i32_t size) n builder ) *)
         | _ -> expr se
@@ -188,7 +188,7 @@ let rec expr ((_, e) : sexpr) = match e with
         let local_var = match se with 
             (A.Void, _) -> L.build_alloca (ltype_of_typ t) n f_builder
           | (A.Array, _) -> (match snd se with
-                    SLitArray(ty, size) -> L.build_array_alloca (ltype_of_typ ty) (L.const_int i32_t size) n f_builder
+                    SLitArray(ty, size) -> L.build_array_alloca (ltype_of_typ ty) (expr size) n f_builder
                   )
           | _ -> L.build_alloca (ltype_of_typ t) n f_builder
         in if t <> A.Array then ignore (L.build_store (expr se) local_var f_builder);
@@ -234,14 +234,16 @@ let rec expr ((_, e) : sexpr) = match e with
       | SAssign (s, e) -> let e' = expr f_builder e in
                           ignore(L.build_store e' (lookup s) f_builder); e'
       | SArrayIndexAssign (s, idx, e) -> 
-                          let e' = expr builder e
+                          let e' = expr f_builder e and
+                          indx = expr f_builder idx
                           in
-                          let element_ptr = L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder and
+                          let element_ptr = L.build_gep (lookup s) [| indx |] "" f_builder and
                           e' = e'
                         in
-                          ignore(L.build_store e' element_ptr builder); e'
+                          ignore(L.build_store e' element_ptr f_builder); e'
       | SArrayIndexAccess (s, idx) -> 
-                    let element_ptr = L.build_load(L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder) "" builder
+                    let indx = expr f_builder idx in
+                    let element_ptr = L.build_load(L.build_gep (lookup s) [| indx |] "" f_builder) "" f_builder
                     in element_ptr
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
         let e1' = expr f_builder e1
@@ -414,14 +416,16 @@ let rec expr ((_, e) : sexpr) = match e with
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SArrayIndexAssign (s, idx, e) -> 
-                          let e' = expr builder e
+                          let e' = expr builder e and
+                          indx = expr builder idx
                           in
-                          let element_ptr = L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder and
+                          let element_ptr = L.build_gep (lookup s) [| indx |] "" builder and
                           e' = e'
                         in
                           ignore(L.build_store e' element_ptr builder); e'
       | SArrayIndexAccess (s, idx) -> 
-                    let element_ptr = L.build_load(L.build_gep (lookup s) [| (L.const_int i32_t idx) |] "" builder) "" builder
+                    let indx = expr builder idx in
+                    let element_ptr = L.build_load(L.build_gep (lookup s) [| indx |] "" builder) "" builder
                     in element_ptr
       | SBinop ((A.Float,_ ) as e1, op, e2) ->
         let e1' = expr builder e1

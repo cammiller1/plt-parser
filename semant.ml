@@ -62,7 +62,9 @@ let check (globals, functions, statements) =
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
       | Noexpr     -> (Void, SNoexpr)
-      | LitArray(t, size) -> (Array, SLitArray(t, size))
+      | LitArray(t, size) -> 
+          let sz = expr size in
+          (Array, SLitArray(t, sz))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
           and (t2, e2') = expr e2 in
@@ -218,23 +220,31 @@ let check (globals, functions, statements) =
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
-      | LitArray(t, size) -> (Array, SLitArray(t, size))
+      | LitArray(t, size) -> 
+          let sz = expr size in
+          (Array, SLitArray(t, sz))
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
-          let rt = if rt = Array then let SArrayIndexAccess(var, idx) = e' in type_of_array_identifier var else rt
+          let rt = if rt = Array then let SArrayIndexAccess(var, (rt_i, idx)) = e' in type_of_array_identifier var else rt
           in
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
           in 
           (check_assign lt rt err, SAssign(var, (rt, e')))
-      | ArrayIndexAssign(var, idx, e) ->
-          let lt = type_of_identifier var
-          and (rt, e') = expr e in
-          (Array, SArrayIndexAssign(var, idx, (rt, e')))
-      | ArrayIndexAccess(var, idx) -> (Array, SArrayIndexAccess(var, idx))
+      | ArrayIndexAssign(var, idx, e) as ex ->
+          let lt = type_of_array_identifier var
+          and (rt, e') = expr e 
+          and (rt_i, indx) = expr idx 
+          in
+          let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
+            string_of_typ rt ^ " in " ^ string_of_expr ex
+          in
+          (check_assign lt rt err, SArrayIndexAssign(var, (rt_i, indx), (rt, e')))
+      | ArrayIndexAccess(var, idx) -> let (rt_i, indx) = expr idx in
+          (type_of_array_identifier var, SArrayIndexAccess(var, (rt_i, indx)))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
           and (t2, e2') = expr e2 in
@@ -373,13 +383,15 @@ in
       | Litf l -> (Float, SLitf l)
       | Litb l  -> (Boolean, SLitb l)
       | Lits l  -> (String, SLits l)
-      | LitArray(t, size) -> (Array, SLitArray(t, size))
+      | LitArray(t, size) -> 
+          let sz = expr size in
+          (Array, SLitArray(t, sz))
       | Noexpr     -> (Void, SNoexpr)
       | Id s       -> (type_of_identifier s, SId s)
       | Assign(var, e) as ex -> 
           let lt = type_of_identifier var
           and (rt, e') = expr e in
-          let rt = if rt = Array then let SArrayIndexAccess(var, idx) = e' in type_of_array_identifier var else rt
+          let rt = if rt = Array then let SArrayIndexAccess(var, (rt_i, idx)) = e' in type_of_array_identifier var else rt
           in
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
@@ -387,12 +399,15 @@ in
           (check_assign lt rt err, SAssign(var, (rt, e')))
       | ArrayIndexAssign(var, idx, e) as ex ->
           let lt = type_of_array_identifier var
-          and (rt, e') = expr e in
+          and (rt, e') = expr e 
+          and (rt_i, indx) = expr idx 
+          in
           let err = "illegal assignment " ^ string_of_typ lt ^ " = " ^ 
             string_of_typ rt ^ " in " ^ string_of_expr ex
           in
-          (check_assign lt rt err, SArrayIndexAssign(var, idx, (rt, e')))
-      | ArrayIndexAccess(var, idx) -> (type_of_array_identifier var, SArrayIndexAccess(var, idx))
+          (check_assign lt rt err, SArrayIndexAssign(var, (rt_i, indx), (rt, e')))
+      | ArrayIndexAccess(var, idx) -> let (rt_i, indx) = expr idx in
+          (type_of_array_identifier var, SArrayIndexAccess(var, (rt_i, indx)))
       | Binop(e1, op, e2) as e -> 
           let (t1, e1') = expr e1 
           and (t2, e2') = expr e2 in

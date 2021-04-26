@@ -1,3 +1,5 @@
 array x [string 3];
 x[1] = "hello";
-print(x[1]);
+string s;
+s = x[1];
+print(s);

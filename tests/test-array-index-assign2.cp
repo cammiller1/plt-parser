@@ -1,3 +1,5 @@
 array x [float 3];
 x[1] = 2.3;
-print(x[1]);
+float a;
+a = x[1];
+print(a);

@@ -80,6 +80,24 @@ cc -o test-array-index-assign1.exe test-array-index-assign1.s
 diff -b test-array-index-assign1.out tests/test-array-index-assign1.out > test-array-index-assign1.diff
 ###### SUCCESS
 
+###### Testing test-array-index-assign2
+./compyled.native tests/test-array-index-assign2.cp > test-array-index-assign2.ll
+llc -relocation-model=pic test-array-index-assign2.ll > test-array-index-assign2.s
+cc -o test-array-index-assign2.exe test-array-index-assign2.s
+./test-array-index-assign2.exe
+diff -b test-array-index-assign2.out tests/test-array-index-assign2.out > test-array-index-assign2.diff
+FAILED test-array-index-assign2.out differs from tests/test-array-index-assign2.out
+###### FAILED
+
+###### Testing test-array-index-assign3
+./compyled.native tests/test-array-index-assign3.cp > test-array-index-assign3.ll
+llc -relocation-model=pic test-array-index-assign3.ll > test-array-index-assign3.s
+cc -o test-array-index-assign3.exe test-array-index-assign3.s
+./test-array-index-assign3.exe
+diff -b test-array-index-assign3.out tests/test-array-index-assign3.out > test-array-index-assign3.diff
+FAILED test-array-index-assign3.out differs from tests/test-array-index-assign3.out
+###### FAILED
+
 ###### Testing test-assign-arithm-add
 ./compyled.native tests/test-assign-arithm-add.cp > test-assign-arithm-add.ll
 llc -relocation-model=pic test-assign-arithm-add.ll > test-assign-arithm-add.s
@@ -334,6 +352,11 @@ llc -relocation-model=pic test-while1.ll > test-while1.s
 cc -o test-while1.exe test-while1.s
 ./test-while1.exe
 diff -b test-while1.out tests/test-while1.out > test-while1.diff
+###### SUCCESS
+
+###### Testing fail-assign-array-index1
+./compyled.native < tests/fail-assign-array-index1.cp 2> fail-assign-array-index1.err >> testall.log
+diff -b fail-assign-array-index1.err tests/fail-assign-array-index1.err > fail-assign-array-index1.diff
 ###### SUCCESS
 
 ###### Testing fail-assign1

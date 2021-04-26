@@ -30,17 +30,17 @@ int len(const char *s) {
  * String comparison
  */
 
-int string_equality(const char *s1, const char *s2)
-{
-	int res =  strcmp(s1, s2);
-	if (res == 0)   return 1;   // equality is true
-	else            return 0;   // equality is false
-}
-
-// bool string_equality(const char *s1, const char *s2)
+// int string_equality(const char *s1, const char *s2)
 // {
 // 	int res =  strcmp(s1, s2);
-// 	if (res == 0)   return true;   // equality is true
-// 	else            return false;   // equality is false
+// 	if (res == 0)   return 1;   // equality is true
+// 	else            return 0;   // equality is false
 // }
+
+bool string_equality(const char *s1, const char *s2)
+{
+	int res =  strcmp(s1, s2);
+	if (res == 0)   return true;   // equality is true
+	else            return false;   // equality is false
+}
 

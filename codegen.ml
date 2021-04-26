@@ -234,6 +234,11 @@ let translate (globals, functions, statements) =
         (match op with
            A.Add  -> L.build_call string_concat_f [| e1'; e2' |] "string_concat" builder
          | A.Eq   -> L.build_call string_equality_f [| e1'; e2' |] "string_equality" builder)
+      (* | SBinop ((A.Boolean,_ ) as e1, op, e2) ->
+        let e1' = expr builder e1
+        and e2' = expr builder e2 in
+        (match op with
+         | A.Eq   -> L.build_call string_equality_f [| e1'; e2' |] "string_equality" builder) *)
       | SBinop (e1, op, e2) ->
             let e1' = expr builder e1
             and e2' = expr builder e2 in

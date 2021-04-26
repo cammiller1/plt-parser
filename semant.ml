@@ -68,6 +68,7 @@ let check (globals, functions, statements) =
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div when same && t1 = Float -> Float
           | Add when same && t1 = String -> String
+          (* | Eq  when same && t1 = String -> Boolean *)
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -119,8 +120,27 @@ let check (globals, functions, statements) =
     in List.fold_left add_bind StringMap.empty [ ("print", Int);
                                ("printb", Boolean);
                                ("printf", Float); 
-                               ("prints", String);
-                               ("string_concat", String)]
+                               ("prints", String);]
+  in
+
+  let built_in_decls2 = 
+    let add_bind map (name, ty) = StringMap.add name {
+      typ = String;
+      fname = name; 
+      formals = [(ty, "x", Noexpr)];
+      locals = [];
+      body = [] } map 
+    in List.fold_left add_bind built_in_decls1 [ ("string_concat", String); ]
+  in
+
+  let built_in_decls3 = 
+    let add_bind map (name, ty) = StringMap.add name {
+      typ = Boolean;
+      fname = name; 
+      formals = [(ty, "x", Noexpr)];
+      locals = [];
+      body = [] } map 
+    in List.fold_left add_bind built_in_decls2 [ ("string_equality", String) ]
   in
 
   let built_in_decls = 
@@ -130,8 +150,7 @@ let check (globals, functions, statements) =
       formals = [(ty, "x", Noexpr)];
       locals = [];
       body = [] } map 
-    in List.fold_left add_bind built_in_decls1 [ ("len", String);
-                                                 ("string_equality", String) ]
+    in List.fold_left add_bind built_in_decls3 [ ("len", String); ]
   in
 
   
@@ -230,6 +249,7 @@ let check (globals, functions, statements) =
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div when same && t1 = Float -> Float
           | Add when same && t1 = String -> String
+          (* | Eq  when same && t1 = String -> Boolean *)
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -316,6 +336,7 @@ let check (globals, functions, statements) =
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div when same && t1 = Float -> Float
           | Add when same && t1 = String -> String
+          (* | Eq  when same && t1 = String -> Boolean *)
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean
@@ -455,6 +476,7 @@ let check (globals, functions, statements) =
             Add | Sub | Mul | Div when same && t1 = Int   -> Int
           | Add | Sub | Mul | Div when same && t1 = Float -> Float
           | Add when same && t1 = String -> String
+          (* | Eq  when same && t1 = String -> Boolean *)
           | Eq | Ne            when same               -> Boolean
           | Lt | Lte | Gt | Gte
                      when same && (t1 = Int || t1 = Float) -> Boolean

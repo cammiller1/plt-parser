@@ -454,6 +454,16 @@ diff -b fail-assign4.err tests/fail-assign4.err > fail-assign4.diff
 diff -b fail-divide-int-float.err tests/fail-divide-int-float.err > fail-divide-int-float.diff
 ###### SUCCESS
 
+###### Testing fail-duplicate-func-name
+./compyled.native < tests/fail-duplicate-func-name.cp 2> fail-duplicate-func-name.err >> testall.log
+diff -b fail-duplicate-func-name.err tests/fail-duplicate-func-name.err > fail-duplicate-func-name.diff
+###### SUCCESS
+
+###### Testing fail-duplicate-var-name
+./compyled.native < tests/fail-duplicate-var-name.cp 2> fail-duplicate-var-name.err >> testall.log
+diff -b fail-duplicate-var-name.err tests/fail-duplicate-var-name.err > fail-duplicate-var-name.diff
+###### SUCCESS
+
 ###### Testing fail-expr1
 ./compyled.native < tests/fail-expr1.cp 2> fail-expr1.err >> testall.log
 diff -b fail-expr1.err tests/fail-expr1.err > fail-expr1.diff

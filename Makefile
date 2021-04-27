@@ -29,4 +29,4 @@ clean :
 	ocamlbuild -clean
 	rm -rf ocamlllvm
 	rm -rf _build
-	rm -rf testall.log *.diff *.ll
+	rm -rf testall.log *.diff *.ll *.o

@@ -61,6 +61,14 @@ let string_of_op = function
   | Or -> "||"
   | Mod -> "%"
 
+let string_of_typ = function
+    Int -> "int"
+  | Boolean -> "boolean"
+  | Float -> "float"
+  | Void -> "void"
+  | String -> "string"
+  | Array -> "array"
+
 let string_of_uop = function
     Not -> "not"
 
@@ -70,14 +78,14 @@ let rec string_of_expr = function
   | Litb(true) -> "true"
   | Litb(false) -> "false"
   | Lits(l) -> l
-  | LitArray(t, size) -> "an array"  (* TODO: make me better *)
+  | LitArray(t, size) -> "array of type " ^ string_of_typ t ^ " and size " ^ string_of_expr size
   | Id(s) -> s
   | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Uniop(o, e) -> string_of_uop o ^ string_of_expr e
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
-  | ArrayIndexAssign(s, i, e) -> "an array assignment"  (* TODO: make me better *)
-  | ArrayIndexAccess(s, i) -> "an array access"  (* TODO: make me better *)
+  | ArrayIndexAssign(s, i, e) -> "array assignment of " ^ string_of_expr e ^ " at index " ^ string_of_expr i ^ " for array " ^ s
+  | ArrayIndexAccess(s, i) -> "array " ^ s ^ "at index " ^ string_of_expr i
   | Call(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
   | Noexpr -> ""
@@ -94,14 +102,6 @@ let rec string_of_stmt = function
       "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
       string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
-
-let string_of_typ = function
-    Int -> "int"
-  | Boolean -> "boolean"
-  | Float -> "float"
-  | Void -> "void"
-  | String -> "string"
-  | Array -> "array"
 
 let string_of_vdecl (t, id, e) = string_of_typ t ^ " " ^ id ^ ";\n"
 

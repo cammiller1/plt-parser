@@ -1,1 +1,1 @@
-Fatal error: exception Failure("illegal assignment int = float in an array assignment")
+Fatal error: exception Failure("illegal assignment int = float in array assignment of 2.2 at index 1 for array x")

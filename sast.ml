@@ -50,14 +50,14 @@ let rec string_of_sexpr (t, e) =
   | SLitb(true) -> "True"
   | SLitb(false) -> "False"
   | SLits(l) -> l
-  | SLitArray(t, size) -> "an array"  (* TODO: make me better *)
+  | SLitArray(t, size) -> "array of type " ^ string_of_typ t
   | SId(s) -> s
   | SBinop(e1, o, e2) ->
       string_of_sexpr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_sexpr e2
   | SUniop(o, e) -> string_of_uop o ^ string_of_sexpr e
   | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
-  | SArrayIndexAssign(s, i, e) -> "an array assignment"  (* TODO: make me better *)
-  | SArrayIndexAccess(s, i) -> "an array access"  (* TODO: make me better *)
+  | SArrayIndexAssign(s, i, e) -> "array assignment of " ^ string_of_sexpr e ^ " at index " ^ string_of_sexpr i ^ " for array " ^ s 
+  | SArrayIndexAccess(s, i) -> "array " ^ s ^ "at index " ^ string_of_sexpr i
   | SCall(f, el) ->
       f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
   | SNoexpr -> ""
